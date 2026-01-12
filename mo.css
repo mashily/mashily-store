@@ -31,14 +31,14 @@
      } */
     .container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
       /* display: flex; */
       /* flex-direction: row; */
       /* flex-wrap: wrap; */
       gap: 2px;
       padding: 1em;
-      width: 100%;
-      margin: auto;
+      /* width: 100%; */
+      /* margin: auto; */
       /* background: url(https://p2.piqsels.com/preview/335/477/318/paper-background-wallpaper-texture.jpg) no-repeat; */
       background: url(https://c4.wallpaperflare.com/wallpaper/268/96/863/anime-anime-girls-original-characters-short-hair-wallpaper-preview.jpg) no-repeat;
       background-position: center;
@@ -51,17 +51,21 @@
       border-radius: 5px;
       padding: 5px;
       box-shadow: 0 0 10px #00ff88;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      /* transition: transform 0.3s ease, box-shadow 0.3s ease; */
     }
-    .product:hover {
+    /* .product:hover {
       transform: scale(1.1);
-      /* box-shadow: 0 0 20px #00ff88; */
-    }
+      box-shadow: 0 0 20px #00ff88;
+    } */
     .product img {
       width: 100%;
       border-radius: 5px;
       /* overflow: hidden; */
       /* object-fit: cover; */
+    }
+
+    .product img:hover{
+      opacity: 0.5;
     }
     .name {
       font-size: 1.1em;
