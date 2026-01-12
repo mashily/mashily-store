@@ -1,102 +1,448 @@
- body {
-      /* background-color: #000; */
-      color: #00ff88;
-      font-family: "Courier New", monospace;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-    header {
-      width: 100%;
-      /* background-color: #020202; */
-      /* border-bottom: 1px solid #00ff88; */
-      display: flex;
-      justify-content: space-evenly;
-      align-items: center;
-      /* margin:0 10em; */
-      position: fixed;
-      /* z-index: 100; */
-    }
-/* 
-   .mo{
-     text-shadow: 5px 0 8px #00ff88;
-      margin-right:40em;
-    }
-    h1 {
-      letter-spacing: 2px;
-      text-shadow: 5px 0 8px #00ff88;
-    } */
-     /* section{
-      padding: 100px 200px ;
-     } */
-    .container {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-      /* display: flex; */
-      /* flex-direction: row; */
-      /* flex-wrap: wrap; */
-      gap: 2px;
-      padding: 1em;
-      /* width: 100%; */
-      /* margin: auto; */
-      /* background: url(https://p2.piqsels.com/preview/335/477/318/paper-background-wallpaper-texture.jpg) no-repeat; */
-      background: url(https://c4.wallpaperflare.com/wallpaper/268/96/863/anime-anime-girls-original-characters-short-hair-wallpaper-preview.jpg) no-repeat;
-      background-position: center;
-      background-size: cover;
-      background-attachment: fixed;
-    }
-    .product {
-      /* background-color: #0a0a0a; */
-      border: 1px solid #00ff88;
-      border-radius: 5px;
-      padding: 5px;
-      box-shadow: 0 0 10px #00ff88;
-      /* transition: transform 0.3s ease, box-shadow 0.3s ease; */
-    }
-    /* .product:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 20px #00ff88;
-    } */
-    .product img {
-      width: 100%;
-      border-radius: 5px;
-      /* overflow: hidden; */
-      /* object-fit: cover; */
-    }
+* { box-sizing: border-box; }
+body {
+    font-family: 'Cairo', sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
 
-    .product img:hover{
-      opacity: 0.5;
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2c3e50;
+    color: white;
+    padding: 0.6rem 4%;
+    position: sticky;
+    top: 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 1.3rem;
+    font-weight: 800;
+}
+
+nav ul { list-style: none; display: flex; gap: 12px; margin: 0; padding: 0; }
+nav a, .cart-link { color: white; text-decoration: none; font-weight: bold; cursor: pointer; }
+
+.whatsapp-nav-btn {
+    background: #25d366;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+    font-size: 0.85rem;
+}
+
+.whatsapp-nav-btn:hover {
+    background: #1da851;
+}
+
+/* 6 أصناف في الصف الواحد مع مسافات أصغر */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    padding: 15px 4%;
+}
+
+@media (max-width: 1200px) {
+    .products-grid {
+        grid-template-columns: repeat(4, 1fr);
     }
-    .name {
-      font-size: 1.1em;
-      font-weight: bold;
-      /* margin: 5px 0; */
-      color: #00ffaa;
+}
+
+@media (max-width: 768px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 12px 3%;
     }
-    .price {
-      font-size: 1.1em;
-      font-weight: bold;
-      color: #00ff88;
+}
+
+@media (max-width: 480px) {
+    .products-grid {
+        grid-template-columns: 1fr;
     }
-    .btn {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 5px 10px;
-      border: 1px solid #00ff88;
-      border-radius: 5px;
-      text-decoration: none;
-      color: #00ff88;
-      transition: background-color 0.3s;
+}
+
+/* تصميم المنتج مع مسافات مضغوطة */
+.product-card {
+    background: white;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid #eee;
+}
+
+.product-card:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+    border-color: #e67e22;
+}
+
+.product-image {
+    height: 110px; /* تصغير ارتفاع الصورة */
+    overflow: hidden;
+    padding: 5px;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+    border-radius: 5px;
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.03);
+}
+
+/* تفاصيل المنتج مع مسافات مضغوطة جداً */
+.product-details {
+    padding: 8px 10px 10px 10px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card h3 { 
+    margin: 0 0 6px 0; 
+    font-size: 0.9rem; 
+    color: #2c3e50;
+    min-height: 32px; /* تصغير ارتفاع الاسم */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+.product-card .price { 
+    color: #27ae60; 
+    font-size: 1rem; 
+    font-weight: bold; 
+    margin: 6px 0 8px 0;
+    padding: 6px 0 0 0;
+    border-top: 1px solid #f0f0f0;
+}
+
+.buy-btn {
+    background: #e67e22;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    transition: all 0.3s;
+    font-size: 0.85rem;
+    margin-top: auto;
+}
+
+.buy-btn:hover { 
+    background: #d35400; 
+    transform: scale(1.01);
+}
+
+/* صندوق معلومات المنتج (يشبه الإشعار) */
+.product-info-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 450px;
+    max-width: 90%;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+    z-index: 3000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    border: 2px solid #e67e22;
+}
+
+.product-info-box.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.info-box-content {
+    padding: 0;
+    overflow: hidden;
+}
+
+.info-box-header {
+    background: #2c3e50;
+    color: white;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info-box-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.close-info {
+    cursor: pointer;
+    font-size: 20px;
+    transition: transform 0.3s;
+    padding: 0 5px;
+}
+
+.close-info:hover {
+    transform: scale(1.2);
+    color: #e67e22;
+}
+
+.info-box-body {
+    display: flex;
+    padding: 0;
+}
+
+.info-image {
+    flex: 1;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+}
+
+.info-image img {
+    max-width: 100%;
+    max-height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+.info-details {
+    flex: 1.5;
+    padding: 15px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-details p {
+    margin: 0 0 10px 0;
+    color: #555;
+    line-height: 1.4;
+    font-size: 0.9rem;
+}
+
+.info-price {
+    color: #27ae60 !important;
+    font-size: 1.2rem !important;
+    font-weight: bold !important;
+    margin: 10px 0 !important;
+}
+
+.info-specs h4 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+}
+
+.info-specs ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.info-specs li {
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.3;
+    position: relative;
+    padding-right: 12px;
+}
+
+.info-specs li:before {
+    content: "•";
+    position: absolute;
+    right: 0;
+    color: #e67e22;
+    font-weight: bold;
+}
+
+.info-add-btn {
+    background: #e67e22;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+    margin-top: 15px;
+}
+
+.info-add-btn:hover { 
+    background: #d35400; 
+    transform: scale(1.02);
+}
+
+/* طبقة شفافة خلف صندوق المعلومات */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2999;
+    display: none;
+}
+
+.overlay.active {
+    display: block;
+}
+
+/* السلة الجانبية */
+.cart-sidebar {
+    position: fixed; 
+    top: 0; 
+    right: -350px; 
+    width: 300px; 
+    height: 100%;
+    background: white; 
+    box-shadow: -4px 0 12px rgba(0,0,0,0.15);
+    transition: 0.3s; 
+    z-index: 2000; 
+    display: flex; 
+    flex-direction: column;
+}
+
+@media (max-width: 768px) {
+    .cart-sidebar {
+        width: 100%;
+        right: -100%;
     }
-    .btn:hover {
-      background-color: #00ff88;
-      color: #000;
-      visibility: hidden;
-      
+    
+    .product-info-box {
+        width: 95%;
     }
-    footer {
-      padding: 10px;
-      font-size: 0.9em;
-      border-top: 1px solid #00ff88;
-      color: #000000;
+    
+    .info-box-body {
+        flex-direction: column;
     }
+}
+
+.cart-sidebar.active { right: 0; }
+
+.cart-header { 
+    background: #2c3e50; 
+    color: white; 
+    padding: 12px 15px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+
+.close-btn { 
+    cursor: pointer; 
+    font-size: 20px; 
+    transition: transform 0.3s;
+}
+
+.close-btn:hover {
+    transform: scale(1.2);
+}
+
+.cart-items-body { 
+    flex: 1; 
+    padding: 12px; 
+    overflow-y: auto; 
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 6px;
+    border-right: 2px solid #e67e22;
+}
+
+.cart-item-name {
+    flex: 1;
+    margin-left: 8px;
+    font-size: 0.85rem;
+}
+
+.cart-item-price {
+    font-weight: bold;
+    color: #27ae60;
+    font-size: 0.85rem;
+}
+
+.cart-footer { 
+    padding: 12px; 
+    border-top: 1px solid #eee; 
+}
+
+.total-box { 
+    font-size: 1.1rem; 
+    font-weight: bold; 
+    margin-bottom: 10px; 
+    text-align: center; 
+    color: #2c3e50;
+}
+
+.clear-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: background 0.3s;
+    font-size: 0.85rem;
+}
+
+.clear-btn:hover {
+    background: #c0392b;
+}
+
+.whatsapp-btn { 
+    background: #25d366; 
+    color: white; 
+    border: none; 
+    width: 100%; 
+    padding: 10px; 
+    border-radius: 6px; 
+    font-weight: bold; 
+    cursor: pointer;
+    transition: background 0.3s;
+    font-size: 0.85rem;
+}
+
+.whatsapp-btn:hover { 
+    background: #1da851; 
+}
