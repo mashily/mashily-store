@@ -2,314 +2,34 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المدير</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>دخول المدير | مشالى</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .login-container {
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            width: 100%;
-            max-width: 450px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            background: linear-gradient(to right, #4a6fa5, #3a5a8c);
-            color: white;
-            padding: 30px 25px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 16px;
-        }
-
-        .login-form {
-            padding: 35px 30px;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .input-with-icon {
-            position: relative;
-        }
-
-        .input-with-icon i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #667eea;
-        }
-
-        .input-with-icon input {
-            width: 100%;
-            padding: 15px 45px 15px 15px;
-            border: 2px solid #e1e5ee;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
-            background-color: #f8f9fa;
-        }
-
-        .input-with-icon input:focus {
-            border-color: #667eea;
-            outline: none;
-            background-color: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .remember-forgot {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .remember {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #555;
-        }
-
-        .remember input {
-            width: 18px;
-            height: 18px;
-            accent-color: #667eea;
-        }
-
-        .forgot-password {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .forgot-password:hover {
-            color: #764ba2;
-            text-decoration: underline;
-        }
-
-        .login-button {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(to right, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .login-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .login-button:active {
-            transform: translateY(0);
-        }
-
-        .store-link {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .store-link a {
-            color: #4a6fa5;
-            text-decoration: none;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: color 0.3s;
-        }
-
-        .store-link a:hover {
-            color: #764ba2;
-            text-decoration: underline;
-        }
-
-        .credentials-info {
-            background-color: #f0f7ff;
-            border: 1px solid #c2d9ff;
-            border-radius: 10px;
-            padding: 18px;
-            margin-top: 25px;
-            font-size: 14px;
-        }
-
-        .credentials-info h3 {
-            color: #2d5aa0;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .credentials-info p {
-            margin-bottom: 8px;
-            color: #444;
-        }
-
-        .warning {
-            background-color: #fff8e6;
-            border: 1px solid #ffd166;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            text-align: center;
-            color: #b37a00;
-            font-weight: 500;
-        }
-
-        .warning i {
-            margin-left: 5px;
-        }
-
-        @media (max-width: 480px) {
-            .login-container {
-                border-radius: 15px;
-            }
-            
-            .header {
-                padding: 25px 20px;
-            }
-            
-            .login-form {
-                padding: 25px 20px;
-            }
-            
-            .remember-forgot {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
+        .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+        .login-btn { background: #3498db; color: white; border: none; width: 100%; padding: 12px; cursor: pointer; border-radius: 5px; font-weight: bold; }
     </style>
 </head>
-<body>
-    <div class="login-container">
-        <div class="header">
-            <h1><i class="fas fa-user-shield"></i> لوحة تحكم المدير</h1>
-            <p>تسجيل الدخول لإدارة المتجر</p>
-        </div>
-        
-        <form class="login-form">
-            <div class="form-group">
-                <label for="username">اسم المستخدم</label>
-                <div class="input-with-icon">
-                    <input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
-                    <i class="fas fa-user"></i>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">كلمة المرور</label>
-                <div class="input-with-icon">
-                    <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
-                    <i class="fas fa-lock"></i>
-                </div>
-            </div>
-            
-            <div class="remember-forgot">
-                <div class="remember">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">تذكرني</label>
-                </div>
-                <a href="#" class="forgot-password">نسيت كلمة المرور؟</a>
-            </div>
-            
-            <button type="submit" class="login-button">
-                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
-            </button>
-            
-            <div class="store-link">
-                <a href="#">
-                    <a href="index.html"> <!-- غير index.html باسم صفحتك الرئيسية -->
-                        <i class="fas fa-store"></i> العودة للمتجر
-                    </a>
-            </div>
-            
-            <div class="credentials-info">
-                <h3><i class="fas fa-info-circle"></i> معلومات الدخول:</h3>
-                <p><strong>اسم المستخدم:</strong> admin</p>
-                <p><strong>كلمة المرور:</strong> admin123</p>
-            </div>
-            
-            <div class="warning">
-                <i class="fas fa-exclamation-triangle"></i>
-                هذه الصفحة للمدير فقط. لا تشارك بيانات الدخول مع أي شخص.
-            </div>
-        </form>
+<body class="light-theme">
+    <div class="login-box">
+        <h2><i class="fas fa-lock"></i> دخول المدير</h2>
+        <input type="text" id="username" placeholder="اسم المستخدم">
+        <input type="password" id="password" placeholder="كلمة المرور">
+        <button class="login-btn" onclick="login()">دخول</button>
+        <p style="margin-top: 15px; font-size: 0.8rem; color: #888;">بيانات افتراضية: admin / admin123</p>
     </div>
 
     <script>
-        document.querySelector('.login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            if(username === 'admin' && password === 'admin123') {
-                // تسجيل الدخول ناجح
-                alert('تم تسجيل الدخول بنجاح! سيتم توجيهك إلى لوحة التحكم.');
-                // في التطبيق الحقيقي، هنا ستقوم بإعادة التوجيه إلى لوحة التحكم
-                // window.location.href = 'dashboard.html';
+        function login() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            if (user === 'admin' && pass === 'admin123') {
+                sessionStorage.setItem('isAdmin', 'true');
+                window.location.href = 'manager.html';
             } else {
-                alert('اسم المستخدم أو كلمة المرور غير صحيحة. الرجاء المحاولة مرة أخرى.');
+                alert('البيانات غير صحيحة!');
             }
-        });
+        }
     </script>
 </body>
 </html>

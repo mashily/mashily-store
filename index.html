@@ -11,421 +11,84 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- زر الدخول السريع للمدير (يظهر فقط للمدير) -->
-    <div class="admin-quick-access" id="adminQuickAccess" style="display: none;">
-        <button class="admin-quick-btn" onclick="goToManager()" title="لوحة التحكم">
-            <i class="fas fa-user-shield"></i>
-        </button>
-    </div>
-
     <header>
         <div class="header-top">
             <div class="logo">
-                <i class="fas fa-bolt"></i>
-                مشالى للالكترونيات ✨
+                <i class="fas fa-bolt"></i> مشالى للالكترونيات ✨
             </div>
             
-            <!-- نظام الثيمات -->
             <div class="theme-switcher">
-                <button class="theme-btn" data-theme="light" onclick="changeTheme('light')" title="الوضع الفاتح">
-                    <i class="fas fa-sun"></i>
-                </button>
-                <button class="theme-btn" data-theme="dark" onclick="changeTheme('dark')" title="الوضع الداكن">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <button class="theme-btn" data-theme="hacker" onclick="changeTheme('hacker')" title="ثيم الهاكر">
-                    <i class="fas fa-code"></i>
-                </button>
-            </div>
-            
-            <div class="language-switcher">
-                <button class="lang-btn active" data-lang="ar" onclick="changeLanguage('ar')">
-                    <i class="fas fa-language"></i> العربية
-                </button>
-                <button class="lang-btn" data-lang="en" onclick="changeLanguage('en')">
-                    <i class="fas fa-globe"></i> English
-                </button>
+                <button class="theme-btn" onclick="changeTheme('light')"><i class="fas fa-sun"></i></button>
+                <button class="theme-btn" onclick="changeTheme('dark')"><i class="fas fa-moon"></i></button>
+                <button class="theme-btn" onclick="changeTheme('hacker')"><i class="fas fa-code"></i></button>
             </div>
             
             <div class="header-info">
-                <span class="discount-badge">
-                    <i class="fas fa-tag"></i> خصم خاص علي الكميات
-                </span>
-                <div class="contact-info">
-                    <i class="fab fa-whatsapp"></i> 01551831308
-                </div>
+                <div class="contact-info"><i class="fab fa-whatsapp"></i> 01551831308</div>
             </div>
         </div>
         
         <nav>
             <ul class="nav-main">
-                <li><a href="#" class="nav-link active" data-category="all"><i class="fas fa-th-large"></i> <span data-translate="allProducts">جميع المنتجات</span></a></li>
-                <li><a href="#" class="nav-link" data-category="storage"><i class="fas fa-hdd"></i> <span data-translate="storage">أجهزة التخزين</span></a></li>
-                <li><a href="#" class="nav-link" data-category="accessories"><i class="fas fa-headphones"></i> <span data-translate="accessories">الإكسسوارات</span></a></li>
-                <li><a href="#" class="nav-link" data-category="smart"><i class="fas fa-lightbulb"></i> <span data-translate="smart">الأجهزة الذكية</span></a></li>
-                <li><a href="#" class="nav-link" data-category="audio"><i class="fas fa-music"></i> <span data-translate="audio">الصوتيات</span></a></li>
-                <li><a href="#" class="nav-link" data-category="offers" onclick="showOffersOnly()"><i class="fas fa-fire"></i> عروض</a></li>
+                <li><a href="#" class="nav-link active" data-category="all">جميع المنتجات</a></li>
+                <li><a href="#" class="nav-link" data-category="storage">أجهزة التخزين</a></li>
+                <li><a href="#" class="nav-link" data-category="accessories">الإكسسوارات</a></li>
+                <li><a href="#" class="nav-link" data-category="smart">الأجهزة الذكية</a></li>
             </ul>
             
             <div class="nav-actions">
                 <div class="search-box">
-                    <input type="text" id="search-input" placeholder="ابحث عن منتج..." data-translate-placeholder="searchPlaceholder">
+                    <input type="text" id="search-input" placeholder="ابحث عن منتج...">
                     <i class="fas fa-search"></i>
                 </div>
-                <li class="cart-link" onclick="toggleCart()">
+                <div class="cart-link" onclick="toggleCart()">
                     <i class="fas fa-shopping-cart"></i>
-                    <span data-translate="cart">السلة</span> (<span id="cart-count">0</span>)
                     <span class="cart-badge" id="cart-badge">0</span>
-                </li>
-                <a href="https://wa.me/201551831308" target="_blank" class="whatsapp-nav-btn">
-                    <i class="fab fa-whatsapp"></i> <span data-translate="orderWhatsapp">طلب عبر واتساب</span>
-                </a>
+                </div>
             </div>
         </nav>
     </header>
 
-    <!-- قسم العروض الخاصة -->
-    <section class="offers-section">
-        <div class="section-header">
-            <h2><i class="fas fa-fire"></i> <span data-translate="specialOffers">عروض خاصة</span></h2>
-            <p>استفد من أفضل العروض والخصومات الحصرية</p>
-        </div>
-        <div class="offers-container">
-            <div class="offer-card offer-hot">
-                <div class="offer-badge"><span data-translate="bestSelling">🔥 الأكثر مبيعاً</span></div>
-                <h3 data-translate="comboOffer">عرض كومبو</h3>
-                <p>هارد SSD + كابل USB + حماية مجانية</p>
-                <div class="offer-price">
-                    <span class="old-price">1800 جنيه</span>
-                    <span class="new-price">1500 جنيه</span>
-                </div>
-                <button class="offer-btn" onclick="orderOffer('combo')" data-translate="orderNow">اطلب الآن</button>
-            </div>
-            
-            <div class="offer-card offer-new">
-                <div class="offer-badge"><span data-translate="newArrival">🆕 جديد</span></div>
-                <h3 data-translate="discount15">خصم 15%</h3>
-                <p>على جميع الإكسسوارات لمدة محدودة</p>
-                <div class="offer-price">
-                    <span class="saving" data-translate="saveUp">وفر حتى</span> 300 جنيه
-                </div>
-                <button class="offer-btn" onclick="orderOffer('discount')" data-translate="getOffer">استفد من العرض</button>
-            </div>
-            
-            <div class="offer-card offer-shipping">
-                <div class="offer-badge"><span data-translate="freeShipping">🚚 توصيل</span></div>
-                <h3 data-translate="freeShippingTitle">توصيل مجاني</h3>
-                <p>للطلبات فوق 1000 جنيه داخل القاهرة</p>
-                <div class="offer-price">
-                    <span class="free" data-translate="free">مجاناً</span>
-                </div>
-                <button class="offer-btn" onclick="orderOffer('shipping')" data-translate="shopNow">تسوق الآن</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- شريط البحث والفلاتر -->
-    <div class="filters-bar">
-        <div class="container">
-            <div class="filter-group">
-                <span class="filter-label"><i class="fas fa-filter"></i> <span data-translate="sortBy">ترتيب حسب:</span></span>
-                <select id="sort-select" class="filter-select">
-                    <option value="default" data-translate="bestSellingSort">الأكثر مبيعاً</option>
-                    <option value="price-low" data-translate="priceLow">السعر: من الأقل للأعلى</option>
-                    <option value="price-high" data-translate="priceHigh">السعر: من الأعلى للأقل</option>
-                    <option value="name" data-translate="nameSort">الاسم: أ-ي</option>
-                </select>
-            </div>
-            
-            <div class="stats">
-                <span class="stat-item">
-                    <i class="fas fa-box"></i>
-                    <span id="products-count">12</span> <span data-translate="productsCount">منتج</span>
-                </span>
-                <span class="stat-item">
-                    <i class="fas fa-truck"></i>
-                    <span data-translate="fastDelivery">توصيل خلال 24 ساعة</span>
-                </span>
-                <span class="stat-item">
-                    <i class="fas fa-shield-alt"></i>
-                    <span data-translate="warranty">ضمان حتى سنة</span>
-                </span>
-            </div>
-        </div>
-    </div>
-
     <main>
-        <!-- المنتجات -->
+        <div class="filters-bar">
+            <div class="container">
+                <span class="stat-item"><i class="fas fa-box"></i> <span id="products-count">0</span> منتج</span>
+            </div>
+        </div>
+
         <div class="products-container">
             <div class="products-grid" id="products-grid">
-                <!-- سيتم تعبئته بالجافاسكريبت -->
-            </div>
-            
-            <!-- رسالة عندما لا توجد نتائج -->
-            <div id="no-results" class="no-results">
+                </div>
+            <div id="no-results" class="no-results" style="display:none;">
                 <i class="fas fa-search fa-3x"></i>
-                <h3 data-translate="noResults">لا توجد منتجات تطابق بحثك</h3>
-                <p data-translate="tryDifferent">حاول البحث بكلمات أخرى أو تصفح الفئات المختلفة</p>
+                <h3>لا توجد منتجات تطابق بحثك</h3>
             </div>
         </div>
     </main>
 
-    <!-- صندوق عرض معلومات المنتج -->
-    <div id="product-info-box" class="product-info-box">
-        <div class="info-box-content">
-            <div class="info-box-header">
-                <h3 id="info-product-name">اسم المنتج</h3>
-                <div class="product-tags">
-                    <span class="tag" id="info-product-category">فئة</span>
-                    <span class="tag tag-hot" id="info-product-tag">🔥</span>
-                </div>
-                <span class="close-info" onclick="hideProductInfo()">✕</span>
-            </div>
-            <div class="info-box-body">
-                <div class="info-image">
-                    <img id="info-product-image" src="" alt="صورة المنتج">
-                    <div class="image-badge" id="info-product-badge">عرض خاص</div>
-                </div>
-                <div class="info-details">
-                    <p id="info-product-description">وصف المنتج</p>
-                    
-                    <div class="price-section">
-                        <p class="info-price" id="info-product-price">0 جنيه</p>
-                        <div class="price-compare" id="price-compare">
-                            <span class="old-price-compare">0 جنيه</span>
-                            <span class="discount-percent">0%</span>
-                        </div>
-                    </div>
-                    
-                    <!-- نظام التقييمات -->
-                    <div class="product-reviews">
-                        <h4><i class="fas fa-star"></i> <span data-translate="reviews">التقيمات</span></h4>
-                        
-                        <div class="reviews-summary">
-                            <div class="average-rating">
-                                <span class="rating-number">4.5</span>
-                                <div class="stars">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                </div>
-                                <span class="total-reviews">(24 <span data-translate="reviews">تقييم</span>)</span>
-                            </div>
-                            
-                            <div class="rating-bars">
-                                <div class="rating-bar">
-                                    <span>5 <i class="fas fa-star"></i></span>
-                                    <div class="bar-container">
-                                        <div class="bar" style="width: 70%"></div>
-                                    </div>
-                                    <span>70%</span>
-                                </div>
-                                <div class="rating-bar">
-                                    <span>4 <i class="fas fa-star"></i></span>
-                                    <div class="bar-container">
-                                        <div class="bar" style="width: 20%"></div>
-                                    </div>
-                                    <span>20%</span>
-                                </div>
-                                <div class="rating-bar">
-                                    <span>3 <i class="fas fa-star"></i></span>
-                                    <div class="bar-container">
-                                        <div class="bar" style="width: 5%"></div>
-                                    </div>
-                                    <span>5%</span>
-                                </div>
-                                <div class="rating-bar">
-                                    <span>2 <i class="fas fa-star"></i></span>
-                                    <div class="bar-container">
-                                        <div class="bar" style="width: 3%"></div>
-                                    </div>
-                                    <span>3%</span>
-                                </div>
-                                <div class="rating-bar">
-                                    <span>1 <i class="fas fa-star"></i></span>
-                                    <div class="bar-container">
-                                        <div class="bar" style="width: 2%"></div>
-                                    </div>
-                                    <span>2%</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- نموذج إضافة تقييم -->
-                        <div class="add-review">
-                            <h5><span data-translate="writeReview">اكتب تقييمك</span></h5>
-                            <div class="rating-input">
-                                <span class="rating-label"><span data-translate="rating">تقييم</span>:</span>
-                                <div class="star-rating">
-                                    <i class="far fa-star" data-rating="1"></i>
-                                    <i class="far fa-star" data-rating="2"></i>
-                                    <i class="far fa-star" data-rating="3"></i>
-                                    <i class="far fa-star" data-rating="4"></i>
-                                    <i class="far fa-star" data-rating="5"></i>
-                                </div>
-                                <span class="selected-rating">0 <span data-translate="stars">نجوم</span></span>
-                            </div>
-                            <textarea class="review-text" placeholder="شاركنا تجربتك مع هذا المنتج..." data-translate-placeholder="reviewPlaceholder"></textarea>
-                            <button class="submit-review" onclick="submitReview()">
-                                <span data-translate="submitReview">إرسال التقييم</span>
-                            </button>
-                        </div>
-                        
-                        <!-- قائمة التقييمات -->
-                        <div class="reviews-list">
-                            <!-- سيتم تعبئتها بالجافاسكريبت -->
-                        </div>
-                    </div>
-                    
-                    <div class="info-specs">
-                        <h4><i class="fas fa-list"></i> <span data-translate="specifications">المواصفات:</span></h4>
-                        <ul id="info-product-specs">
-                            <!-- سيتم تعبئتها بالجافاسكريبت -->
-                        </ul>
-                    </div>
-                    
-                    <div class="info-actions">
-                        <div class="quantity-selector">
-                            <button class="qty-btn" onclick="changeQuantity(-1)">-</button>
-                            <input type="number" id="product-quantity" value="1" min="1" max="10">
-                            <button class="qty-btn" onclick="changeQuantity(1)">+</button>
-                        </div>
-                        <button class="info-add-btn" id="info-add-to-cart">
-                            <i class="fas fa-cart-plus"></i> <span data-translate="addToCartBtn">أضف للسلة</span>
-                        </button>
-                    </div>
-                    
-                    
-                    <div class="product-features">
-                        <div class="feature">
-                            <i class="fas fa-shipping-fast"></i>
-                            <span data-translate="fastShipping">توصيل سريع خلال 24-48 ساعة</span>
-                        </div>
-                        <div class="feature">
-                            <i class="fas fa-shield-alt"></i>
-                            <span data-translate="yearWarranty">ضمان لمدة سنة كاملة</span>
-                        </div>
-                        <div class="feature">
-                            <i class="fas fa-exchange-alt"></i>
-                            <span data-translate="returnPolicy">إرجاع خلال 7 أيام</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- السلة الجانبية المتحركة -->
     <div id="cart-sidebar" class="cart-sidebar">
         <div class="cart-header">
-            <h2><i class="fas fa-shopping-cart"></i> <span data-translate="shoppingCart">سلة المشتريات</span></h2>
+            <h2>سلة المشتريات</h2>
             <span class="close-btn" onclick="toggleCart()">✕</span>
         </div>
-        <div id="cart-items" class="cart-items-body">
-            <!-- المنتجات ستظهر هنا -->
-        </div>
+        <div id="cart-items" class="cart-items-body"></div>
         <div class="cart-footer">
-            <div class="cart-summary">
-                <div class="summary-row">
-                    <span class="summary-label" data-translate="subtotal">المجموع:</span>
-                    <span class="summary-value" id="subtotal-price">0</span> جنيه
-                </div>
-                <div class="summary-row discount">
-                    <span class="summary-label" data-translate="discount">الخصم:</span>
-                    <span class="summary-value" id="discount-price">0</span> جنيه
-                </div>
-                <div class="summary-row total">
-                    <span class="summary-label" data-translate="total">الإجمالي:</span>
-                    <span class="summary-value" id="total-price">0</span> جنيه
-                </div>
+            <div class="summary-row total">
+                <span>الإجمالي:</span>
+                <span id="total-price">0</span> جنيه
             </div>
-            
-            <div class="cart-actions">
-                <button class="clear-btn" onclick="clearCart()">
-                    <i class="fas fa-trash-alt"></i> <span data-translate="clearCart">مسح السلة</span>
-                </button>
-                <button class="whatsapp-btn" onclick="sendToWhatsApp()">
-                    <i class="fab fa-whatsapp"></i> <span data-translate="completeOrder">إتمام الطلب</span>
-                </button>
-            </div>
-            
-            <div class="payment-section">
-                <h4><i class="fas fa-credit-card"></i> <span data-translate="paymentMethods">طرق الدفع المتاحة:</span></h4>
-                <div class="payment-methods">
-                    <div class="payment-method" onclick="showPaymentInfo('instapay')">
-                        <i class="fas fa-qrcode"></i> <span data-translate="instapay">إنستاباي</span>
-                    </div>
-                    <div class="payment-method" onclick="showPaymentInfo('vodafone')">
-                        <i class="fas fa-mobile-alt"></i> <span data-translate="vodafoneCash">فودافون كاش</span>
-                    </div>
-                </div>
-            </div>
+            <button class="whatsapp-btn" onclick="sendToWhatsApp()">
+                <i class="fab fa-whatsapp"></i> إتمام الطلب عبر واتساب
+            </button>
         </div>
     </div>
 
-    <!-- نافذة معلومات الدفع -->
-    <div id="payment-info" class="payment-info">
-        <div class="payment-info-content">
-            <h3 id="payment-title"></h3>
-            <div id="payment-details"></div>
-            <div class="payment-buttons">
-                <button class="copy-btn" onclick="copyPaymentInfo()">
-                    <i class="fas fa-copy"></i> <span data-translate="copyInfo">نسخ المعلومات</span>
-                </button>
-                <button class="close-payment" onclick="hidePaymentInfo()">
-                    <i class="fas fa-times"></i> <span data-translate="close">إغلاق</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- طبقة شفافة خلف صندوق المعلومات -->
-    <div id="overlay" class="overlay" onclick="hideProductInfo()"></div>
-
-    <!-- رسائل التنبيه -->
-    <div id="notification" class="notification">
-        <i class="fas fa-check-circle"></i>
-        <span id="notification-text"></span>
-    </div>
+    <div id="overlay" class="overlay" onclick="toggleCart()"></div>
 
     <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4><i class="fas fa-store"></i> متجر مشالى للالكترونيات</h4>
-                <p data-translate="storeDescription">أفضل منتجات الكترونية بأسعار تنافسية مع ضمان وجودة عالية</p>
-            </div>
-            
-            <div class="footer-section">
-                <h4><i class="fas fa-headset"></i> <span data-translate="support">الدعم والمساعدة</span></h4>
-                <p><span data-translate="whatsappNum">واتساب:</span> 01012345678</p>
-                <p><span data-translate="deliveryAreas">التوصيل:</span> داخل القاهرة والجيزة</p>
-                <p><span data-translate="warrantyInfo">الضمان:</span> سنة على جميع المنتجات</p>
-            </div>
-            
-            <div class="footer-section">
-                <h4><i class="fas fa-clock"></i> <span data-translate="workingHours">أوقات العمل</span></h4>
-                <p><span data-translate="weekDays">السبت إلى الخميس:</span> 10 ص - 10 م</p>
-                <p><span data-translate="friday">الجمعة:</span> 2 م - 10 م</p>
-            </div>
-        </div>
-        
         <div class="footer-bottom">
-            <!-- زر الدخول إلى لوحة التحكم -->
-            <div class="admin-access">
-                <a href="login.html" class="admin-btn">
-                    <i class="fas fa-user-shield"></i> لوحة تحكم المدير
-                </a>
-            </div>
-            
-            <p>© 2024 متجر مشالى للالكترونيات. <span data-translate="rights">جميع الحقوق محفوظة.</span></p>
-            <div class="payment-methods">
-                <i class="fab fa-cc-visa"></i>
-                <i class="fab fa-cc-mastercard"></i>
-                <i class="fas fa-money-bill-wave"></i>
-                <i class="fab fa-cc-paypal"></i>
-            </div>
+            <a href="login.html" class="admin-btn"><i class="fas fa-user-shield"></i> دخول المدير</a>
+            <p>© 2024 متجر مشالى للالكترونيات. جميع الحقوق محفوظة.</p>
         </div>
     </footer>
 
