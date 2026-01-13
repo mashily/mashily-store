@@ -1,3 +1,11 @@
+// ===== بيانات الأقسام =====
+const categoriesData = [
+    { id: 1, name: "تخزين", slug: "storage", icon: "fas fa-hdd" },
+    { id: 2, name: "إكسسوارات", slug: "accessories", icon: "fas fa-headphones" },
+    { id: 3, name: "ذكية", slug: "smart", icon: "fas fa-lightbulb" },
+    { id: 4, name: "صوتيات", slug: "audio", icon: "fas fa-music" }
+];
+
 // ===== بيانات المنتجات =====
 const productsData = [
     {
@@ -251,10 +259,10 @@ const productsData = [
         stock: 22,
         rating: 4.2,
         reviewCount: 16
-    } ,
-     {
+    },
+    {
         id: 13,
-        name: "حافظة لابتوب",
+        name: "حافظة لابتوب مقاومة للماء",
         price: 220,
         originalPrice: 280,
         description: "حافظة لابتوب مقاومة للماء والصدمات.",
@@ -272,10 +280,10 @@ const productsData = [
         stock: 22,
         rating: 4.2,
         reviewCount: 16
-    } ,
-     {
+    },
+    {
         id: 14,
-        name: "بطارية لاب توب",
+        name: "بطارية لاب توب HP",
         price: 150,
         originalPrice: 180,
         description: "بطارية لاب توب نوع HP.",
@@ -293,9 +301,29 @@ const productsData = [
         stock: 22,
         rating: 4.2,
         reviewCount: 16
-    } 
-
+    }
 ];
+
+// ===== نظام التقييمات =====
+const productReviews = {
+    1: [
+        { user: "أحمد محمد", rating: 5, text: "منتج ممتاز وسريع، أنصح به بشدة!", date: "2024-01-15" },
+        { user: "سارة علي", rating: 4, text: "جيد لكن السعر مرتفع قليلاً", date: "2024-01-10" },
+        { user: "محمد خالد", rating: 5, text: "السرعة خرافية، فرق كبير عن الهارد العادي", date: "2024-01-05" }
+    ],
+    2: [
+        { user: "محمد خالد", rating: 5, text: "كابل قوي ومتين، يعمل بشكل ممتاز", date: "2024-01-12" },
+        { user: "فاطمة أحمد", rating: 4, text: "جيد ولكن الطول يمكن أن يكون أطول", date: "2024-01-08" }
+    ],
+    4: [
+        { user: "علي سعيد", rating: 5, text: "تغير حياتي، التحكم بالإضاءة عن بعد رائع", date: "2024-01-14" },
+        { user: "مريم حسن", rating: 5, text: "الألوان جميلة والتطبيق سهل الاستخدام", date: "2024-01-09" }
+    ],
+    7: [
+        { user: "خالد عمرو", rating: 5, text: "كاميرا ممتازة، الرؤية الليلية واضحة جداً", date: "2024-01-16" },
+        { user: "نور محمد", rating: 4, text: "جيدة ولكن تحتاج إنترنت قوي", date: "2024-01-11" }
+    ]
+};
 
 // ===== المتغيرات العامة =====
 let cart = [];
@@ -309,6 +337,14 @@ let currentCategory = "all";
 let searchQuery = "";
 let sortBy = "default";
 let currentLang = 'ar';
+
+// ===== نظام الثيمات =====
+let currentTheme = 'light';
+const THEMES = {
+    light: 'light',
+    dark: 'dark',
+    hacker: 'hacker'
+};
 
 // ===== نظام اللغة =====
 const translations = {
@@ -485,29 +521,15 @@ const translations = {
     }
 };
 
-// ===== نظام التقييمات =====
-const productReviews = {
-    1: [
-        { user: "أحمد محمد", rating: 5, text: "منتج ممتاز وسريع، أنصح به بشدة!", date: "2024-01-15" },
-        { user: "سارة علي", rating: 4, text: "جيد لكن السعر مرتفع قليلاً", date: "2024-01-10" },
-        { user: "محمد خالد", rating: 5, text: "السرعة خرافية، فرق كبير عن الهارد العادي", date: "2024-01-05" }
-    ],
-    2: [
-        { user: "محمد خالد", rating: 5, text: "كابل قوي ومتين، يعمل بشكل ممتاز", date: "2024-01-12" },
-        { user: "فاطمة أحمد", rating: 4, text: "جيد ولكن الطول يمكن أن يكون أطول", date: "2024-01-08" }
-    ],
-    4: [
-        { user: "علي سعيد", rating: 5, text: "تغير حياتي، التحكم بالإضاءة عن بعد رائع", date: "2024-01-14" },
-        { user: "مريم حسن", rating: 5, text: "الألوان جميلة والتطبيق سهل الاستخدام", date: "2024-01-09" }
-    ],
-    7: [
-        { user: "خالد عمرو", rating: 5, text: "كاميرا ممتازة، الرؤية الليلية واضحة جداً", date: "2024-01-16" },
-        { user: "نور محمد", rating: 4, text: "جيدة ولكن تحتاج إنترنت قوي", date: "2024-01-11" }
-    ]
-};
-
 // ===== تهيئة الصفحة =====
 document.addEventListener('DOMContentLoaded', function() {
+    // تحميل الثيم المحفوظ
+    loadSavedTheme();
+    
+    // التحقق من تسجيل دخول المدير
+    checkAdminLogin();
+    
+    // تحميل البيانات
     loadPreferredLanguage();
     loadProducts();
     updateUI();
@@ -515,8 +537,120 @@ document.addEventListener('DOMContentLoaded', function() {
     loadReviewsFromStorage();
     updateProductsCount();
     
+    // إخفاء رسالة عدم وجود نتائج
     document.getElementById('no-results').style.display = 'none';
 });
+
+// ===== نظام الثيمات =====
+function changeTheme(theme) {
+    // إزالة كل الثيمات
+    document.body.classList.remove('dark-theme', 'hacker-theme');
+    
+    // إضافة الثيم الجديد
+    if (theme === 'dark') {
+        document.body.classList.add('dark-theme');
+    } else if (theme === 'hacker') {
+        document.body.classList.add('hacker-theme');
+        applyHackerEffects();
+    } else {
+        removeHackerEffects();
+    }
+    
+    // تحديث الأزرار النشطة
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.theme === theme) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // حفظ في localStorage
+    currentTheme = theme;
+    localStorage.setItem('storeTheme', theme);
+}
+
+function loadSavedTheme() {
+    const savedTheme = localStorage.getItem('storeTheme') || 'light';
+    changeTheme(savedTheme);
+}
+
+// تأثيرات خاصة لثيم الهاكر
+function applyHackerEffects() {
+    // تأثير الكتابة على العناوين
+    const titles = document.querySelectorAll('h1, h2, h3, .product-card h3');
+    titles.forEach(title => {
+        if (!title.classList.contains('hacker-text')) {
+            title.classList.add('hacker-text');
+        }
+    });
+    
+    // تأثير عشوائي على الأسعار
+    const prices = document.querySelectorAll('.current-price, .info-price, .new-price');
+    prices.forEach(price => {
+        const original = price.textContent;
+        
+        // حفظ الأصل
+        if (!price.dataset.original) {
+            price.dataset.original = original;
+        }
+        
+        // إعداد المؤقت للتأثير
+        if (!price.dataset.hackerInterval) {
+            const intervalId = setInterval(() => {
+                if (document.body.classList.contains('hacker-theme') && Math.random() > 0.7) {
+                    // تأثير تغيير الأرقام
+                    const hacked = original.replace(/\d/g, () => 
+                        Math.floor(Math.random() * 10)
+                    );
+                    price.textContent = hacked;
+                    
+                    setTimeout(() => {
+                        price.textContent = price.dataset.original;
+                    }, 100);
+                }
+            }, 2000);
+            
+            price.dataset.hackerInterval = intervalId;
+        }
+    });
+}
+
+function removeHackerEffects() {
+    // إزالة تأثير الكتابة
+    document.querySelectorAll('.hacker-text').forEach(el => {
+        el.classList.remove('hacker-text');
+    });
+    
+    // إيقاف مؤقتات الهاكر
+    const prices = document.querySelectorAll('.current-price, .info-price, .new-price');
+    prices.forEach(price => {
+        if (price.dataset.hackerInterval) {
+            clearInterval(parseInt(price.dataset.hackerInterval));
+            delete price.dataset.hackerInterval;
+        }
+        
+        // استعادة النص الأصلي
+        if (price.dataset.original) {
+            price.textContent = price.dataset.original;
+        }
+    });
+}
+
+// ===== التحقق من تسجيل دخول المدير =====
+function checkAdminLogin() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const loginTime = localStorage.getItem('loginTime');
+    const currentTime = new Date().getTime();
+    
+    if (isLoggedIn === 'true' && (currentTime - loginTime < 8 * 60 * 60 * 1000)) {
+        document.getElementById('adminQuickAccess').style.display = 'block';
+    }
+}
+
+// ===== الانتقال إلى لوحة المدير =====
+function goToManager() {
+    window.location.href = 'manager.html';
+}
 
 // ===== دالة تغيير اللغة =====
 function changeLanguage(lang) {
@@ -1161,13 +1295,8 @@ function sortProducts(products) {
 }
 
 function getCategoryName(category) {
-    const categories = {
-        "storage": "تخزين",
-        "accessories": "إكسسوارات",
-        "smart": "ذكية",
-        "audio": "صوتيات"
-    };
-    return categories[category] || category;
+    const categoryObj = categoriesData.find(c => c.slug === category);
+    return categoryObj ? categoryObj.name : category;
 }
 
 function updateProductsCount(count) {
@@ -1188,11 +1317,13 @@ function showNotification(text) {
 
 // ===== إعداد مستمعي الأحداث =====
 function setupEventListeners() {
+    // البحث
     document.getElementById('search-input').addEventListener('input', function(e) {
         searchQuery = e.target.value;
         loadProducts();
     });
     
+    // الروابط التنقلية
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function(e) {
             if (!this.getAttribute('onclick')) {
@@ -1207,11 +1338,13 @@ function setupEventListeners() {
         });
     });
     
+    // الفرز
     document.getElementById('sort-select').addEventListener('change', function(e) {
         sortBy = e.target.value;
         loadProducts();
     });
     
+    // إغلاق بالنقر على ESC
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             if (document.getElementById('product-info-box').classList.contains('active')) {
@@ -1223,6 +1356,7 @@ function setupEventListeners() {
         }
     });
     
+    // إغلاق السلة بالنقر خارجها
     document.addEventListener('click', function(e) {
         const cartSidebar = document.getElementById('cart-sidebar');
         const cartLink = document.querySelector('.cart-link');
@@ -1235,6 +1369,7 @@ function setupEventListeners() {
         }
     });
     
+    // منع إغلاق صندوق معلومات المنتج عند النقر داخله
     const productInfoBox = document.getElementById('product-info-box');
     if (productInfoBox) {
         productInfoBox.addEventListener('click', function(e) {
@@ -1242,6 +1377,7 @@ function setupEventListeners() {
         });
     }
     
+    // إغلاق نافذة الدفع بالنقر خارجها
     const paymentInfo = document.getElementById('payment-info');
     if (paymentInfo) {
         paymentInfo.addEventListener('click', function(e) {
@@ -1251,6 +1387,7 @@ function setupEventListeners() {
         });
     }
     
+    // تحديث الكمية يدوياً
     const quantityInput = document.getElementById('product-quantity');
     if (quantityInput) {
         quantityInput.addEventListener('change', function(e) {
@@ -1266,7 +1403,45 @@ function setupEventListeners() {
             }
         });
     }
+    
+    // إضافة مستمعين لأزرار الثيمات
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            changeTheme(this.dataset.theme);
+        });
+    });
 }
 
+// ===== دوال التخزين والاسترجاع =====
+function saveDataToLocalStorage() {
+    localStorage.setItem('storeProducts', JSON.stringify(productsData));
+    localStorage.setItem('storeCategories', JSON.stringify(categoriesData));
+    localStorage.setItem('storeReviews', JSON.stringify(productReviews));
+}
+
+function loadDataFromLocalStorage() {
+    const savedProducts = localStorage.getItem('storeProducts');
+    const savedCategories = localStorage.getItem('storeCategories');
+    const savedReviews = localStorage.getItem('storeReviews');
+    
+    if (savedProducts) {
+        productsData = JSON.parse(savedProducts);
+    }
+    
+    if (savedCategories) {
+        categoriesData = JSON.parse(savedCategories);
+    }
+    
+    if (savedReviews) {
+        Object.assign(productReviews, JSON.parse(savedReviews));
+    }
+}
+
+// ===== التهيئة النهائية =====
 // تحميل التقييمات عند البدء
 loadReviewsFromStorage();
+
+// حفظ بيانات أولية إذا لم تكن موجودة
+if (!localStorage.getItem('storeProducts')) {
+    saveDataToLocalStorage();
+}

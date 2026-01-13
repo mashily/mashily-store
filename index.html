@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر مشالى للالكترونيات | 2026</title>
+    <title>متجر مشالى للالكترونيات | 2024</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,12 +11,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- زر الدخول السريع للمدير (يظهر فقط للمدير) -->
+    <div class="admin-quick-access" id="adminQuickAccess" style="display: none;">
+        <button class="admin-quick-btn" onclick="goToManager()" title="لوحة التحكم">
+            <i class="fas fa-user-shield"></i>
+        </button>
+    </div>
 
     <header>
         <div class="header-top">
             <div class="logo">
                 <i class="fas fa-bolt"></i>
                 مشالى للالكترونيات ✨
+            </div>
+            
+            <!-- نظام الثيمات -->
+            <div class="theme-switcher">
+                <button class="theme-btn" data-theme="light" onclick="changeTheme('light')" title="الوضع الفاتح">
+                    <i class="fas fa-sun"></i>
+                </button>
+                <button class="theme-btn" data-theme="dark" onclick="changeTheme('dark')" title="الوضع الداكن">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="theme-btn" data-theme="hacker" onclick="changeTheme('hacker')" title="ثيم الهاكر">
+                    <i class="fas fa-code"></i>
+                </button>
             </div>
             
             <div class="language-switcher">
@@ -393,7 +412,14 @@
         </div>
         
         <div class="footer-bottom">
-            <p>© 2026 متجر مشالى للالكترونيات. <span data-translate="rights">جميع الحقوق محفوظة.</span></p>
+            <!-- زر الدخول إلى لوحة التحكم -->
+            <div class="admin-access">
+                <a href="login.html" class="admin-btn">
+                    <i class="fas fa-user-shield"></i> لوحة تحكم المدير
+                </a>
+            </div>
+            
+            <p>© 2024 متجر مشالى للالكترونيات. <span data-translate="rights">جميع الحقوق محفوظة.</span></p>
             <div class="payment-methods">
                 <i class="fab fa-cc-visa"></i>
                 <i class="fab fa-cc-mastercard"></i>
