@@ -251,7 +251,50 @@ const productsData = [
         stock: 22,
         rating: 4.2,
         reviewCount: 16
-    }
+    } ,
+     {
+        id: 13,
+        name: "حافظة لابتوب",
+        price: 220,
+        originalPrice: 280,
+        description: "حافظة لابتوب مقاومة للماء والصدمات.",
+        image: "images/download.jfif",
+        category: "accessories",
+        specs: [
+            "مقاسات 13-15 بوصة",
+            "مقاومة للماء والصدمات",
+            "جيب داخلي للشاحن",
+            "حزام كتف قابل للإزالة",
+            "تصميم عصري",
+            "ضمان 6 أشهر"
+        ],
+        tags: ["🆕 جديد"],
+        stock: 22,
+        rating: 4.2,
+        reviewCount: 16
+    } ,
+     {
+        id: 14,
+        name: "بطارية لاب توب",
+        price: 150,
+        originalPrice: 180,
+        description: "بطارية لاب توب نوع HP.",
+        image: "images/1.webp",
+        category: "accessories",
+        specs: [
+            "مقاسات 13-15 بوصة",
+            "مقاومة للماء والصدمات",
+            "جيب داخلي للشاحن",
+            "حزام كتف قابل للإزالة",
+            "تصميم عصري",
+            "ضمان 6 أشهر"
+        ],
+        tags: ["🆕 الاكثر طلبا"],
+        stock: 22,
+        rating: 4.2,
+        reviewCount: 16
+    } 
+
 ];
 
 // ===== المتغيرات العامة =====
