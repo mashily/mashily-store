@@ -3,93 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر مشالى للالكترونيات | 2024</title>
+    <title>متجر مشالى للالكترونيات</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header>
         <div class="header-top">
-            <div class="logo">
-                <i class="fas fa-bolt"></i> مشالى للالكترونيات ✨
-            </div>
+            <a href="index.html" class="logo">
+                <i class="fas fa-bolt"></i> مشالى للالكترونيات
+            </a>
             
-            <div class="theme-switcher">
-                <button class="theme-btn" onclick="changeTheme('light')"><i class="fas fa-sun"></i></button>
-                <button class="theme-btn" onclick="changeTheme('dark')"><i class="fas fa-moon"></i></button>
-                <button class="theme-btn" onclick="changeTheme('hacker')"><i class="fas fa-code"></i></button>
-            </div>
-            
-            <div class="header-info">
-                <div class="contact-info"><i class="fab fa-whatsapp"></i> 01551831308</div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a href="https://wa.me/201551831308" class="whatsapp-link">
+                    <i class="fab fa-whatsapp"></i> 01551831308
+                </a>
+                <div class="theme-switcher">
+                    <span onclick="changeTheme('light')" style="cursor:pointer">☀️</span>
+                    <span onclick="changeTheme('dark')" style="cursor:pointer; margin-right:8px;">🌙</span>
+                </div>
             </div>
         </div>
         
         <nav>
-            <ul class="nav-main">
-                <li><a href="#" class="nav-link active" data-category="all">جميع المنتجات</a></li>
-                <li><a href="#" class="nav-link" data-category="storage">أجهزة التخزين</a></li>
-                <li><a href="#" class="nav-link" data-category="accessories">الإكسسوارات</a></li>
-                <li><a href="#" class="nav-link" data-category="smart">الأجهزة الذكية</a></li>
-            </ul>
-            
+            <ul class="nav-main" id="categories-nav">
+                </ul>
             <div class="nav-actions">
-                <div class="search-box">
-                    <input type="text" id="search-input" placeholder="ابحث عن منتج...">
-                    <i class="fas fa-search"></i>
-                </div>
-                <div class="cart-link" onclick="toggleCart()">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-badge" id="cart-badge">0</span>
+                <div onclick="toggleCart()" style="cursor:pointer; position:relative;">
+                    <i class="fas fa-shopping-cart" style="font-size: 1.2rem;"></i>
+                    <span id="cart-badge" style="position:absolute; top:-8px; right:-10px; background:red; color:white; border-radius:50%; padding:1px 5px; font-size:9px; font-weight:bold;">0</span>
                 </div>
             </div>
         </nav>
     </header>
 
-    <main>
-        <div class="filters-bar">
-            <div class="container">
-                <span class="stat-item"><i class="fas fa-box"></i> <span id="products-count">0</span> منتج</span>
+    <main class="products-container">
+        <div class="products-grid" id="products-grid">
             </div>
-        </div>
-
-        <div class="products-container">
-            <div class="products-grid" id="products-grid">
-                </div>
-            <div id="no-results" class="no-results" style="display:none;">
-                <i class="fas fa-search fa-3x"></i>
-                <h3>لا توجد منتجات تطابق بحثك</h3>
-            </div>
-        </div>
     </main>
 
     <div id="cart-sidebar" class="cart-sidebar">
-        <div class="cart-header">
-            <h2>سلة المشتريات</h2>
-            <span class="close-btn" onclick="toggleCart()">✕</span>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>سلة المشتريات</h3>
+            <span onclick="toggleCart()" style="cursor:pointer; font-weight:bold;">✕</span>
         </div>
-        <div id="cart-items" class="cart-items-body"></div>
-        <div class="cart-footer">
-            <div class="summary-row total">
-                <span>الإجمالي:</span>
-                <span id="total-price">0</span> جنيه
-            </div>
-            <button class="whatsapp-btn" onclick="sendToWhatsApp()">
-                <i class="fab fa-whatsapp"></i> إتمام الطلب عبر واتساب
+        <hr style="margin:10px 0;">
+        <div id="cart-items" style="max-height: 70vh; overflow-y:auto;"></div>
+        <div style="position:absolute; bottom:20px; width:88%; border-top:1px solid #ddd; padding-top:10px;">
+            <p style="font-weight:bold;">الإجمالي: <span id="total-price">0</span> ج.م</p>
+            <button onclick="sendToWhatsApp()" style="width:100%; background:#25d366; color:white; border:none; padding:12px; margin-top:10px; border-radius:5px; font-weight:bold; cursor:pointer;">
+                <i class="fab fa-whatsapp"></i> إرسال الطلب الآن
             </button>
         </div>
     </div>
-
     <div id="overlay" class="overlay" onclick="toggleCart()"></div>
 
     <footer>
-        <div class="footer-bottom">
-            <a href="login.html" class="admin-btn"><i class="fas fa-user-shield"></i> دخول المدير</a>
-            <p>© 2024 متجر مشالى للالكترونيات. جميع الحقوق محفوظة.</p>
-        </div>
+        <p style="font-size: 0.75rem;">© 2024 متجر مشالى للالكترونيات - جميع الحقوق محفوظة</p>
+        <a href="login.html" class="admin-foot-link">دخول المدير</a>
     </footer>
 
     <script src="script.js"></script>
