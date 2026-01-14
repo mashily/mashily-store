@@ -3,77 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر مشالى للالكترونيات | الرئيسية</title>
+    <title>مشالى للالكترونيات | جودة نثق بها</title>
+    <meta name="description" content="متجر مشالى للالكترونيات - أفضل العروض على الهاردات والإكسسوارات في مصر">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-
     <header>
         <div class="header-top">
-            <a href="index.html" class="logo"><i class="fas fa-bolt"></i> مشالى للالكترونيات</a>
-            <div style="display:flex; gap:15px; align-items:center;">
-                <a href="https://wa.me/201551831308" class="whatsapp-top"><i class="fab fa-whatsapp"></i> تواصل معنا</a>
+            <a href="index.html" class="logo"><i class="fas fa-bolt"></i> مشالى</a>
+            <div class="search-container">
+                <input type="text" id="search-input" onkeyup="searchProducts()" placeholder="ابحث عن منتج...">
+                <i class="fas fa-search"></i>
+            </div>
+            <div style="display:flex; gap:12px;">
                 <div onclick="toggleCart()" style="cursor:pointer; position:relative;">
                     <i class="fas fa-shopping-cart fa-lg"></i>
-                    <span id="cart-badge" style="position:absolute; top:-10px; right:-10px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px; font-weight:bold;">0</span>
+                    <span id="cart-badge" style="position:absolute; top:-10px; right:-10px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px;">0</span>
                 </div>
             </div>
         </div>
-        <nav style="margin-top:12px; overflow-x: auto; white-space: nowrap; border-top: 1px solid #eee; padding-top: 10px;">
+        <nav style="margin-top:10px; overflow-x: auto; white-space: nowrap; padding-top: 10px; border-top: 1px solid #eee;">
             <div id="categories-nav" style="display:inline-flex; gap:10px;"></div>
         </nav>
     </header>
 
     <div class="news-ticker">
         <div class="ticker-content">
-             🔥 أهلاً بكم في مشالى للالكترونيات .. خصم 20% على جميع السماعات لفترة محدودة .. 🔥 شحن سريع لجميع المحافظات .. 🔥 جودة نضمنها لك 100% .. 🔥 لا تتردد في طلب استشارتنا الفنية عبر الواتساب مجاناً ..
+             🔥 أهلاً بكم في مشالى للالكترونيات .. خصومات تصل إلى 30% .. 🔥 اطلب الآن عبر الواتساب واستلم فوراً .. 🔥 جودة أصلية بضمان حقيقي ..
         </div>
     </div>
 
-    <main class="products-grid" id="products-grid">
-        </main>
+    <main class="products-grid" id="products-grid"></main>
 
     <div class="modal" id="product-modal">
         <div class="modal-content">
-            <span class="modal-close" onclick="closeModal()">×</span>
-            <img id="modal-img" src="" style="width:100%; height:220px; object-fit:contain; margin-bottom:15px;">
-            <h2 id="modal-name"></h2>
-            <div class="stars">⭐⭐⭐⭐⭐</div>
-            <p id="modal-price" style="font-size:1.5rem; color:var(--accent); font-weight:900; margin:10px 0;"></p>
-            <p id="modal-desc" style="color:#666; font-size:0.9rem; margin-bottom:20px;"></p>
-            <p style="color:var(--accent); font-weight:bold; font-size:0.75rem; margin-bottom:10px;">🔥 متوفر عدد محدود جداً!</p>
-            <button id="modal-add-btn" class="btn-main">إضافة إلى سلة المشتريات</button>
+            <span onclick="closeModal()" style="position:absolute; top:10px; left:15px; cursor:pointer; font-size:1.5rem;">×</span>
+            <img id="modal-img" src="" style="width:100%; height:200px; object-fit:contain;">
+            <h2 id="modal-name" style="margin:15px 0;"></h2>
+            <p id="modal-price" style="font-size:1.5rem; color:var(--accent); font-weight:bold;"></p>
+            <p id="modal-desc" style="color:#666; font-size:0.9rem; margin:15px 0;"></p>
+            <button id="modal-add-btn" class="btn-main">إضافة للسلة</button>
         </div>
     </div>
 
     <div id="cart-sidebar" class="cart-sidebar">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>حقيبة التسوق</h3>
-            <span onclick="toggleCart()" style="cursor:pointer; font-weight:bold;">✕</span>
-        </div>
-        <hr style="margin:15px 0;">
-        <div id="cart-items" style="max-height: 65vh; overflow-y:auto;"></div>
-        <div style="position:absolute; bottom:25px; width:85%;">
-            <h4 style="display:flex; justify-content:space-between;"><span>الإجمالي:</span> <span id="total-price">0</span> ج.م</h4>
-            <button onclick="sendToWhatsApp()" style="width:100%; background:#25d366; color:white; border:none; padding:15px; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer; font-size:1rem;">
-                <i class="fab fa-whatsapp"></i> إرسال الطلب للمحل
-            </button>
+        <h3>حقيبة التسوق</h3><hr><br>
+        <div id="cart-items"></div>
+        <div style="position:absolute; bottom:20px; width:85%;">
+            <h4>الإجمالي: <span id="total-price">0</span> ج.م</h4>
+            <button onclick="sendToWhatsApp()" style="width:100%; background:#25d366; color:white; border:none; padding:12px; border-radius:8px; margin-top:10px; font-weight:bold; cursor:pointer;">إرسال الطلب عبر واتساب</button>
         </div>
     </div>
     <div id="overlay" class="overlay" onclick="toggleCart()"></div>
-
-    <footer>
-        <h4>مشالى للالكترونيات</h4>
-        <p style="font-size:0.85rem; color:#888; margin-top:5px;">اختيارك الأول للإبداع والتقنية</p>
-        <div class="footer-links">
-            <a href="#">من نحن</a>
-            <a href="#">سياسة الضمان</a>
-            <a href="#">الشحن والتوصيل</a>
-            <a href="#">الخصوصية</a>
-        </div>
-        <a href="login.html" class="admin-link">لوحة تحكم المدير</a>
-    </footer>
 
     <script src="script.js"></script>
 </body>
