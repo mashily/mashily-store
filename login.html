@@ -5,28 +5,26 @@
     <title>دخول المدير</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .login-wrap { height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); width: 320px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; outline: none; }
-        .btn { background: #3498db; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .login-screen { height: 100vh; display: flex; align-items: center; justify-content: center; background: #2c3e50; }
+        .login-card { background: white; padding: 40px; border-radius: 15px; width: 350px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
     </style>
 </head>
-<body class="light-theme">
-    <div class="login-wrap">
+<body>
+    <div class="login-screen">
         <div class="login-card">
-            <h2 style="margin-bottom:20px;">دخول المدير</h2>
-            <input type="text" id="user" placeholder="اسم المستخدم">
-            <input type="password" id="pass" placeholder="كلمة المرور">
-            <button class="btn" onclick="login()">دخول</button>
-            <br><br>
-            <a href="index.html" style="font-size: 0.8rem; color:#888; text-decoration:none;">العودة للمتجر</a>
+            <h2>دخول المدير</h2><br>
+            <input type="text" id="u" placeholder="اسم المستخدم">
+            <input type="password" id="p" placeholder="كلمة المرور">
+            <button onclick="login()" class="btn-main" style="margin-top:15px;">دخول النظام</button>
+            <p style="margin-top:20px; font-size:0.8rem; color:#888;">admin / admin123</p>
         </div>
     </div>
     <script>
         function login() {
-            if(document.getElementById('user').value === 'admin' && document.getElementById('pass').value === 'admin123') {
+            if(document.getElementById('u').value==='admin' && document.getElementById('p').value==='admin123') {
                 sessionStorage.setItem('isAdmin', 'true');
-                window.location.href = 'manager.html';
+                window.location.href='manager.html';
             } else { alert('خطأ في البيانات!'); }
         }
     </script>

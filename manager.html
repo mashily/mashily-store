@@ -2,54 +2,52 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>إحصائيات وإدارة مشالى</title>
+    <title>لوحة التحكم | مشالى</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .admin-box { max-width: 1000px; margin: 20px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: var(--primary); color: white; padding: 20px; border-radius: 10px; text-align: center; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        body { background: #eaeff2; padding: 20px; }
+        .admin-wrap { max-width: 1100px; margin: 0 auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .stat-card { background: var(--primary); color: white; padding: 20px; border-radius: 12px; text-align: center; flex: 1; }
+        .admin-grid { display: grid; grid-template-columns: 2fr 1.2fr; gap: 30px; margin-top: 30px; }
+        input, select { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; }
+        .p-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; font-size: 0.85rem; align-items: center; }
+        .del-x { color: red; cursor: pointer; font-weight: bold; }
     </style>
 </head>
-<body style="background:#f0f2f5;">
-    <div class="admin-box">
-        <div style="display:flex; justify-content:space-between;">
-            <h2>لوحة الإدارة الذكية</h2>
-            <a href="index.html" style="font-weight:bold; color:var(--primary);">العودة للمتجر</a>
+<body>
+    <div class="admin-wrap">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2><i class="fas fa-tools"></i> إدارة متجر مشالى</h2>
+            <a href="index.html" class="btn-main" style="width:auto; padding:8px 20px;">العودة للمتجر</a>
         </div>
-        <hr style="margin:20px 0;">
+        <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
 
-        <div class="stats-grid">
-            <div class="stat-card" style="background:#3498db;">
-                <h4 id="total-prods-count">0</h4>
-                <p>إجمالي المنتجات</p>
-            </div>
-            <div class="stat-card" style="background:#2ecc71;">
-                <h4 id="total-stock-value">0</h4>
-                <p>قيمة البضاعة (ج.م)</p>
-            </div>
-            <div class="stat-card" style="background:#e67e22;">
-                <h4 id="total-cats-count">0</h4>
-                <p>عدد الأقسام</p>
-            </div>
+        <div style="display:flex; gap:20px;">
+            <div class="stat-card"> <h3 id="s-count">0</h3> <p>منتج مضاف</p> </div>
+            <div class="stat-card" style="background:#2ecc71;"> <h3 id="s-value">0</h3> <p>قيمة المخزن (ج.م)</p> </div>
+            <div class="stat-card" style="background:#f39c12;"> <h3 id="s-cats">0</h3> <p>عدد الأقسام</p> </div>
         </div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
-            <div style="background:#f9f9f9; padding:20px; border-radius:10px;">
+        <div class="admin-grid">
+            <div style="background:#fcfcfc; padding:20px; border-radius:15px; border:1px solid #f0f0f0;">
                 <h3>إضافة منتج جديد</h3>
                 <input type="text" id="p-name" placeholder="اسم المنتج">
-                <input type="number" id="p-price" placeholder="السعر">
-                <input type="text" id="p-img" placeholder="رابط الصورة">
-                <input type="text" id="p-label" placeholder="ملصق (مثل: جديد، عرض..)">
-                <select id="p-cat"></select>
-                <button onclick="saveProduct()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">حفظ في المتجر</button>
+                <input type="number" id="p-price" placeholder="السعر (ج.م)">
+                <input type="text" id="p-img" placeholder="رابط صورة المنتج (URL)">
+                <input type="text" id="p-label" placeholder="ملصق المنتج (مثال: جديد، خصم 10%)">
+                <label style="display:block; margin-top:15px; font-weight:bold;">اختر القسم:</label>
+                <select id="p-cat-select"></select>
+                <button onclick="saveProduct()" class="btn-main" style="margin-top:20px; background:#2ecc71;">حفظ المنتج ونشره</button>
+                
+                <h3 style="margin-top:40px;">المنتجات المضافة حالياً</h3>
+                <div id="p-list" style="margin-top:10px; max-height:400px; overflow-y:auto;"></div>
             </div>
 
-            <div style="background:#f9f9f9; padding:20px; border-radius:10px;">
+            <div style="background:#fcfcfc; padding:20px; border-radius:15px; border:1px solid #f0f0f0;">
                 <h3>إدارة الأقسام</h3>
                 <input type="text" id="cat-name" placeholder="اسم القسم الجديد">
-                <button onclick="addCat()" style="width:100%; padding:10px; margin-top:5px;">إضافة قسم</button>
-                <div id="cats-list" style="margin-top:20px;"></div>
+                <button onclick="addCat()" class="btn-main" style="margin-top:10px; background:#34495e;">إضافة قسم</button>
+                <div id="cats-list-admin" style="margin-top:20px;"></div>
             </div>
         </div>
     </div>
@@ -57,37 +55,50 @@
     <script>
         if(sessionStorage.getItem('isAdmin') !== 'true') window.location.href = 'login.html';
 
-        let prods = JSON.parse(localStorage.getItem('storeProducts')) || [];
+        let products = JSON.parse(localStorage.getItem('storeProducts')) || [];
         let cats = JSON.parse(localStorage.getItem('storeCats')) || ["الكل", "تخزين", "إكسسوارات"];
 
-        function updateAdmin() {
-            // تحديث الإحصائيات
-            document.getElementById('total-prods-count').innerText = prods.length;
-            document.getElementById('total-stock-value').innerText = prods.reduce((s, i) => s + i.price, 0).toLocaleString();
-            document.getElementById('total-cats-count').innerText = cats.length;
+        function refresh() {
+            document.getElementById('s-count').innerText = products.length;
+            document.getElementById('s-value').innerText = products.reduce((s, i) => s + i.price, 0).toLocaleString();
+            document.getElementById('s-cats').innerText = cats.length;
 
-            // تحديث القوائم
-            document.getElementById('p-cat').innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
-            document.getElementById('cats-list').innerHTML = cats.map(c => `<div>- ${c}</div>`).join('');
+            document.getElementById('p-cat-select').innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+            document.getElementById('cats-list-admin').innerHTML = cats.map((c, i) => `
+                <div class="p-item"><span>${c}</span> ${c !== "الكل" ? `<span class="del-x" onclick="delCat(${i})">حذف</span>` : ''}</div>
+            `).join('');
+
+            document.getElementById('p-list').innerHTML = products.map((p, i) => `
+                <div class="p-item">
+                    <span>${p.name} (${p.price}ج)</span>
+                    <span class="del-x" onclick="delProd(${i})">حذف المنتج</span>
+                </div>
+            `).join('');
         }
 
         function saveProduct() {
             let n = document.getElementById('p-name').value;
             let p = document.getElementById('p-price').value;
             let img = document.getElementById('p-img').value;
-            if(!n || !p) return alert('أدخل البيانات');
-            prods.push({ id: Date.now(), name: n, price: parseInt(p), image: img, category: document.getElementById('p-cat').value, label: document.getElementById('p-label').value });
-            localStorage.setItem('storeProducts', JSON.stringify(prods));
-            updateAdmin();
-            alert('تم الحفظ');
+            let lbl = document.getElementById('p-label').value;
+            let cat = document.getElementById('p-cat-select').value;
+
+            if(!n || !p) return alert('يرجى كتابة الاسم والسعر');
+            products.push({ id: Date.now(), name: n, price: parseInt(p), image: img || 'https://via.placeholder.com/150', category: cat, label: lbl });
+            localStorage.setItem('storeProducts', JSON.stringify(products));
+            refresh();
+            alert('تمت الإضافة');
         }
 
         function addCat() {
             let c = document.getElementById('cat-name').value;
-            if(c) { cats.push(c); localStorage.setItem('storeCats', JSON.stringify(cats)); updateAdmin(); }
+            if(c) { cats.push(c); localStorage.setItem('storeCats', JSON.stringify(cats)); refresh(); document.getElementById('cat-name').value=''; }
         }
 
-        updateAdmin();
+        function delProd(i) { products.splice(i, 1); localStorage.setItem('storeProducts', JSON.stringify(products)); refresh(); }
+        function delCat(i) { cats.splice(i, 1); localStorage.setItem('storeCats', JSON.stringify(cats)); refresh(); }
+
+        refresh();
     </script>
 </body>
 </html>
