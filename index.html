@@ -3,64 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر مشالى للالكترونيات</title>
+    <title>متجر مشالى للالكترونيات | الصفحة الرئيسية</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+
     <header>
         <div class="header-top">
-            <a href="index.html" class="logo">
-                <i class="fas fa-bolt"></i> مشالى للالكترونيات
-            </a>
-            
-            <div style="display: flex; gap: 12px; align-items: center;">
-                <a href="https://wa.me/201551831308" class="whatsapp-link">
-                    <i class="fab fa-whatsapp"></i> 01551831308
-                </a>
-                <div class="theme-switcher">
-                    <span onclick="changeTheme('light')" style="cursor:pointer">☀️</span>
-                    <span onclick="changeTheme('dark')" style="cursor:pointer; margin-right:8px;">🌙</span>
+            <a href="index.html" class="logo"><i class="fas fa-bolt"></i> مشالى للالكترونيات</a>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <a href="https://wa.me/201551831308" class="whatsapp-top"><i class="fab fa-whatsapp"></i> تواصل معنا</a>
+                <div onclick="toggleCart()" style="cursor:pointer; position:relative;">
+                    <i class="fas fa-shopping-cart fa-lg"></i>
+                    <span id="cart-badge" style="position:absolute; top:-10px; right:-10px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px;">0</span>
                 </div>
             </div>
         </div>
-        
-        <nav>
-            <ul class="nav-main" id="categories-nav">
-                </ul>
-            <div class="nav-actions">
-                <div onclick="toggleCart()" style="cursor:pointer; position:relative;">
-                    <i class="fas fa-shopping-cart" style="font-size: 1.2rem;"></i>
-                    <span id="cart-badge" style="position:absolute; top:-8px; right:-10px; background:red; color:white; border-radius:50%; padding:1px 5px; font-size:9px; font-weight:bold;">0</span>
-                </div>
-            </div>
-        </nav>
     </header>
 
-    <main class="products-container">
-        <div class="products-grid" id="products-grid">
+    <div class="slider-container" id="slider">
+        <div class="slide active" style="background: #2c3e50;">
+            <h2>أهلاً بكم في مشالى للالكترونيات</h2>
+            <p>أفضل جودة وأنسب سعر في مصر</p>
+        </div>
+        <div class="slide" style="background: #e74c3c;">
+            <h2>عروض الشتاء بدأت!</h2>
+            <p>خصومات تصل إلى 30% على جميع الإكسسوارات</p>
+        </div>
+        <div class="slide" style="background: #27ae60;">
+            <h2>شحن سريع لجميع المحافظات</h2>
+            <p>اطلب الآن واستلم خلال 48 ساعة</p>
+        </div>
+    </div>
+
+    <nav style="padding: 10px 4%; overflow-x: auto; white-space: nowrap;">
+        <div id="categories-nav" style="display:inline-flex; gap:10px;"></div>
+    </nav>
+
+    <main class="products-grid" id="products-grid"></main>
+
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">×</span>
+            <img id="modal-img" src="" style="width:200px; height:200px; object-fit:cover; border-radius:10px;">
+            <div id="modal-details">
+                <h2 id="modal-name"></h2>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p id="modal-price" style="font-size:1.5rem; color:var(--accent); font-weight:bold; margin:10px 0;"></p>
+                <p id="modal-desc" style="color:#666; font-size:0.9rem; margin-bottom:15px;"></p>
+                <p class="stock-alert">🔥 متوفر فقط 3 قطع في المخزن!</p>
+                <button id="modal-add-btn" class="save-btn" style="background:var(--primary); color:white; border:none; padding:12px 30px; border-radius:8px; cursor:pointer; margin-top:15px; width:100%; font-weight:bold;">إضافة للسلة</button>
             </div>
-    </main>
+        </div>
+    </div>
 
     <div id="cart-sidebar" class="cart-sidebar">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>سلة المشتريات</h3>
-            <span onclick="toggleCart()" style="cursor:pointer; font-weight:bold;">✕</span>
-        </div>
-        <hr style="margin:10px 0;">
-        <div id="cart-items" style="max-height: 70vh; overflow-y:auto;"></div>
-        <div style="position:absolute; bottom:20px; width:88%; border-top:1px solid #ddd; padding-top:10px;">
-            <p style="font-weight:bold;">الإجمالي: <span id="total-price">0</span> ج.م</p>
-            <button onclick="sendToWhatsApp()" style="width:100%; background:#25d366; color:white; border:none; padding:12px; margin-top:10px; border-radius:5px; font-weight:bold; cursor:pointer;">
-                <i class="fab fa-whatsapp"></i> إرسال الطلب الآن
-            </button>
+        <h3>حقيبة التسوق</h3><hr><br>
+        <div id="cart-items"></div>
+        <div style="position:absolute; bottom:20px; width:88%;">
+            <h4>الإجمالي: <span id="total-price">0</span> ج.م</h4>
+            <button onclick="sendToWhatsApp()" style="width:100%; background:#25d366; color:white; border:none; padding:15px; border-radius:8px; margin-top:10px; font-weight:bold; cursor:pointer;">إتمام الطلب عبر واتساب</button>
         </div>
     </div>
     <div id="overlay" class="overlay" onclick="toggleCart()"></div>
 
     <footer>
-        <p style="font-size: 0.75rem;">© 2024 متجر مشالى للالكترونيات - جميع الحقوق محفوظة</p>
-        <a href="login.html" class="admin-foot-link">دخول المدير</a>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>عن مشالى</h4>
+                <p>نحن نوفر أفضل الحلول التقنية والإلكترونية في مصر منذ أكثر من 5 سنوات. شعارنا الجودة والأمانة.</p>
+            </div>
+            <div class="footer-col">
+                <h4>روابط سريعة</h4>
+                <a href="#">سياسة الضمان</a>
+                <a href="#">سياسة الاسترجاع</a>
+                <a href="#">الشحن والتوصيل</a>
+            </div>
+            <div class="footer-col">
+                <h4>تواصل معنا</h4>
+                <p><i class="fas fa-phone"></i> 01551831308</p>
+                <p><i class="fas fa-map-marker-alt"></i> القاهرة، جمهورية مصر العربية</p>
+            </div>
+        </div>
+        <hr>
+        <a href="login.html" class="admin-link">لوحة تحكم المدير</a>
     </footer>
 
     <script src="script.js"></script>
