@@ -1,9 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
 
-:root { --primary: #3498db; --bg: #f8f9fa; --card: #ffffff; --text: #333; --border: #eee; }
-body.light-theme { --bg: #f8f9fa; --card: #ffffff; --text: #333; --border: #eee; }
+:root { --primary: #e67e22; --bg: #f8f9fa; --card: #ffffff; --text: #333; --border: #eee; }
 body.dark-theme { --bg: #121212; --card: #1e1e1e; --text: #ecf0f1; --border: #333; }
-body.hacker-theme { --bg: #000; --card: #0d0d0d; --text: #00ff41; --border: #00ff4133; --primary: #00ff41; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; transition: 0.2s; }
 body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; overflow-x: hidden; }
@@ -11,22 +9,49 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; ov
 header { background: var(--card); padding: 10px 4%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
 .header-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 
-.search-row { flex: 1; display: flex; align-items: center; gap: 8px; max-width: 500px; }
-.search-container { flex: 1; position: relative; }
-.search-container input { width: 100%; padding: 6px 35px 6px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; font-size: 0.9rem; }
+/* معالجة الصور الاحترافية */
+.img-container { width: 100%; height: 140px; display: flex; align-items: center; justify-content: center; background: #fff; border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+.img-container img { max-width: 90%; max-height: 90%; object-fit: contain; }
+
+/* شريط الأقسام السريع */
+.cat-nav-scroll { display: flex; gap: 10px; padding: 12px 4%; overflow-x: auto; background: var(--card); border-bottom: 1px solid var(--border); scrollbar-width: none; }
+.cat-nav-scroll::-webkit-scrollbar { display: none; }
+.cat-btn-chip { white-space: nowrap; padding: 6px 18px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+.cat-btn-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* السلة المطورة */
+.cart-sidebar { position: fixed; top: 0; left: -320px; width: 300px; height: 100%; background: var(--card); z-index: 2500; padding: 15px; box-shadow: 2px 0 15px rgba(0,0,0,0.3); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+.cart-sidebar.active { left: 0; }
+.cart-item-compact { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.03); padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 0.8rem; }
 
 .news-ticker { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; height: 35px; display: flex; align-items: center; z-index: 2000; overflow: hidden; }
-.ticker-content { display: inline-block; white-space: nowrap; animation: ticker-move var(--speed, 20s) linear infinite; font-weight: bold; font-size: 0.85rem; }
-@keyframes ticker-move { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+.ticker-content { display: inline-block; white-space: nowrap; animation: ticker-move var(--speed, 20s) linear infinite; font-weight: bold; padding-left: 100%; }
+@keyframes ticker-move { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 15px; }
-.product-card { background: var(--card); border-radius: 10px; padding: 10px; border: 1px solid var(--border); text-align: center; position: relative; display: flex; flex-direction: column; }
-.img-container { width: 100%; height: 120px; display: flex; align-items: center; justify-content: center; background: #fff; border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
-.product-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 15px; padding: 15px; }
+.product-card { background: var(--card); border-radius: 12px; padding: 12px; border: 1px solid var(--border); text-align: center; height: 100%; display: flex; flex-direction: column; }
 
-.cart-sidebar { position: fixed; top: 0; left: -320px; width: 280px; height: 100%; background: var(--card); z-index: 2500; padding: 15px; box-shadow: 2px 0 15px rgba(0,0,0,0.5); transition: 0.3s; }
-.cart-sidebar.active { left: 0; }
-.cart-item-compact { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.03); padding: 6px; border-radius: 8px; margin-bottom: 8px; font-size: 0.75rem; position: relative; }
-.qty-btn { background: var(--primary); color: white; border: none; border-radius: 4px; width: 22px; height: 22px; cursor: pointer; font-weight: bold; }
-.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2400; }
-.overlay.active { display: block; }
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2400; opacity: 0; transition: 0.3s; }
+.overlay.active { display: block; opacity: 1; }
+
+.qty-btn { background: var(--primary); color: white; border: none; border-radius: 5px; width: 28px; height: 28px; cursor: pointer; font-weight: bold; }
+
+.cart-sidebar {
+    position: fixed; top: 0; left: -320px; width: 300px; height: 100%; 
+    background: var(--card); z-index: 2500; padding: 15px; 
+    box-shadow: 2px 0 15px rgba(0,0,0,0.3); 
+    transition: transform 0.4s ease; /* سلاسة الحركة */
+}
+.cart-sidebar.active { transform: translateX(320px); }
+
+.overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); 
+    z-index: 2400; opacity: 0; transition: opacity 0.3s;
+}
+.overlay.active { display: block; opacity: 1; }
+
+.cart-item-compact {
+    display: flex; align-items: center; justify-content: space-between; 
+    background: rgba(0,0,0,0.03); padding: 8px; border-radius: 8px; 
+    margin-bottom: 8px; border-right: 3px solid var(--primary);
+}

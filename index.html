@@ -3,55 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مشالى للالكترونيات</title>
+    <title>متجر مشالى | الصفحة الرئيسية</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="light-theme">
+<body>
     <header>
-        <div class="header-top">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <a href="index.html" class="logo" style="text-decoration:none; color:var(--primary); font-weight:900; font-size:1.2rem;">⚡ مشالى</a>
-                <a href="academy.html" style="text-decoration:none; color:#e67e22; font-size:0.7rem; border:1px solid #e67e22; padding:2px 6px; border-radius:15px;">📺 التعليمية</a>
-            </div>
-            <div class="search-row">
-                <div class="search-container">
-                    <input type="text" id="search-input" onkeyup="searchProducts()" placeholder="ابحث عن منتج...">
-                    <i class="fas fa-search" style="position:absolute; right:10px; top:8px; color:#999;"></i>
-                </div>
-                <button onclick="toggleTheme()" class="qty-btn" style="background:#555; width:30px; height:30px;"><i class="fas fa-palette"></i></button>
-            </div>
-            <div onclick="toggleCart()" style="cursor:pointer; position:relative;">
-                <i class="fas fa-shopping-basket"></i>
-                <span id="cart-badge" style="position:absolute; top:-8px; right:-8px; background:red; color:white; border-radius:50%; padding:1px 5px; font-size:9px;">0</span>
+    <div class="header-top">
+        <a href="index.html" style="text-decoration:none; color:var(--primary); font-weight:900; font-size:1.4rem;">⚡ مشالى</a>
+        
+        <div style="flex:1; max-width:400px; position:relative;">
+            <input type="text" id="search-input" onkeyup="searchProducts()" placeholder="ابحث عن منتج..." style="width:100%; padding:8px 35px 8px 10px; border-radius:20px; border:1px solid #ddd; outline:none;">
+            <i class="fas fa-search" style="position:absolute; right:12px; top:10px; color:#999;"></i>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:15px;">
+            <a href="manager.html" title="لوحة الإدارة" style="color:#999; text-decoration:none;">
+                <i class="fas fa-user-cog fa-lg"></i>
+            </a>
+            
+            <div onclick="toggleCart(true)" style="cursor:pointer; position:relative;">
+                <i class="fas fa-shopping-basket fa-lg"></i>
+                <span id="cart-badge" style="position:absolute; top:-8px; right:-8px; background:red; color:white; border-radius:50%; padding:1px 5px; font-size:10px;">0</span>
             </div>
         </div>
+    </div>
+    <div style="margin-top:10px;">
+        <a href="academy.html" style="color:#e67e22; text-decoration:none; font-weight:bold; font-size:0.85rem;">
+            <i class="fas fa-graduation-cap"></i> الأكاديمية التعليمية
+        </a>
+    </div>
     </header>
 
+    <div class="cat-nav-scroll" id="product-cats"></div>
     <div class="news-ticker"><div class="ticker-content" id="ticker-text"></div></div>
-
     <main class="products-grid" id="products-grid"></main>
-
-    <footer style="text-align:center; padding:20px 10px 60px;">
-        <a href="manager.html" style="color:var(--text); text-decoration:none; font-size:0.8rem; border: 1px solid #ddd; padding: 5px 10px; border-radius: 5px;">⚙️ لوحة المدير</a>
-    </footer>
 
     <div id="cart-sidebar" class="cart-sidebar">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h4>🛒 السلة</h4>
-            <button onclick="clearFullCart()" style="background:none; border:none; color:red; font-size:0.7rem; cursor:pointer;">🗑️ مسح الكل</button>
-            <button onclick="toggleCart()" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">✕</button>
+            <h4>🛒 سلتك</h4>
+            <div>
+                <button onclick="clearFullCart()" style="background:none; border:none; color:#ff4757; font-size:0.7rem; cursor:pointer; margin-left:10px;">مسح الكل</button>
+                <button onclick="toggleCart(false)" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">✕</button>
+            </div>
         </div>
         <hr style="margin:10px 0; opacity:0.1;">
         <div id="cart-items"></div>
-        <div style="position:absolute; bottom:15px; width:calc(100% - 30px);">
-            <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:10px; font-size:0.9rem;">
+        <div style="position:absolute; bottom:20px; width:calc(100% - 30px); background:var(--card);">
+            <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:15px; border-top:1px solid #eee; padding-top:10px;">
                 <span>الإجمالي:</span> <span id="total-price">0</span> ج.م
             </div>
-            <button onclick="sendToWhatsApp()" style="width:100%; background:#25d366; color:white; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer;">طلب واتساب</button>
+            <button onclick="sendToWhatsApp()" style="width:100%; background:#25d366; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;"><i class="fab fa-whatsapp"></i> اطلب الآن</button>
         </div>
     </div>
-    <div id="overlay" class="overlay" onclick="toggleCart()"></div>
+    <div id="overlay" class="overlay" onclick="toggleCart(false)"></div>
     <script src="script.js"></script>
 </body>
 </html>
+<footer style="text-align:center; padding:40px; background:#fff; border-top:1px solid #eee; margin-top:20px;">
+    <p style="font-size:0.9rem; color:#666; margin-bottom:10px;">جميع الحقوق محفوظة © متجر مشالى 2024</p>
+    <a href="manager.html" style="display:inline-block; padding:8px 20px; background:#f0f2f5; color:#333; text-decoration:none; border-radius:20px; font-size:0.8rem; font-weight:bold; border:1px solid #ddd;">
+        <i class="fas fa-lock"></i> لوحة تحكم المدير
+    </a>
+</footer>
