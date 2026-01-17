@@ -2,71 +2,69 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>إدارة مشالى | المتطورة</title>
+    <title>إدارة مشالى | لوحة التحكم</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-sec { background:white; padding:20px; border-radius:15px; margin-bottom:20px; border:1px solid #ddd; }
+        input, select, textarea { width:100%; padding:10px; margin:5px 0; border:1px solid #ccc; border-radius:8px; }
+        .tab-btn { padding:10px 20px; cursor:pointer; border:none; background:#eee; }
+        .tab-btn.active { background:var(--primary); color:white; }
+    </style>
 </head>
-<body style="padding:20px; background:#eee; color:#333;">
-    <div style="max-width:900px; margin:auto; background:white; padding:30px; border-radius:20px;">
-        <div style="display:flex; justify-content:space-between;">
-            <h2>لوحة التحكم المتطورة</h2>
-            <a href="index.html">خروج</a>
+<body style="padding:20px; background:#f0f2f5; color:#333;">
+    <div style="max-width:1000px; margin:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2>🛠️ لوحة تحكم مشالى</h2>
+            <a href="index.html" class="qty-btn">عودة للمتجر</a>
         </div>
-        <hr><br>
-
-        <div style="background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:20px;">
-            <h3>تعديل الشريط السفلي</h3>
-            <input type="text" id="new-ticker" style="width:80%; padding:10px;" placeholder="اكتب جملة العروض هنا...">
-            <button onclick="saveTicker()" class="qty-btn" style="width:18%;">حفظ</button>
+        <br>
+        
+        <div class="admin-sec">
+            <h3>📢 شريط الأخبار السفلي</h3>
+            <input type="text" id="ticker-input" placeholder="اكتب جملة العروض هنا...">
+            <button class="qty-btn" onclick="saveTicker()">حفظ الشريط</button>
         </div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-            <div style="background:#f9f9f9; padding:15px; border-radius:10px;">
-                <h3>إضافة صنف جديد</h3>
-                <input type="text" id="p-name" placeholder="اسم المنتج" style="width:100%; margin:5px 0; padding:8px;">
-                <input type="number" id="p-price" placeholder="السعر" style="width:100%; margin:5px 0; padding:8px;">
-                <input type="text" id="p-img" placeholder="رابط الصورة" style="width:100%; margin:5px 0; padding:8px;">
-                
-                <div style="margin:10px 0;">
-                    <label>اختر رمز للملصق:</label><br>
-                    <button onclick="setEmoji('🔥')" class="qty-btn" style="background:#eee; color:black;">🔥</button>
-                    <button onclick="setEmoji('🆕')" class="qty-btn" style="background:#eee; color:black;">🆕</button>
-                    <button onclick="setEmoji('💎')" class="qty-btn" style="background:#eee; color:black;">💎</button>
-                    <button onclick="setEmoji('⚡')" class="qty-btn" style="background:#eee; color:black;">⚡</button>
-                    <input type="text" id="p-label" placeholder="أو اكتب ملصق مخصص" style="width:100%; margin-top:5px; padding:8px;">
-                </div>
-
-                <select id="p-cat" style="width:100%; padding:8px; margin:5px 0;"></select>
-                <button onclick="addProduct()" class="qty-btn" style="width:100%; background:#2ecc71; height:40px; margin-top:10px;">إضافة للمتجر</button>
+        <div class="admin-sec">
+            <h3>📦 إضافة منتج جديد</h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <input type="text" id="p-name" placeholder="اسم المنتج">
+                <input type="number" id="p-price" placeholder="السعر">
+                <input type="text" id="p-img" placeholder="رابط الصورة">
+                <input type="text" id="p-label" placeholder="ملصق (مثل: 🔥 عرض لفترة)">
+                <select id="p-cat">
+                    <option>تخزين</option><option>إكسسوارات</option><option>صوتيات</option>
+                </select>
+                <button class="qty-btn" style="background:#2ecc71;" onclick="addProduct()">إضافة المنتج</button>
             </div>
+        </div>
 
-            <div>
-                <h3>قائمة المنتجات الحالية</h3>
-                <div id="admin-list" style="max-height:400px; overflow-y:auto; border:1px solid #eee; padding:10px;"></div>
+        <div class="admin-sec" style="border-top:5px solid #e67e22;">
+            <h3>🎓 إدارة مشالى التعليمية</h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <input type="text" id="v-title" placeholder="عنوان الفيديو">
+                <input type="text" id="v-url" placeholder="رابط يوتيوب">
+                <input type="text" id="v-cat" placeholder="القسم (مثل: صيانة)">
+                <textarea id="v-desc" placeholder="وصف بسيط"></textarea>
+                <button class="qty-btn" style="background:#e67e22; grid-column:span 2;" onclick="addVideo()">إضافة الفيديو للأكاديمية</button>
             </div>
+        </div>
+
+        <div id="list-area" class="admin-sec">
+            <h3>المنتجات والفيديوهات الحالية (للحذف)</h3>
+            <div id="items-list"></div>
         </div>
     </div>
 
     <script>
         if(sessionStorage.getItem('isAdmin')!=='true') window.location.href='login.html';
+        
         let products = JSON.parse(localStorage.getItem('storeProducts')) || [];
-        let cats = JSON.parse(localStorage.getItem('storeCats')) || ["تخزين", "إكسسوارات"];
-
-        function refresh() {
-            document.getElementById('p-cat').innerHTML = cats.map(c => `<option>${c}</option>`).join('');
-            document.getElementById('admin-list').innerHTML = products.map((p,i) => `
-                <div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #eee;">
-                    <span>${p.name}</span>
-                    <b onclick="delProd(${i})" style="color:red; cursor:pointer;">حذف</b>
-                </div>
-            `).join('');
-        }
-
-        function setEmoji(e) { document.getElementById('p-label').value = e; }
+        let videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
 
         function saveTicker() {
-            let t = document.getElementById('new-ticker').value;
-            localStorage.setItem('tickerText', t);
-            alert('تم تحديث شريط الأخبار');
+            localStorage.setItem('tickerText', document.getElementById('ticker-input').value);
+            alert('تم الحفظ!');
         }
 
         function addProduct() {
@@ -79,11 +77,34 @@
                 category: document.getElementById('p-cat').value
             });
             localStorage.setItem('storeProducts', JSON.stringify(products));
-            refresh();
+            renderLists();
         }
 
-        function delProd(i) { products.splice(i,1); localStorage.setItem('storeProducts', JSON.stringify(products)); refresh(); }
-        refresh();
+        function addVideo() {
+            videos.push({
+                id: Date.now(),
+                title: document.getElementById('v-title').value,
+                url: document.getElementById('v-url').value,
+                category: document.getElementById('v-cat').value,
+                desc: document.getElementById('v-desc').value
+            });
+            localStorage.setItem('academyVideos', JSON.stringify(videos));
+            renderLists();
+        }
+
+        function renderLists() {
+            let html = '<h4>المنتجات:</h4>';
+            products.forEach((p, i) => html += `<div style="padding:5px; border-bottom:1px solid #eee;">${p.name} <button onclick="delP(${i})" style="color:red;">حذف</button></div>`);
+            html += '<h4 style="margin-top:20px;">الفيديوهات:</h4>';
+            videos.forEach((v, i) => html += `<div style="padding:5px; border-bottom:1px solid #eee;">${v.title} <button onclick="delV(${i})" style="color:red;">حذف</button></div>`);
+            document.getElementById('items-list').innerHTML = html;
+        }
+
+        function delP(i) { products.splice(i,1); localStorage.setItem('storeProducts', JSON.stringify(products)); renderLists(); }
+        function delV(i) { videos.splice(i,1); localStorage.setItem('academyVideos', JSON.stringify(videos)); renderLists(); }
+        
+        document.getElementById('ticker-input').value = localStorage.getItem('tickerText') || "";
+        renderLists();
     </script>
 </body>
 </html>
