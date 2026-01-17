@@ -3,61 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مشالى التعليمية | فيديوهاتنا</title>
+    <title>مشالى التعليمية</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="light-theme">
-    <header>
-        <div class="header-top">
-            <a href="index.html" style="text-decoration:none; color:var(--text); font-weight:bold;"><i class="fas fa-store"></i> المتجر</a>
-            <h2 style="color:#e67e22; font-size:1.2rem;">📺 مشالى التعليمية</h2>
-            <button onclick="toggleTheme()" class="qty-btn" style="background:#444; width:35px;"><i class="fas fa-palette"></i></button>
-        </div>
-    </header>
-
-    <div id="academy-cats" style="padding:15px; display:flex; gap:10px; overflow-x:auto; background:rgba(0,0,0,0.03);">
-        <button class="qty-btn" onclick="renderAcademy('الكل')">الكل</button>
-    </div>
-
-    <main class="products-grid" id="academy-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));"></main>
-
+    <header><div class="header-top"><a href="index.html" style="text-decoration:none; color:var(--text);">🔙 المتجر</a><h3>📺 مشالى التعليمية</h3></div></header>
+    <div id="v-cats" style="padding:10px; display:flex; gap:8px; overflow-x:auto;"></div>
+    <main class="products-grid" id="academy-grid" style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));"></main>
     <script src="script.js"></script>
     <script>
-        function renderAcademy(filter = 'الكل') {
+        function renderAcademy(f = 'الكل') {
             const vids = JSON.parse(localStorage.getItem('academyVideos')) || [];
-            const grid = document.getElementById('academy-grid');
-            const cats = [...new Set(vids.map(v => v.category))];
-            
-            // تحديث الأزرار
-            document.getElementById('academy-cats').innerHTML = `<button class="qty-btn" onclick="renderAcademy('الكل')">الكل</button>` + 
-                cats.map(c => `<button class="qty-btn" style="background:#666;" onclick="renderAcademy('${c}')">${c}</button>`).join('');
-
-            const filtered = filter === 'الكل' ? vids : vids.filter(v => v.category === filter);
-
-            grid.innerHTML = filtered.map(v => `
+            const cats = ['الكل', ...new Set(vids.map(v => v.category))];
+            document.getElementById('v-cats').innerHTML = cats.map(c => `<button class="qty-btn" style="background:#666;" onclick="renderAcademy('${c}')">${c}</button>`).join('');
+            const filtered = f === 'الكل' ? vids : vids.filter(v => v.category === f);
+            document.getElementById('academy-grid').innerHTML = filtered.map(v => `
                 <div class="product-card" style="text-align:right;">
-                    <iframe width="100%" height="180" src="https://www.youtube.com/embed/${getYoutubeID(v.url)}" frameborder="0" allowfullscreen></iframe>
-                    <h4 style="margin:10px 0;">${v.title}</h4>
-                    <p style="font-size:0.75rem; opacity:0.8; margin-bottom:10px;">${v.desc}</p>
-                    <div style="display:flex; gap:5px;">
-                        <button class="qty-btn" style="background:#25d366; flex:1; font-size:0.7rem;" onclick="window.open('https://wa.me/201551831308?text=استفسار عن فيديو: ${v.title}')"><i class="fab fa-whatsapp"></i> واتساب</button>
-                        <button class="qty-btn" style="background:#3498db; flex:1; font-size:0.7rem;" onclick="alert('اترك تعليقك هنا: قيد التطوير')"><i class="fas fa-comment"></i> تعليق</button>
-                    </div>
+                    <iframe width="100%" height="150" src="https://www.youtube.com/embed/${v.url.split('v=')[1] || v.url.split('/').pop()}" frameborder="0" allowfullscreen></iframe>
+                    <h5 style="margin:8px 0;">${v.title}</h5>
+                    <button class="qty-btn" style="width:100%; background:#25d366; font-size:0.7rem;" onclick="window.open('https://wa.me/201551831308?text=استفسار:${v.title}')">استفسار واتساب</button>
                 </div>
             `).join('');
         }
-
-        function getYoutubeID(url) {
-            const reg = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(reg);
-            return (match && match[2].length === 11) ? match[2] : '';
-        }
-
-        window.onload = () => {
-            applyTheme(localStorage.getItem('theme') || 'light-theme');
-            renderAcademy();
-        };
+        window.onload = () => { applyTheme(localStorage.getItem('theme')||'light-theme'); renderAcademy(); };
     </script>
 </body>
 </html>

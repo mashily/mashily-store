@@ -2,109 +2,207 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>إدارة مشالى | لوحة التحكم</title>
+    <title>لوحة تحكم مشالى | مطورة</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .admin-sec { background:white; padding:20px; border-radius:15px; margin-bottom:20px; border:1px solid #ddd; }
-        input, select, textarea { width:100%; padding:10px; margin:5px 0; border:1px solid #ccc; border-radius:8px; }
-        .tab-btn { padding:10px 20px; cursor:pointer; border:none; background:#eee; }
-        .tab-btn.active { background:var(--primary); color:white; }
+        /* إخفاء المحتوى تماماً في البداية */
+        #main-admin-content { display: none; }
+        .admin-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .flex-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        input, select { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #333; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        .btn-sm { padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.7rem; color: white; }
     </style>
 </head>
-<body style="padding:20px; background:#f0f2f5; color:#333;">
-    <div style="max-width:1000px; margin:auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2>🛠️ لوحة تحكم مشالى</h2>
-            <a href="index.html" class="qty-btn">عودة للمتجر</a>
-        </div>
-        <br>
-        
-        <div class="admin-sec">
-            <h3>📢 شريط الأخبار السفلي</h3>
-            <input type="text" id="ticker-input" placeholder="اكتب جملة العروض هنا...">
-            <button class="qty-btn" onclick="saveTicker()">حفظ الشريط</button>
-        </div>
+<body style="padding: 20px; background: #f4f7f6;">
 
-        <div class="admin-sec">
-            <h3>📦 إضافة منتج جديد</h3>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <input type="text" id="p-name" placeholder="اسم المنتج">
-                <input type="number" id="p-price" placeholder="السعر">
-                <input type="text" id="p-img" placeholder="رابط الصورة">
-                <input type="text" id="p-label" placeholder="ملصق (مثل: 🔥 عرض لفترة)">
-                <select id="p-cat">
-                    <option>تخزين</option><option>إكسسوارات</option><option>صوتيات</option>
-                </select>
-                <button class="qty-btn" style="background:#2ecc71;" onclick="addProduct()">إضافة المنتج</button>
+    <div id="login-overlay" style="max-width: 400px; margin: 100px auto; text-align: center; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+        <i class="fas fa-lock" style="font-size: 3rem; color: #3498db; margin-bottom: 20px;"></i>
+        <h3>منطقة محظورة للمدير</h3>
+        <p style="font-size: 0.8rem; color: #666; margin-bottom: 20px;">الرجاء إدخال كلمة المرور للمتابعة</p>
+        <input type="password" id="admin-pass-input" placeholder="كلمة المرور" style="text-align: center; margin-bottom: 15px;">
+        <button class="qty-btn" style="width: 100%;" onclick="checkAdminPass()">دخول</button>
+        <br><br>
+        <a href="index.html" style="text-decoration: none; color: #999; font-size: 0.8rem;">العودة للمتجر</a>
+    </div>
+
+    <div id="main-admin-content">
+        <div style="max-width: 900px; margin: auto;">
+            <div class="flex-row" style="justify-content: space-between;">
+                <h2>⚙️ إدارة متجر مشالى</h2>
+                <button onclick="adminLogout()" class="qty-btn" style="background: #e74c3c;">تسجيل خروج</button>
             </div>
-        </div>
 
-        <div class="admin-sec" style="border-top:5px solid #e67e22;">
-            <h3>🎓 إدارة مشالى التعليمية</h3>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <input type="text" id="v-title" placeholder="عنوان الفيديو">
-                <input type="text" id="v-url" placeholder="رابط يوتيوب">
-                <input type="text" id="v-cat" placeholder="القسم (مثل: صيانة)">
-                <textarea id="v-desc" placeholder="وصف بسيط"></textarea>
-                <button class="qty-btn" style="background:#e67e22; grid-column:span 2;" onclick="addVideo()">إضافة الفيديو للأكاديمية</button>
+            <div class="admin-card">
+                <h4>📢 شريط الأخبار السفلي</h4>
+                <div class="flex-row">
+                    <input type="text" id="t-text" placeholder="نص الشريط">
+                    <select id="t-speed" style="width: 100px;">
+                        <option value="30s">بطيء</option>
+                        <option value="20s">متوسط</option>
+                        <option value="10s">سريع</option>
+                    </select>
+                    <button class="qty-btn" onclick="saveTicker()">حفظ</button>
+                </div>
             </div>
-        </div>
 
-        <div id="list-area" class="admin-sec">
-            <h3>المنتجات والفيديوهات الحالية (للحذف)</h3>
-            <div id="items-list"></div>
+            <div class="admin-card">
+                <h4 id="p-form-title">📦 إضافة / تعديل منتج</h4>
+                <input type="hidden" id="p-id">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <input id="p-n" placeholder="اسم المنتج">
+                    <input id="p-p" type="number" placeholder="السعر (ج.م)">
+                    <input id="p-i" placeholder="رابط الصورة">
+                    <input id="p-l" placeholder="ملصق (مثل: 🔥 عرض خاص)">
+                </div>
+                <button class="qty-btn" style="width: 100%; margin-top: 10px; background: #2ecc71;" onclick="saveProduct()">حفظ المنتج</button>
+            </div>
+
+            <div class="admin-card">
+                <h4>🎥 إضافة فيديو للأكاديمية</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <input id="v-t" placeholder="عنوان الفيديو">
+                    <input id="v-u" placeholder="رابط يوتيوب">
+                    <input id="v-c" placeholder="اسم القسم (مثلاً: صيانة)">
+                </div>
+                <button class="qty-btn" style="width: 100%; margin-top: 10px; background: #e67e22;" onclick="addV()">إضافة الفيديو</button>
+            </div>
+
+            <div class="admin-card">
+                <h4>📋 إدارة المحتوى الحالي</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <b>المنتجات:</b>
+                        <div id="p-list" style="margin-top: 10px;"></div>
+                    </div>
+                    <div>
+                        <b>الفيديوهات:</b>
+                        <div id="v-list" style="margin-top: 10px;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        if(sessionStorage.getItem('isAdmin')!=='true') window.location.href='login.html';
-        
+        // دالة التحقق من الباسورد
+        function checkAdminPass() {
+            const pass = document.getElementById('admin-pass-input').value;
+            if(pass === "123") { // يمكنك تغيير "123" لأي باسورد تريده
+                sessionStorage.setItem('isAdmin', 'true');
+                showAdminPage();
+            } else {
+                alert("كلمة المرور خاطئة!");
+            }
+        }
+
+        function showAdminPage() {
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('main-admin-content').style.display = 'block';
+            render();
+        }
+
+        function adminLogout() {
+            sessionStorage.removeItem('isAdmin');
+            location.reload();
+        }
+
+        // عند تحميل الصفحة، نتحقق هل هو مسجل دخول أم لا
+        window.onload = function() {
+            if(sessionStorage.getItem('isAdmin') === 'true') {
+                showAdminPage();
+            }
+            document.getElementById('t-text').value = localStorage.getItem('tickerText') || "";
+        };
+
+        // باقي دوال الإدارة
         let products = JSON.parse(localStorage.getItem('storeProducts')) || [];
         let videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
 
         function saveTicker() {
-            localStorage.setItem('tickerText', document.getElementById('ticker-input').value);
-            alert('تم الحفظ!');
+            localStorage.setItem('tickerText', document.getElementById('t-text').value);
+            localStorage.setItem('tickerSpeed', document.getElementById('t-speed').value);
+            alert('تم حفظ إعدادات الشريط');
         }
 
-        function addProduct() {
-            products.push({
-                id: Date.now(),
-                name: document.getElementById('p-name').value,
-                price: parseInt(document.getElementById('p-price').value),
-                image: document.getElementById('p-img').value,
-                label: document.getElementById('p-label').value,
-                category: document.getElementById('p-cat').value
-            });
+        function saveProduct() {
+            let id = document.getElementById('p-id').value;
+            let obj = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('p-n').value,
+                price: parseInt(document.getElementById('p-p').value),
+                image: document.getElementById('p-i').value,
+                label: document.getElementById('p-l').value
+            };
+            if(id) {
+                let idx = products.findIndex(x => x.id == id);
+                products[idx] = obj;
+            } else {
+                products.push(obj);
+            }
             localStorage.setItem('storeProducts', JSON.stringify(products));
-            renderLists();
+            resetPForm();
+            render();
         }
 
-        function addVideo() {
-            videos.push({
-                id: Date.now(),
-                title: document.getElementById('v-title').value,
-                url: document.getElementById('v-url').value,
-                category: document.getElementById('v-cat').value,
-                desc: document.getElementById('v-desc').value
-            });
+        function addV() {
+            videos.push({id:Date.now(), title:document.getElementById('v-t').value, url:document.getElementById('v-u').value, category:document.getElementById('v-c').value});
             localStorage.setItem('academyVideos', JSON.stringify(videos));
-            renderLists();
+            render();
         }
 
-        function renderLists() {
-            let html = '<h4>المنتجات:</h4>';
-            products.forEach((p, i) => html += `<div style="padding:5px; border-bottom:1px solid #eee;">${p.name} <button onclick="delP(${i})" style="color:red;">حذف</button></div>`);
-            html += '<h4 style="margin-top:20px;">الفيديوهات:</h4>';
-            videos.forEach((v, i) => html += `<div style="padding:5px; border-bottom:1px solid #eee;">${v.title} <button onclick="delV(${i})" style="color:red;">حذف</button></div>`);
-            document.getElementById('items-list').innerHTML = html;
+        function editP(id) {
+            let p = products.find(x => x.id == id);
+            document.getElementById('p-id').value = p.id;
+            document.getElementById('p-n').value = p.name;
+            document.getElementById('p-p').value = p.price;
+            document.getElementById('p-i').value = p.image;
+            document.getElementById('p-l').value = p.label;
+            document.getElementById('p-form-title').innerText = "✏️ تعديل منتج: " + p.name;
+            window.scrollTo(0, 0);
         }
 
-        function delP(i) { products.splice(i,1); localStorage.setItem('storeProducts', JSON.stringify(products)); renderLists(); }
-        function delV(i) { videos.splice(i,1); localStorage.setItem('academyVideos', JSON.stringify(videos)); renderLists(); }
-        
-        document.getElementById('ticker-input').value = localStorage.getItem('tickerText') || "";
-        renderLists();
+        function copyP(id) {
+            let p = products.find(x => x.id == id);
+            let copy = {...p, id: Date.now(), name: p.name + " (نسخة)"};
+            products.push(copy);
+            localStorage.setItem('storeProducts', JSON.stringify(products));
+            render();
+        }
+
+        function delP(i){ if(confirm('حذف المنتج؟')) { products.splice(i,1); localStorage.setItem('storeProducts', JSON.stringify(products)); render(); }}
+        function delV(i){ if(confirm('حذف الفيديو؟')) { videos.splice(i,1); localStorage.setItem('academyVideos', JSON.stringify(videos)); render(); }}
+
+        function resetPForm() {
+            document.getElementById('p-id').value = "";
+            document.getElementById('p-n').value = "";
+            document.getElementById('p-p').value = "";
+            document.getElementById('p-i').value = "";
+            document.getElementById('p-l').value = "";
+            document.getElementById('p-form-title').innerText = "📦 إضافة منتج جديد";
+        }
+
+        function render() {
+            const pList = document.getElementById('p-list');
+            const vList = document.getElementById('v-list');
+            if(!pList || !vList) return;
+
+            pList.innerHTML = products.map((p,i)=> `
+                <div class="list-item">
+                    <span>${p.name.substring(0,15)}.. (<b>${p.price}ج</b>)</span>
+                    <div style="display:flex; gap:3px;">
+                        <button class="btn-sm" style="background:#3498db;" onclick="editP(${p.id})">تعديل</button>
+                        <button class="btn-sm" style="background:#9b59b6;" onclick="copyP(${p.id})">نسخ</button>
+                        <button class="btn-sm" style="background:#e74c3c;" onclick="delP(${i})">حذف</button>
+                    </div>
+                </div>`).join('');
+
+            vList.innerHTML = videos.map((v,i)=> `
+                <div class="list-item">
+                    <span>${v.title.substring(0,15)}.. [${v.category}]</span>
+                    <button class="btn-sm" style="background:#e74c3c;" onclick="delV(${i})">حذف</button>
+                </div>`).join('');
+        }
     </script>
 </body>
 </html>

@@ -1,41 +1,28 @@
-// script.js
-let categories = JSON.parse(localStorage.getItem('storeCats')) || ["تخزين", "إكسسوارات", "صوتيات"];
 let products = JSON.parse(localStorage.getItem('storeProducts')) || [];
 let cart = JSON.parse(localStorage.getItem('MASHILY_CART')) || [];
-let tickerText = localStorage.getItem('tickerText') || "🔥 أهلاً بكم في مشالى للالكترونيات 🔥 جودة نضمنها لك 🔥";
 
 function init() {
     const ticker = document.getElementById('ticker-text');
-    if(ticker) ticker.innerText = tickerText;
-    renderCats();
+    if(ticker) {
+        ticker.innerText = localStorage.getItem('tickerText') || "🔥 أهلاً بكم في مشالى للإلكترونيات 🔥";
+        document.documentElement.style.setProperty('--speed', localStorage.getItem('tickerSpeed') || '20s');
+    }
     renderProducts(products);
     updateCartUI();
     applyTheme(localStorage.getItem('theme') || 'light-theme');
 }
 
-// إغلاق السلة بـ ESC
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keydown', (e) => { 
     if(e.key === "Escape") {
         document.getElementById('cart-sidebar').classList.remove('active');
         document.getElementById('overlay').classList.remove('active');
     }
 });
 
-function toggleTheme() {
-    let current = document.body.className;
-    let next = current === 'light-theme' ? 'dark-theme' : current === 'dark-theme' ? 'hacker-theme' : 'light-theme';
-    applyTheme(next);
-}
-
-function applyTheme(theme) {
-    document.body.className = theme;
-    localStorage.setItem('theme', theme);
-}
-
-function renderCats() {
-    const nav = document.getElementById('categories-nav');
-    if(!nav) return;
-    nav.innerHTML = categories.map(cat => `<button onclick="filterProducts('${cat}')" class="qty-btn" style="background:#7f8c8d;">${cat}</button>`).join('');
+function applyTheme(t) { document.body.className = t; localStorage.setItem('theme', t); }
+function toggleTheme() { 
+    let n = document.body.className === 'light-theme' ? 'dark-theme' : document.body.className === 'dark-theme' ? 'hacker-theme' : 'light-theme';
+    applyTheme(n);
 }
 
 function renderProducts(items) {
@@ -44,80 +31,59 @@ function renderProducts(items) {
     grid.innerHTML = items.map(p => `
         <div class="product-card">
             ${p.label ? `<span class="badge">${p.label}</span>` : ''}
-            <img src="${p.image}" onerror="this.src='https://via.placeholder.com/150'">
-            <h4 style="font-size:0.8rem; margin:8px 0; height:2.4em; overflow:hidden;">${p.name}</h4>
-            <span style="color:#ff4757; font-weight:bold; display:block; margin-bottom:8px;">${p.price} ج.م</span>
-            <button class="qty-btn" style="width:100%;" onclick="addToCart(${p.id})">إضافة للسلة</button>
+            <div class="img-container"><img src="${p.image}" onerror="this.src='https://via.placeholder.com/150'"></div>
+            <h4 style="font-size:0.75rem; height:2.2em; overflow:hidden;">${p.name}</h4>
+            <b style="color:#e74c3c; font-size:0.9rem; margin:5px 0;">${p.price} ج.م</b>
+            <button class="qty-btn" style="width:100%; font-size:0.7rem;" onclick="addToCart(${p.id})">إضافة للسلة</button>
         </div>
     `).join('');
 }
 
-function searchProducts() {
-    let term = document.getElementById('search-input').value.toLowerCase();
-    renderProducts(products.filter(p => p.name.toLowerCase().includes(term)));
-}
-
-function filterProducts(cat) {
-    if (cat === "الكل") renderProducts(products);
-    else renderProducts(products.filter(p => p.category === cat));
-}
-
-function showOffers() {
-    renderProducts(products.filter(p => p.label && p.label !== ""));
-}
-
 function addToCart(id) {
-    const p = products.find(item => item.id === id);
-    let found = cart.find(item => item.id === id);
-    if(found) found.qty++;
-    else cart.push({...p, qty: 1});
+    let p = products.find(x => x.id === id);
+    let f = cart.find(x => x.id === id);
+    if(f) f.qty++; else cart.push({...p, qty: 1});
     updateCartUI();
     toggleCart(true);
 }
 
 function updateCartUI() {
     localStorage.setItem('MASHILY_CART', JSON.stringify(cart));
-    const badge = document.getElementById('cart-badge');
-    const total = document.getElementById('total-price');
-    if(badge) badge.innerText = cart.reduce((s,i)=>s+i.qty, 0);
-    if(total) total.innerText = cart.reduce((s,i)=>s+(i.price*i.qty), 0).toLocaleString();
-    
+    if(document.getElementById('cart-badge')) document.getElementById('cart-badge').innerText = cart.reduce((s,i)=>s+i.qty, 0);
+    if(document.getElementById('total-price')) document.getElementById('total-price').innerText = cart.reduce((s,i)=>s+(i.price*i.qty), 0);
     const container = document.getElementById('cart-items');
     if(!container) return;
     container.innerHTML = cart.map((item, idx) => `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background:rgba(120,120,120,0.1); padding:10px; border-radius:10px; font-size:0.8rem; position:relative;">
-            <button class="remove-item" onclick="removeFromCart(${idx})">✕</button>
-            <div style="flex:1; padding-right:10px;"><b>${item.name}</b><br><span>${item.price} ج.م</span></div>
+        <div class="cart-item-compact">
+            <button onclick="removeFromCart(${idx})" style="border:none; background:none; color:red; cursor:pointer;">✕</button>
+            <div style="flex:1; padding:0 5px;"><b>${item.name.substring(0,15)}..</b></div>
             <div style="display:flex; align-items:center; gap:5px;">
-                <button onclick="changeQty(${idx}, -1)" class="qty-btn" style="padding:2px 8px;">-</button>
+                <button onclick="changeQty(${idx},-1)" class="qty-btn">-</button>
                 <span>${item.qty}</span>
-                <button onclick="changeQty(${idx}, 1)" class="qty-btn" style="padding:2px 8px;">+</button>
+                <button onclick="changeQty(${idx},1)" class="qty-btn">+</button>
             </div>
         </div>
     `).join('');
 }
 
-function changeQty(idx, val) {
-    cart[idx].qty += val;
-    if(cart[idx].qty < 1) cart.splice(idx, 1);
-    updateCartUI();
+function clearFullCart() { if(confirm('إفراغ السلة؟')) { cart = []; updateCartUI(); toggleCart(false); } }
+function changeQty(i,v){ cart[i].qty+=v; if(cart[i].qty<1) cart.splice(i,1); updateCartUI(); }
+function removeFromCart(i){ cart.splice(i,1); updateCartUI(); }
+function toggleCart(s){ 
+    const c = document.getElementById('cart-sidebar');
+    const o = document.getElementById('overlay');
+    if(s === true) { c.classList.add('active'); o.classList.add('active'); }
+    else { c.classList.toggle('active'); o.classList.toggle('active'); }
 }
 
-function removeFromCart(idx) { cart.splice(idx, 1); updateCartUI(); }
-
-function toggleCart(forceOpen = false) {
-    const side = document.getElementById('cart-sidebar');
-    const over = document.getElementById('overlay');
-    if(forceOpen) { side.classList.add('active'); over.classList.add('active'); }
-    else { side.classList.toggle('active'); over.classList.toggle('active'); }
+function searchProducts() {
+    let t = document.getElementById('search-input').value.toLowerCase();
+    renderProducts(products.filter(p => p.name.toLowerCase().includes(t)));
 }
 
 function sendToWhatsApp() {
-    if(!cart.length) return;
-    let msg = "طلب جديد من مشالى:\n";
-    cart.forEach(i => msg += `• ${i.name} (${i.qty}) = ${i.price * i.qty}ج\n`);
-    msg += `الإجمالي: ${document.getElementById('total-price').innerText} ج.م`;
-    window.open(`https://wa.me/201551831308?text=${encodeURIComponent(msg)}`);
+    let m = "طلب جديد من مشالى:\n" + cart.map(i => `- ${i.name} (${i.qty})`).join('\n');
+    window.open(`https://wa.me/201551831308?text=${encodeURIComponent(m)}`);
 }
 
 window.onload = init;
