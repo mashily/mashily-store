@@ -2,40 +2,87 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>إدارة مشالى</title>
+    <title>إدارة مشالى | المتطورة</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body style="padding:20px; background:#eee;">
-    <div style="max-width:800px; margin:auto; background:white; padding:30px; border-radius:15px;">
-        <h2>لوحة التحكم</h2><br>
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <div style="flex:1; background:#3498db; color:white; padding:15px; border-radius:10px;">المنتجات: <b id="cnt">0</b></div>
-            <div style="flex:1; background:#2ecc71; color:white; padding:15px; border-radius:10px;">القيمة: <b id="val">0</b></div>
+<body style="padding:20px; background:#eee; color:#333;">
+    <div style="max-width:900px; margin:auto; background:white; padding:30px; border-radius:20px;">
+        <div style="display:flex; justify-content:space-between;">
+            <h2>لوحة التحكم المتطورة</h2>
+            <a href="index.html">خروج</a>
         </div>
-        <input type="text" id="n" placeholder="اسم المنتج" style="width:100%; padding:10px; margin-bottom:10px;">
-        <input type="number" id="p" placeholder="السعر" style="width:100%; padding:10px; margin-bottom:10px;">
-        <input type="text" id="img" placeholder="رابط الصورة" style="width:100%; padding:10px; margin-bottom:10px;">
-        <select id="c" style="width:100%; padding:10px; margin-bottom:10px;"></select>
-        <button onclick="add()" style="width:100%; padding:15px; background:#2ecc71; border:none; color:white; border-radius:10px; cursor:pointer;">إضافة المنتج</button>
-        <hr style="margin:20px 0;">
-        <div id="list"></div>
+        <hr><br>
+
+        <div style="background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:20px;">
+            <h3>تعديل الشريط السفلي</h3>
+            <input type="text" id="new-ticker" style="width:80%; padding:10px;" placeholder="اكتب جملة العروض هنا...">
+            <button onclick="saveTicker()" class="qty-btn" style="width:18%;">حفظ</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+            <div style="background:#f9f9f9; padding:15px; border-radius:10px;">
+                <h3>إضافة صنف جديد</h3>
+                <input type="text" id="p-name" placeholder="اسم المنتج" style="width:100%; margin:5px 0; padding:8px;">
+                <input type="number" id="p-price" placeholder="السعر" style="width:100%; margin:5px 0; padding:8px;">
+                <input type="text" id="p-img" placeholder="رابط الصورة" style="width:100%; margin:5px 0; padding:8px;">
+                
+                <div style="margin:10px 0;">
+                    <label>اختر رمز للملصق:</label><br>
+                    <button onclick="setEmoji('🔥')" class="qty-btn" style="background:#eee; color:black;">🔥</button>
+                    <button onclick="setEmoji('🆕')" class="qty-btn" style="background:#eee; color:black;">🆕</button>
+                    <button onclick="setEmoji('💎')" class="qty-btn" style="background:#eee; color:black;">💎</button>
+                    <button onclick="setEmoji('⚡')" class="qty-btn" style="background:#eee; color:black;">⚡</button>
+                    <input type="text" id="p-label" placeholder="أو اكتب ملصق مخصص" style="width:100%; margin-top:5px; padding:8px;">
+                </div>
+
+                <select id="p-cat" style="width:100%; padding:8px; margin:5px 0;"></select>
+                <button onclick="addProduct()" class="qty-btn" style="width:100%; background:#2ecc71; height:40px; margin-top:10px;">إضافة للمتجر</button>
+            </div>
+
+            <div>
+                <h3>قائمة المنتجات الحالية</h3>
+                <div id="admin-list" style="max-height:400px; overflow-y:auto; border:1px solid #eee; padding:10px;"></div>
+            </div>
+        </div>
     </div>
+
     <script>
         if(sessionStorage.getItem('isAdmin')!=='true') window.location.href='login.html';
         let products = JSON.parse(localStorage.getItem('storeProducts')) || [];
         let cats = JSON.parse(localStorage.getItem('storeCats')) || ["تخزين", "إكسسوارات"];
-        
+
         function refresh() {
-            document.getElementById('cnt').innerText = products.length;
-            document.getElementById('val').innerText = products.reduce((s,i)=>s+i.price,0);
-            document.getElementById('c').innerHTML = cats.map(c=>`<option>${c}</option>`).join('');
-            document.getElementById('list').innerHTML = products.map((p,i)=>`<div>${p.name} - ${p.price}ج <b onclick="del(${i})" style="color:red; cursor:pointer;">حذف</b></div>`).join('');
+            document.getElementById('p-cat').innerHTML = cats.map(c => `<option>${c}</option>`).join('');
+            document.getElementById('admin-list').innerHTML = products.map((p,i) => `
+                <div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #eee;">
+                    <span>${p.name}</span>
+                    <b onclick="delProd(${i})" style="color:red; cursor:pointer;">حذف</b>
+                </div>
+            `).join('');
         }
-        function add() {
-            products.push({id: Date.now(), name: document.getElementById('n').value, price: parseInt(document.getElementById('p').value), image: document.getElementById('img').value, category: document.getElementById('c').value});
-            localStorage.setItem('storeProducts', JSON.stringify(products)); refresh();
+
+        function setEmoji(e) { document.getElementById('p-label').value = e; }
+
+        function saveTicker() {
+            let t = document.getElementById('new-ticker').value;
+            localStorage.setItem('tickerText', t);
+            alert('تم تحديث شريط الأخبار');
         }
-        function del(i) { products.splice(i,1); localStorage.setItem('storeProducts', JSON.stringify(products)); refresh(); }
+
+        function addProduct() {
+            products.push({
+                id: Date.now(),
+                name: document.getElementById('p-name').value,
+                price: parseInt(document.getElementById('p-price').value),
+                image: document.getElementById('p-img').value,
+                label: document.getElementById('p-label').value,
+                category: document.getElementById('p-cat').value
+            });
+            localStorage.setItem('storeProducts', JSON.stringify(products));
+            refresh();
+        }
+
+        function delProd(i) { products.splice(i,1); localStorage.setItem('storeProducts', JSON.stringify(products)); refresh(); }
         refresh();
     </script>
 </body>
