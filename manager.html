@@ -2,180 +2,133 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم مشالى | الإدارة</title>
+    <title>إدارة مشالى | النسخة الاحترافية</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f0f2f5; }
-        .admin-container { max-width: 900px; margin: 20px auto; padding: 15px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #ddd; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; }
-        .btn-save { background: #27ae60; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; }
-        .btn-video { background: #e67e22; }
-        .item-list { margin-top: 15px; }
-        .list-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; background: #fff; }
-        .list-row:last-child { border: none; }
-        .actions button { margin-right: 5px; padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; }
-        .edit-btn { background: #3498db; color: white; }
-        .del-btn { background: #e74c3c; color: white; }
-        #auth-screen { text-align: center; padding-top: 100px; }
+        body { background:#f4f7f6; padding:20px; font-family: 'Cairo', sans-serif; }
+        .box { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #ddd; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; }
+        .btn-act { background: #27ae60; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .emoji-item { cursor: pointer; font-size: 1.5rem; margin-right: 10px; }
+        .preview-img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen">
-        <div class="card" style="max-width: 400px; margin: auto;">
-            <i class="fas fa-user-shield fa-3x" style="color: #2c3e50; margin-bottom: 15px;"></i>
-            <h3>دخول الإدارة</h3>
-            <input type="password" id="admin-pass" placeholder="أدخل كلمة المرور">
-            <button class="btn-save" onclick="checkAuth()">دخول</button>
+    <div id="auth" style="text-align:center; padding-top:100px;">
+        <div class="box" style="max-width:350px; margin:auto;">
+            <h3>🔐 دخول الإدارة</h3>
+            <input type="password" id="pass" placeholder="كلمة المرور">
+            <button class="btn-act" onclick="lgn()">دخول</button>
             <br><br>
-            <a href="index.html" style="text-decoration:none; color:#666; font-size:0.8rem;">العودة للمتجر</a>
+            <a href="index.html" style="text-decoration:none; color:#666;"><i class="fas fa-arrow-right"></i> العودة للمتجر</a>
         </div>
     </div>
 
-    <div id="admin-content" class="admin-container" style="display: none;">
-        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 style="margin:0;">⚙️ لوحة التحكم</h2>
-            <button onclick="logout()" class="qty-btn" style="background:#444; width:auto; padding:5px 15px;">خروج</button>
+    <div id="main" style="display:none; max-width:900px; margin:auto;">
+        <div class="box" style="display:flex; justify-content:space-between; align-items:center; background:#2c3e50; color:white;">
+            <div>
+                <a href="index.html" style="color:white; margin-left:15px;"><i class="fas fa-home"></i></a>
+                <b>لوحة تحكم مشالى</b>
+            </div>
+            <button onclick="sessionStorage.clear();location.reload();" style="background:#e74c3c; border:none; color:white; padding:5px 10px; border-radius:5px;">خروج</button>
         </div>
 
-        <div class="card">
-            <h4>📢 شريط الأخبار والعروض</h4>
-            <div style="display:flex; gap:10px;">
-                <input id="ticker-input" placeholder="اكتب نص العرض هنا...">
-                <button class="qty-btn" style="width:100px;" onclick="updateTicker()">حفظ</button>
+        <div class="box">
+            <h4>📢 تعديل شريط الأخبار</h4>
+            <div style="margin-bottom:10px;">
+                <span class="emoji-item" onclick="document.getElementById('ticker-input').value+='🔥'">🔥</span>
+                <span class="emoji-item" onclick="document.getElementById('ticker-input').value+='⚡'">⚡</span>
+                <span class="emoji-item" onclick="document.getElementById('ticker-input').value+='✅'">✅</span>
+                <span class="emoji-item" onclick="document.getElementById('ticker-input').value+='🎁'">🎁</span>
+            </div>
+            <input id="ticker-input" placeholder="اكتب نص الشريط هنا...">
+            <button class="btn-act" style="background:#e67e22;" onclick="localStorage.setItem('tickerText', document.getElementById('ticker-input').value); alert('تم الحفظ')">حفظ الشريط</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+            <div class="box">
+                <h4>📦 إضافة منتج (صورة من الجهاز)</h4>
+                <input id="p-n" placeholder="اسم المنتج">
+                <input id="p-p" type="number" placeholder="السعر">
+                <label>اختر صورة:</label>
+                <input type="file" accept="image/*" onchange="encodeImageFileAsURL(this, 'p-img-data')">
+                <input type="hidden" id="p-img-data">
+                <select id="p-s">
+                    <option value="in">متوفر ✅</option>
+                    <option value="out">نفدت الكمية ❌</option>
+                </select>
+                <input id="p-c" placeholder="القسم">
+                <button class="btn-act" onclick="saveP()">حفظ المنتج</button>
+            </div>
+
+            <div class="box">
+                <h4>🎥 الأكاديمية (فيديو + ملف)</h4>
+                <input id="v-t" placeholder="عنوان الدرس">
+                <input id="v-u" placeholder="رابط يوتيوب">
+                <input id="v-file-url" placeholder="رابط ملف التحميل (اختياري)">
+                <input id="v-c" placeholder="القسم">
+                <button class="btn-act" style="background:#3498db;" onclick="saveV()">إضافة الدرس</button>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="mobile-grid">
-            <div class="card">
-                <h4 id="product-form-title">📦 إضافة منتج جديد</h4>
-                <input type="hidden" id="edit-product-id">
-                <input id="p-name" placeholder="اسم المنتج">
-                <input id="p-price" type="number" placeholder="السعر">
-                <input id="p-img" placeholder="رابط الصورة">
-                <input id="p-cat" placeholder="القسم (رسيفرات، شاشات...)">
-                <button class="btn-save" onclick="saveProduct()">حفظ المنتج</button>
-            </div>
-
-            <div class="card">
-                <h4>🎥 إضافة فيديو للأكاديمية</h4>
-                <input id="v-title" placeholder="عنوان الفيديو">
-                <input id="v-url" placeholder="رابط يوتيوب">
-                <input id="v-cat" placeholder="القسم (تعليم، صيانة...)">
-                <button class="btn-save btn-video" onclick="saveVideo()">إضافة للفيديو</button>
-            </div>
+        <div class="box">
+            <h4>📑 سجل الطلبات الأخير</h4>
+            <div id="logs" style="font-size:0.8rem; max-height:150px; overflow-y:auto; background:#f9f9f9; padding:10px;"></div>
         </div>
 
-        <div class="card">
-            <h4>📋 إدارة المنتجات الحالية</h4>
-            <div id="admin-product-list" class="item-list"></div>
-        </div>
+        <div class="box" id="plist"></div>
     </div>
 
+    <script src="script.js"></script>
     <script>
-        // نظام الحماية
-        function checkAuth() {
-            if(document.getElementById('admin-pass').value === '123') {
-                sessionStorage.setItem('isMASHILYAdmin', 'true');
-                location.reload();
-            } else { alert('كلمة المرور خاطئة!'); }
-        }
+        function lgn(){ if(document.getElementById('pass').value==='123'){ sessionStorage.setItem('ok','1'); location.reload(); }}
+        if(sessionStorage.getItem('ok')==='1'){ document.getElementById('auth').style.display='none'; document.getElementById('main').style.display='block'; }
 
-        function logout() {
-            sessionStorage.removeItem('isMASHILYAdmin');
-            location.reload();
-        }
-
-        if(sessionStorage.getItem('isMASHILYAdmin') === 'true') {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('admin-content').style.display = 'block';
-        }
-
-        // جلب البيانات
-        let products = JSON.parse(localStorage.getItem('storeProducts')) || [];
-        let videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
-
-        // شريط الأخبار
         document.getElementById('ticker-input').value = localStorage.getItem('tickerText') || "";
-        function updateTicker() {
-            localStorage.setItem('tickerText', document.getElementById('ticker-input').value);
-            alert('تم تحديث شريط الأخبار بنجاح');
-        }
 
-        // حفظ المنتج (إضافة أو تعديل)
-        function saveProduct() {
-            const id = document.getElementById('edit-product-id').value;
-            const newP = {
-                id: id ? parseInt(id) : Date.now(),
-                name: document.getElementById('p-name').value,
-                price: document.getElementById('p-price').value,
-                image: document.getElementById('p-img').value,
-                category: document.getElementById('p-cat').value
-            };
-
-            if(id) {
-                products = products.map(p => p.id == id ? newP : p);
-            } else {
-                products.push(newP);
-            }
-
+        function saveP(){
+            let imgData = document.getElementById('p-img-data').value;
+            if(!imgData) { alert("من فضلك اختر صورة"); return; }
+            products.push({
+                id: Date.now(),
+                name: document.getElementById('p-n').value,
+                price: document.getElementById('p-p').value,
+                image: imgData,
+                stock: document.getElementById('p-s').value,
+                category: document.getElementById('p-c').value
+            });
             localStorage.setItem('storeProducts', JSON.stringify(products));
             location.reload();
         }
 
-        // إضافة فيديو
-        function saveVideo() {
-            const newV = {
+        function saveV(){
+            let v = JSON.parse(localStorage.getItem('academyVideos')) || [];
+            v.push({
                 id: Date.now(),
-                title: document.getElementById('v-title').value,
-                url: document.getElementById('v-url').value,
-                category: document.getElementById('v-cat').value
-            };
-            videos.push(newV);
-            localStorage.setItem('academyVideos', JSON.stringify(videos));
-            alert('تم إضافة الفيديو للأكاديمية');
+                title: document.getElementById('v-t').value,
+                url: document.getElementById('v-u').value,
+                fileUrl: document.getElementById('v-file-url').value,
+                category: document.getElementById('v-c').value
+            });
+            localStorage.setItem('academyVideos', JSON.stringify(v));
             location.reload();
         }
 
-        // حذف منتج
-        function deleteProduct(id) {
-            if(confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-                products = products.filter(p => p.id !== id);
-                localStorage.setItem('storeProducts', JSON.stringify(products));
-                renderAdminList();
-            }
-        }
-
-        // تعديل منتج
-        function editProduct(id) {
-            const p = products.find(x => x.id === id);
-            document.getElementById('edit-product-id').value = p.id;
-            document.getElementById('p-name').value = p.name;
-            document.getElementById('p-price').value = p.price;
-            document.getElementById('p-img').value = p.image;
-            document.getElementById('p-cat').value = p.category;
-            document.getElementById('product-form-title').innerText = "✏️ تعديل المنتج";
-            window.scrollTo(0,0);
-        }
-
-        // عرض القائمة للمدير
-        function renderAdminList() {
-            const list = document.getElementById('admin-product-list');
-            list.innerHTML = products.map(p => `
-                <div class="list-row">
-                    <span><b>${p.name}</b> (${p.category})</span>
-                    <div class="actions">
-                        <button class="edit-btn" onclick="editProduct(${p.id})"><i class="fas fa-edit"></i></button>
-                        <button class="del-btn" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button>
-                    </div>
+        function render(){
+            document.getElementById('plist').innerHTML = "<h4>المنتجات الحالية:</h4>" + products.map(p=>`
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
+                    <img src="${p.image}" class="preview-img">
+                    <span>${p.name}</span>
+                    <button onclick="delP(${p.id})" style="color:red; background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i></button>
                 </div>
             `).join('');
+            let h = JSON.parse(localStorage.getItem('orderHistory')) || [];
+            document.getElementById('logs').innerHTML = h.map(o => `<div><b>${o.date}:</b> ${o.details}</div>`).join('');
         }
-
-        renderAdminList();
+        function delP(id){ if(confirm('حذف؟')){ products=products.filter(x=>x.id!=id); localStorage.setItem('storeProducts', JSON.stringify(products)); render(); }}
+        render();
     </script>
 </body>
 </html>

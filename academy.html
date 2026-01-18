@@ -3,155 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أكاديمية مشالى التعليمية | دروس وحلول</title>
+    <title>أكاديمية مشالى | شروحات تقنية</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .academy-search-bar {
-            padding: 20px 4%;
-            background: #fff;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .academy-search-bar input {
-            flex: 1;
-            min-width: 250px;
-            padding: 12px 20px;
-            border-radius: 25px;
-            border: 2px solid #eee;
-            outline: none;
-            font-size: 0.9rem;
-        }
-        .academy-search-bar input:focus { border-color: var(--primary); }
-        
-        .video-card {
-            background: #fff;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: 0.3s;
-            border: 1px solid #eee;
-        }
-        .video-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-        
-        .video-info { padding: 15px; }
-        .video-tag {
-            background: rgba(230, 126, 34, 0.1);
-            color: var(--primary);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-        .share-btn {
-            background: none;
-            border: 1px solid #ddd;
-            color: #666;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .share-btn:hover { background: #f8f9fa; color: var(--primary); border-color: var(--primary); }
-    </style>
 </head>
-<body>
-
-    <header style="background: #fff; border-bottom: 2px solid var(--primary);">
-        <div class="header-top">
-            <a href="index.html" style="text-decoration:none; color:var(--text); font-weight:bold; font-size:0.9rem;">
-                <i class="fas fa-arrow-right"></i> العودة للمتجر
-            </a>
-            <h3 style="color:var(--primary); margin:0;">📺 أكاديمية مشالى</h3>
-            <div style="width:50px;"></div>
+<body style="background:#f8f9fa;">
+    <header style="background:#fff; border-bottom:2px solid #e67e22; padding:15px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <a href="index.html" style="text-decoration:none; color:#333;"><i class="fas fa-arrow-right"></i> المتجر</a>
+            <h3 style="color:#e67e22; margin:0;">📺 أكاديمية مشالى</h3>
+            <div style="width:40px;"></div>
         </div>
     </header>
 
-    <div class="academy-search-bar">
-        <input type="text" id="academy-search" onkeyup="searchAcademy()" placeholder="ابحث عن درس أو حل لمشكلة...">
+    <div style="padding:15px;">
+        <input type="text" id="v-search" onkeyup="renderAcademy()" placeholder="ابحث في الدروس..." style="width:100%; padding:12px; border-radius:25px; border:1px solid #ddd; outline:none;">
     </div>
 
-    <div class="cat-nav-scroll" id="v-cats" style="background:#fff; padding-top:0;"></div>
-
-    <main class="products-grid" id="v-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; padding: 20px;">
-        </main>
+    <main class="products-grid" id="v-grid" style="padding:15px;"></main>
 
     <script>
-        const vids = JSON.parse(localStorage.getItem('academyVideos')) || [];
-        let currentFilter = 'الكل';
-
-        function renderAcademy(filter = 'الكل', searchTerm = '') {
-            currentFilter = filter;
+        function renderAcademy() {
             const grid = document.getElementById('v-grid');
-            const catNav = document.getElementById('v-cats');
+            const vids = JSON.parse(localStorage.getItem('academyVideos')) || [];
+            const likes = JSON.parse(localStorage.getItem('videoLikes')) || {};
+            const term = document.getElementById('v-search').value.toLowerCase();
 
-            // تحديث الأقسام
-            const cats = ['الكل', ...new Set(vids.map(v => v.category).filter(c => c))];
-            catNav.innerHTML = cats.map(c => `
-                <button class="cat-btn-chip ${currentFilter === c ? 'active' : ''}" 
-                        onclick="renderAcademy('${c}')">
-                    ${c}
-                </button>
-            `).join('');
-
-            // تصفية النتائج (قسم + بحث)
-            let filtered = filter === 'الكل' ? vids : vids.filter(v => v.category === filter);
-            if(searchTerm) {
-                filtered = filtered.filter(v => v.title.toLowerCase().includes(searchTerm.toLowerCase()));
-            }
-
-            if(filtered.length === 0) {
-                grid.innerHTML = `<div style="text-align:center; grid-column: 1/-1; padding:50px;">
-                    <i class="fas fa-search fa-3x" style="color:#ddd; margin-bottom:15px;"></i>
-                    <p style="color:#999;">لم نجد دروساً تطابق بحثك</p>
-                </div>`;
-                return;
-            }
+            let filtered = vids.filter(v => v.title.toLowerCase().includes(term));
 
             grid.innerHTML = filtered.map(v => {
-                let videoId = v.url.split('v=')[1] || v.url.split('/').pop();
-                if(videoId.includes('&')) videoId = videoId.split('&')[0];
-
+                let vId = v.url.split('v=')[1] || v.url.split('/').pop();
                 return `
-                    <div class="video-card">
-                        <div style="position:relative; padding-bottom:56.25%; height:0; background:#000;">
-                            <iframe src="https://www.youtube.com/embed/${videoId}" 
-                                    style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" 
-                                    allowfullscreen></iframe>
+                <div class="product-card" style="padding:0; overflow:hidden; background:white; border-radius:15px; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
+                    <iframe width="100%" height="180" src="https://www.youtube.com/embed/${vId}" frameborder="0" allowfullscreen></iframe>
+                    <div style="padding:15px;">
+                        <h4 style="font-size:0.9rem; margin-bottom:12px;">${v.title}</h4>
+                        
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:12px;">
+                            ${v.fileUrl ? `<a href="${v.fileUrl}" target="_blank" style="text-decoration:none; background:#27ae60; color:white; padding:6px; border-radius:8px; font-size:0.7rem; text-align:center;"><i class="fas fa-file-download"></i> ملف الشرح</a>` : ''}
+                            <a href="https://ssyoutube.com/en1/youtube-video-downloader?url=${v.url}" target="_blank" style="text-decoration:none; background:#c0392b; color:white; padding:6px; border-radius:8px; font-size:0.7rem; text-align:center;"><i class="fas fa-video"></i> تحميل الفيديو</a>
                         </div>
-                        <div class="video-info">
-                            <span class="video-tag">${v.category}</span>
-                            <h4 style="margin:0 0 15px 0; font-size:1rem; line-height:1.5; color:#2c3e50; height:3em; overflow:hidden;">${v.title}</h4>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <button class="share-btn" onclick="shareLesson('${v.title}', '${v.url}')">
-                                    <i class="fas fa-share-alt"></i> مشاركة
-                                </button>
-                                <i class="fab fa-youtube" style="color:red; font-size:1.2rem;"></i>
-                            </div>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <button onclick="likeV(${v.id})" style="background:none; border:1px solid #eee; padding:5px 12px; border-radius:10px; cursor:pointer;">
+                                👍 <span id="l-${v.id}">${likes[v.id]||0}</span>
+                            </button>
+                            <span style="color:#e67e22; font-size:0.75rem; font-weight:bold;">#${v.category}</span>
                         </div>
                     </div>
-                `;
-            }).join('');
+                </div>
+            `}).join('');
         }
 
-        function searchAcademy() {
-            const term = document.getElementById('academy-search').value;
-            renderAcademy(currentFilter, term);
+        function likeV(id){
+            let l = JSON.parse(localStorage.getItem('videoLikes')) || {};
+            l[id] = (l[id]||0)+1;
+            localStorage.setItem('videoLikes', JSON.stringify(l));
+            document.getElementById('l-'+id).innerText = l[id];
         }
-
-        function shareLesson(title, url) {
-            if (navigator.share) {
-                navigator.share({ title: title, url: url });
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(title + " : " + url)}`);
-            }
-        }
-
-        window.onload = () => renderAcademy();
+        window.onload = renderAcademy;
     </script>
 </body>
 </html>
