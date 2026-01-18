@@ -2,133 +2,186 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>إدارة مشالى | النسخة الاحترافية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم مشالى | الإدارة الكاملة</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background:#f4f7f6; padding:20px; font-family: 'Cairo', sans-serif; }
-        .box { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #ddd; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; }
-        .btn-act { background: #27ae60; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .emoji-item { cursor: pointer; font-size: 1.5rem; margin-right: 10px; }
-        .preview-img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; }
+        body { background:#f0f2f5; padding:15px; font-family: 'Cairo', sans-serif; }
+        .admin-container { max-width: 1100px; margin: auto; }
+        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e1e4e8; }
+        h3, h4 { margin-top: 0; color: #2c3e50; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-family: 'Cairo'; box-sizing: border-box; }
+        .btn-save { background: #27ae60; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1rem; }
+        .btn-save:hover { background: #219150; }
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; background: #2c3e50; color: white; padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; }
+        .grid-half { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid-half { grid-template-columns: 1fr; } }
+        .item-row { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .item-row img { width: 40px; height: 40px; object-fit: contain; margin-left: 10px; }
+        .delete-btn { color: #e74c3c; cursor: pointer; border: none; background: none; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
-    <div id="auth" style="text-align:center; padding-top:100px;">
-        <div class="box" style="max-width:350px; margin:auto;">
-            <h3>🔐 دخول الإدارة</h3>
-            <input type="password" id="pass" placeholder="كلمة المرور">
-            <button class="btn-act" onclick="lgn()">دخول</button>
-            <br><br>
-            <a href="index.html" style="text-decoration:none; color:#666;"><i class="fas fa-arrow-right"></i> العودة للمتجر</a>
+<div class="admin-container">
+    <div id="auth-screen" style="text-align:center; padding-top:100px;">
+        <div class="card" style="max-width:400px; margin:auto;">
+            <i class="fas fa-lock fa-3x" style="color:var(--primary); margin-bottom:15px;"></i>
+            <h3>دخول الإدارة</h3>
+            <input type="password" id="admin-pass" placeholder="أدخل كلمة المرور">
+            <button class="btn-save" onclick="checkPass()">دخول</button>
+            <p><a href="index.html" style="color:#666; text-decoration:none;">العودة للموقع</a></p>
         </div>
     </div>
 
-    <div id="main" style="display:none; max-width:900px; margin:auto;">
-        <div class="box" style="display:flex; justify-content:space-between; align-items:center; background:#2c3e50; color:white;">
-            <div>
-                <a href="index.html" style="color:white; margin-left:15px;"><i class="fas fa-home"></i></a>
-                <b>لوحة تحكم مشالى</b>
-            </div>
-            <button onclick="sessionStorage.clear();location.reload();" style="background:#e74c3c; border:none; color:white; padding:5px 10px; border-radius:5px;">خروج</button>
+    <div id="admin-panel" style="display:none;">
+        <div class="nav-bar">
+            <span><i class="fas fa-user-cog"></i> مدير متجر مشالى</span>
+            <button onclick="logout()" style="background:#e74c3c; color:white; border:none; padding:5px 15px; border-radius:5px; cursor:pointer;">خروج</button>
         </div>
 
-        <div class="box">
-            <h4>📢 تعديل شريط الأخبار</h4>
-            <div style="margin-bottom:10px;">
-                <span class="emoji-item" onclick="document.getElementById('ticker-input').value+='🔥'">🔥</span>
-                <span class="emoji-item" onclick="document.getElementById('ticker-input').value+='⚡'">⚡</span>
-                <span class="emoji-item" onclick="document.getElementById('ticker-input').value+='✅'">✅</span>
-                <span class="emoji-item" onclick="document.getElementById('ticker-input').value+='🎁'">🎁</span>
-            </div>
-            <input id="ticker-input" placeholder="اكتب نص الشريط هنا...">
-            <button class="btn-act" style="background:#e67e22;" onclick="localStorage.setItem('tickerText', document.getElementById('ticker-input').value); alert('تم الحفظ')">حفظ الشريط</button>
-        </div>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-            <div class="box">
-                <h4>📦 إضافة منتج (صورة من الجهاز)</h4>
-                <input id="p-n" placeholder="اسم المنتج">
-                <input id="p-p" type="number" placeholder="السعر">
-                <label>اختر صورة:</label>
-                <input type="file" accept="image/*" onchange="encodeImageFileAsURL(this, 'p-img-data')">
-                <input type="hidden" id="p-img-data">
-                <select id="p-s">
-                    <option value="in">متوفر ✅</option>
-                    <option value="out">نفدت الكمية ❌</option>
-                </select>
-                <input id="p-c" placeholder="القسم">
-                <button class="btn-act" onclick="saveP()">حفظ المنتج</button>
+        <div class="grid-half">
+            <div class="card">
+                <h4>📦 إضافة منتج جديد</h4>
+                <input id="name" placeholder="اسم الصنف">
+                <input id="price" type="number" placeholder="السعر (ج.م)">
+                <textarea id="desc" placeholder="وصف الصنف (يظهر عند الضغط على الصورة في المتجر)"></textarea>
+                <input id="cat" placeholder="القسم (رسيفرات، شاشات، قطع غيار...)">
+                <label>صورة المنتج:</label>
+                <input type="file" accept="image/*" id="img-input" onchange="handleImg(this)">
+                <input type="hidden" id="img-base64">
+                <button class="btn-save" onclick="addProduct()">حفظ المنتج</button>
             </div>
 
-            <div class="box">
-                <h4>🎥 الأكاديمية (فيديو + ملف)</h4>
-                <input id="v-t" placeholder="عنوان الدرس">
-                <input id="v-u" placeholder="رابط يوتيوب">
-                <input id="v-file-url" placeholder="رابط ملف التحميل (اختياري)">
-                <input id="v-c" placeholder="القسم">
-                <button class="btn-act" style="background:#3498db;" onclick="saveV()">إضافة الدرس</button>
+            <div class="card">
+                <h4>📢 التحكم في المتجر</h4>
+                <label>نص شريط الأخبار (الذي يتحرك بالأسفل):</label>
+                <input id="ticker-input" placeholder="اكتب أخبار المتجر هنا...">
+                <button class="btn-save" style="background:#3498db;" onclick="saveTicker()">حفظ الشريط</button>
+
+                <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+
+                <label>قائمة الإشعارات المتغيرة (افصل بين الجمل بفاصلة ،):</label>
+                <textarea id="proof-input" placeholder="مثال: أحمد اشترى رسيفر، محمد انضم للأكاديمية، تم شحن طلب جديد"></textarea>
+                <button class="btn-save" style="background:#9b59b6;" onclick="saveProof()">حفظ قائمة الإشعارات</button>
             </div>
         </div>
 
-        <div class="box">
-            <h4>📑 سجل الطلبات الأخير</h4>
-            <div id="logs" style="font-size:0.8rem; max-height:150px; overflow-y:auto; background:#f9f9f9; padding:10px;"></div>
+        <div class="grid-half">
+            <div class="card">
+                <h4>📋 المنتجات الحالية (${JSON.parse(localStorage.getItem('storeProducts') || '[]').length})</h4>
+                <div id="product-list" style="max-height:300px; overflow-y:auto;"></div>
+            </div>
+
+            <div class="card">
+                <h4>🎥 دروس الأكاديمية</h4>
+                <input id="v-title" placeholder="عنوان الدرس">
+                <input id="v-url" placeholder="رابط فيديو يوتيوب">
+                <button class="btn-save" style="background:#f39c12;" onclick="addVideo()">إضافة الدرس</button>
+                <div id="video-list" style="margin-top:15px; max-height:150px; overflow-y:auto;"></div>
+            </div>
         </div>
 
-        <div class="box" id="plist"></div>
+        <div class="card">
+            <h4>📑 آخر الطلبات (التي تمت عبر واتساب)</h4>
+            <div id="order-logs" style="background:#f9f9f9; padding:10px; border-radius:8px; font-size:0.9rem;"></div>
+        </div>
     </div>
+</div>
 
-    <script src="script.js"></script>
-    <script>
-        function lgn(){ if(document.getElementById('pass').value==='123'){ sessionStorage.setItem('ok','1'); location.reload(); }}
-        if(sessionStorage.getItem('ok')==='1'){ document.getElementById('auth').style.display='none'; document.getElementById('main').style.display='block'; }
-
-        document.getElementById('ticker-input').value = localStorage.getItem('tickerText') || "";
-
-        function saveP(){
-            let imgData = document.getElementById('p-img-data').value;
-            if(!imgData) { alert("من فضلك اختر صورة"); return; }
-            products.push({
-                id: Date.now(),
-                name: document.getElementById('p-n').value,
-                price: document.getElementById('p-p').value,
-                image: imgData,
-                stock: document.getElementById('p-s').value,
-                category: document.getElementById('p-c').value
-            });
-            localStorage.setItem('storeProducts', JSON.stringify(products));
+<script>
+    // نظام الحماية
+    function checkPass() {
+        if(document.getElementById('admin-pass').value === '123') {
+            sessionStorage.setItem('isAdmin', 'true');
             location.reload();
-        }
+        } else { alert('كلمة المرور خطأ!'); }
+    }
 
-        function saveV(){
-            let v = JSON.parse(localStorage.getItem('academyVideos')) || [];
-            v.push({
-                id: Date.now(),
-                title: document.getElementById('v-t').value,
-                url: document.getElementById('v-u').value,
-                fileUrl: document.getElementById('v-file-url').value,
-                category: document.getElementById('v-c').value
-            });
-            localStorage.setItem('academyVideos', JSON.stringify(v));
-            location.reload();
-        }
+    if(sessionStorage.getItem('isAdmin') === 'true') {
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+    }
 
-        function render(){
-            document.getElementById('plist').innerHTML = "<h4>المنتجات الحالية:</h4>" + products.map(p=>`
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
-                    <img src="${p.image}" class="preview-img">
+    function logout() { sessionStorage.clear(); location.reload(); }
+
+    // معالجة الصورة
+    function handleImg(input) {
+        let reader = new FileReader();
+        reader.onload = function(e) { document.getElementById('img-base64').value = e.target.result; };
+        reader.readAsDataURL(input.files[0]);
+    }
+
+    // إدارة البيانات
+    let products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+    let videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+
+    document.getElementById('ticker-input').value = localStorage.getItem('tickerText') || "";
+    document.getElementById('proof-input').value = localStorage.getItem('proofText') || "";
+
+    function addProduct() {
+        const name = document.getElementById('name').value;
+        const img = document.getElementById('img-base64').value;
+        if(!name || !img) return alert('أكمل البيانات والصورة!');
+        
+        products.push({
+            id: Date.now(),
+            name: name,
+            price: document.getElementById('price').value,
+            desc: document.getElementById('desc').value,
+            category: document.getElementById('cat').value,
+            image: img
+        });
+        localStorage.setItem('storeProducts', JSON.stringify(products));
+        alert('تم الحفظ!'); location.reload();
+    }
+
+    function saveTicker() {
+        localStorage.setItem('tickerText', document.getElementById('ticker-input').value);
+        alert('تم تحديث شريط الأخبار ✅');
+    }
+
+    function saveProof() {
+        localStorage.setItem('proofText', document.getElementById('proof-input').value);
+        alert('تم تحديث قائمة الإشعارات ✅');
+    }
+
+    function addVideo() {
+        videos.push({ title: document.getElementById('v-title').value, url: document.getElementById('v-url').value });
+        localStorage.setItem('academyVideos', JSON.stringify(videos));
+        location.reload();
+    }
+
+    function renderAdmin() {
+        document.getElementById('product-list').innerHTML = products.map(p => `
+            <div class="item-row">
+                <div style="display:flex; align-items:center;">
+                    <img src="${p.image}">
                     <span>${p.name}</span>
-                    <button onclick="delP(${p.id})" style="color:red; background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i></button>
                 </div>
-            `).join('');
-            let h = JSON.parse(localStorage.getItem('orderHistory')) || [];
-            document.getElementById('logs').innerHTML = h.map(o => `<div><b>${o.date}:</b> ${o.details}</div>`).join('');
+                <button class="delete-btn" onclick="deleteP(${p.id})"><i class="fas fa-trash"></i></button>
+            </div>
+        `).join('') || "لا يوجد منتجات";
+
+        let orders = JSON.parse(localStorage.getItem('orderHistory')) || [];
+        document.getElementById('order-logs').innerHTML = orders.map(o => `
+            <div style="padding:5px; border-bottom:1px solid #ddd;">
+                <small style="color:orange">${o.date}</small> - ${o.details}
+            </div>
+        `).join('') || "لا يوجد طلبات مسجلة";
+    }
+
+    function deleteP(id) {
+        if(confirm('حذف هذا المنتج؟')) {
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem('storeProducts', JSON.stringify(products));
+            renderAdmin();
         }
-        function delP(id){ if(confirm('حذف؟')){ products=products.filter(x=>x.id!=id); localStorage.setItem('storeProducts', JSON.stringify(products)); render(); }}
-        render();
-    </script>
+    }
+
+    renderAdmin();
+</script>
+
 </body>
 </html>

@@ -3,54 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر مشالى | الإلكترونيات الذكية</title>
+    <title>متجر مشالى | الإلكترونيات</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .badge-premium { position: absolute; top: 10px; right: 10px; background: #27ae60; color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.65rem; z-index: 5; }
-        .whatsapp-float { position: fixed; bottom: 20px; left: 20px; background: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 2000; text-decoration: none; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
-    </style>
 </head>
 <body>
     <header>
         <div class="header-top">
-            <a href="index.html" style="text-decoration:none; color:var(--primary); font-weight:900; font-size:1.4rem;">⚡ مشالى</a>
-            <div style="flex:1; max-width:400px; position:relative;">
-                <input type="text" id="search-input" onkeyup="searchProducts()" placeholder="ابحث عن منتج...">
-            </div>
-            <div style="display:flex; gap:15px; align-items:center;">
-                <a href="manager.html" style="color:#999;"><i class="fas fa-user-cog fa-lg"></i></a>
-                <div onclick="toggleCart(true)" style="cursor:pointer; position:relative;">
-                    <i class="fas fa-shopping-basket fa-lg"></i>
-                    <span id="cart-badge" style="position:absolute; top:-8px; right:-8px; background:red; color:white; border-radius:50%; padding:2px 5px; font-size:10px;">0</span>
+            <a href="index.html" class="logo">⚡ مشالى</a>
+            <div style="flex:1; max-width:300px;"><input type="text" id="search-input" onkeyup="searchProducts()" placeholder="ابحث عن رسيفر، وصلة..."></div>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <a href="manager.html" style="color:var(--text); font-size:1.1rem;"><i class="fas fa-user-shield"></i></a>
+                <div onclick="toggleDarkMode()" style="cursor:pointer; color:var(--text); font-size:1.1rem;"><i id="theme-icon" class="fas fa-moon"></i></div>
+                <div onclick="toggleCart(true)" style="position:relative; cursor:pointer; color:var(--text); font-size:1.1rem;">
+                    <i class="fas fa-shopping-basket"></i>
+                    <span id="cart-badge" class="badge">0</span>
                 </div>
             </div>
         </div>
-        <div style="margin-top:10px;"><a href="academy.html" style="color:#e67e22; text-decoration:none; font-weight:bold; font-size:0.85rem;"><i class="fas fa-graduation-cap"></i> الأكاديمية التعليمية</a></div>
+        <div style="text-align:center; padding:10px; background:#fcfcfc;" id="sub-nav">
+            <a href="academy.html" class="academy-link">📺 الأكاديمية التعليمية (شروحات)</a>
+        </div>
     </header>
 
     <div class="cat-nav-scroll" id="product-cats"></div>
-    <div class="news-ticker"><div class="ticker-content" id="ticker-text"></div></div>
+
+    <div class="news-ticker">
+        <div class="ticker-content" id="ticker-text">🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥</div>
+    </div>
+
     <main class="products-grid" id="products-grid"></main>
 
     <div id="cart-sidebar" class="cart-sidebar">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h4>🛒 سلتك</h4>
-            <button onclick="clearFullCart()" style="background:none; border:none; color:red; cursor:pointer; font-size:0.7rem;">مسح الكل</button>
-            <button onclick="toggleCart(false)" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">✕</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px;">
+            <h4>🛒 سلة مشترياتك</h4>
+            <button onclick="toggleCart(false)" style="background:none; border:none; font-size:1.5rem;">✕</button>
         </div>
-        <hr>
-        <div id="cart-items"></div>
-        <div style="position:absolute; bottom:20px; width:calc(100% - 30px);">
-            <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:10px;">
-                <span>الإجمالي:</span> <span id="total-price">0</span> ج.م
-            </div>
-            <button onclick="sendToWhatsApp()" style="width:100%; background:#25d366; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;"><i class="fab fa-whatsapp"></i> اطلب الآن</button>
-        </div>
+        <div id="cart-items" style="padding:10px; overflow-y:auto; height:calc(100% - 200px);"></div>
+       <div class="cart-footer">
+    <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:10px;">
+        <span>الإجمالي:</span>
+        <span id="total-price">0</span> ج.م
+    </div>
+    <button onclick="sendToWhatsApp()" class="order-btn" style="display:flex; align-items:center; justify-content:center; gap:10px;">
+        <i class="fab fa-whatsapp" style="font-size:1.3rem;"></i> 
+        إتمام الطلب عبر واتساب
+    </button>
+</div>
     </div>
     <div id="overlay" class="overlay" onclick="toggleCart(false)"></div>
-    <a href="https://wa.me/201551831308" class="whatsapp-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
+
     <script src="script.js"></script>
+    <a href="https://wa.me/201551831308" class="whatsapp-float" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+</a>
 </body>
 </html>
