@@ -3,185 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم مشالى | الإدارة الكاملة</title>
+    <title>لوحة تحكم مشالى | النسخة الاحترافية</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background:#f0f2f5; padding:15px; font-family: 'Cairo', sans-serif; }
-        .admin-container { max-width: 1100px; margin: auto; }
+        body { background:#f0f2f5; padding:15px; font-family: 'Cairo', sans-serif; direction: rtl;}
+        .admin-container { max-width: 1200px; margin: auto; }
         .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e1e4e8; }
-        h3, h4 { margin-top: 0; color: #2c3e50; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 5px; }
+        h4 { margin-top: 0; color: #2c3e50; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 5px; margin-bottom: 15px; }
         input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-family: 'Cairo'; box-sizing: border-box; }
-        .btn-save { background: #27ae60; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1rem; }
-        .btn-save:hover { background: #219150; }
+        .btn-save { background: #27ae60; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1rem; transition: 0.3s; }
+        .btn-save:hover { opacity: 0.9; transform: translateY(-2px); }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; background: #2c3e50; color: white; padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; }
-        .grid-half { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 768px) { .grid-half { grid-template-columns: 1fr; } }
-        .item-row { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
-        .item-row img { width: 40px; height: 40px; object-fit: contain; margin-left: 10px; }
-        .delete-btn { color: #e74c3c; cursor: pointer; border: none; background: none; font-size: 1.1rem; }
+        .logout-btn { background: #e74c3c; color: white; border: none; padding: 7px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .grid-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
+        @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
+        .item-list { max-height: 350px; overflow-y: auto; background: #fafafa; border-radius: 8px; padding: 10px; border: 1px solid #eee; }
+        .item-row { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; background: #fff; margin-bottom: 8px; border-radius: 8px; }
+        .action-btns { display: flex; gap: 12px; font-size: 1.1rem; }
+        .edit-i { color: #3498db; cursor: pointer; }
+        .del-i { color: #e74c3c; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="admin-container">
-    <div id="auth-screen" style="text-align:center; padding-top:100px;">
-        <div class="card" style="max-width:400px; margin:auto;">
-            <i class="fas fa-lock fa-3x" style="color:var(--primary); margin-bottom:15px;"></i>
+    <div id="auth-screen" style="text-align:center; padding-top:80px;">
+        <div class="card" style="max-width:400px; margin:auto; border-top: 5px solid var(--primary);">
+            <i class="fas fa-user-lock fa-4x" style="color:var(--primary); margin-bottom:15px;"></i>
             <h3>دخول الإدارة</h3>
             <input type="password" id="admin-pass" placeholder="أدخل كلمة المرور">
             <button class="btn-save" onclick="checkPass()">دخول</button>
-            <p><a href="index.html" style="color:#666; text-decoration:none;">العودة للموقع</a></p>
+            <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+                <a href="index.html" style="color: var(--primary); text-decoration: none; font-weight: bold;">
+                    <i class="fas fa-arrow-right"></i> العودة للموقع الأساسي
+                </a>
+            </div>
         </div>
     </div>
 
     <div id="admin-panel" style="display:none;">
         <div class="nav-bar">
-            <span><i class="fas fa-user-cog"></i> مدير متجر مشالى</span>
-            <button onclick="logout()" style="background:#e74c3c; color:white; border:none; padding:5px 15px; border-radius:5px; cursor:pointer;">خروج</button>
-        </div>
-
-        <div class="grid-half">
-            <div class="card">
-                <h4>📦 إضافة منتج جديد</h4>
-                <input id="name" placeholder="اسم الصنف">
-                <input id="price" type="number" placeholder="السعر (ج.م)">
-                <textarea id="desc" placeholder="وصف الصنف (يظهر عند الضغط على الصورة في المتجر)"></textarea>
-                <input id="cat" placeholder="القسم (رسيفرات، شاشات، قطع غيار...)">
-                <label>صورة المنتج:</label>
-                <input type="file" accept="image/*" id="img-input" onchange="handleImg(this)">
-                <input type="hidden" id="img-base64">
-                <button class="btn-save" onclick="addProduct()">حفظ المنتج</button>
-            </div>
-
-            <div class="card">
-                <h4>📢 التحكم في المتجر</h4>
-                <label>نص شريط الأخبار (الذي يتحرك بالأسفل):</label>
-                <input id="ticker-input" placeholder="اكتب أخبار المتجر هنا...">
-                <button class="btn-save" style="background:#3498db;" onclick="saveTicker()">حفظ الشريط</button>
-
-                <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
-
-                <label>قائمة الإشعارات المتغيرة (افصل بين الجمل بفاصلة ،):</label>
-                <textarea id="proof-input" placeholder="مثال: أحمد اشترى رسيفر، محمد انضم للأكاديمية، تم شحن طلب جديد"></textarea>
-                <button class="btn-save" style="background:#9b59b6;" onclick="saveProof()">حفظ قائمة الإشعارات</button>
+            <span>⚙️ لوحة تحكم مشالى</span>
+            <div style="display:flex; gap:10px;">
+                <a href="index.html" style="color:white; text-decoration:none;">عرض الموقع</a>
+                <button class="logout-btn" onclick="logoutAdmin()">خروج <i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
 
-        <div class="grid-half">
+        <div class="grid-layout">
             <div class="card">
-                <h4>📋 المنتجات الحالية (${JSON.parse(localStorage.getItem('storeProducts') || '[]').length})</h4>
-                <div id="product-list" style="max-height:300px; overflow-y:auto;"></div>
+                <h4 id="p-title">📦 إدارة المنتجات</h4>
+                <input id="p-id" type="hidden">
+                <input id="p-name" placeholder="اسم المنتج">
+                <div style="display:flex; gap:10px;">
+                    <input id="p-price" type="number" placeholder="السعر">
+                    <select id="p-cat-select"></select>
+                </div>
+                <textarea id="p-desc" placeholder="وصف المنتج الذي يظهر عند الضغط..."></textarea>
+                <input type="file" accept="image/*" onchange="handleImg(this)">
+                <input type="hidden" id="p-img-base64">
+                <button class="btn-save" id="p-btn" onclick="saveProduct()">حفظ المنتج</button>
+                <div class="item-list" id="product-list-area" style="margin-top:15px;"></div>
             </div>
 
-            <div class="card">
-                <h4>🎥 دروس الأكاديمية</h4>
-                <input id="v-title" placeholder="عنوان الدرس">
-                <input id="v-url" placeholder="رابط فيديو يوتيوب">
-                <button class="btn-save" style="background:#f39c12;" onclick="addVideo()">إضافة الدرس</button>
-                <div id="video-list" style="margin-top:15px; max-height:150px; overflow-y:auto;"></div>
+            <div class="card" style="border-right: 4px solid #e74c3c;">
+                <h4 id="v-title-head">🎥 دروس الأكاديمية</h4>
+                <input id="v-id" type="hidden">
+                <input id="v-name" placeholder="عنوان الفيديو">
+                <input id="v-url" placeholder="رابط يوتيوب">
+                <button class="btn-save" id="v-btn" style="background:#e74c3c;" onclick="saveVideo()">حفظ الدرس</button>
+                <div class="item-list" id="video-list-area" style="margin-top:15px;"></div>
             </div>
         </div>
 
-        <div class="card">
-            <h4>📑 آخر الطلبات (التي تمت عبر واتساب)</h4>
-            <div id="order-logs" style="background:#f9f9f9; padding:10px; border-radius:8px; font-size:0.9rem;"></div>
+        <div class="grid-layout">
+            <div class="card">
+                <h4>📂 إدارة الأقسام</h4>
+                <div style="display:flex; gap:5px;">
+                    <input id="new-cat-input" placeholder="اسم القسم الجديد">
+                    <button class="btn-save" style="width:80px; background:#3498db;" onclick="addCategory()">إضافة</button>
+                </div>
+                <div class="item-list" id="cat-list-area" style="margin-top:10px; max-height:150px;"></div>
+            </div>
+            <div class="card">
+                <h4>📢 إعدادات الموقع</h4>
+                <input id="ticker-input" placeholder="شريط الأخبار المتحرك">
+                <button class="btn-save" style="background:#2c3e50; margin-bottom:10px;" onclick="saveTicker()">حفظ الشريط</button>
+                <textarea id="proof-input" placeholder="إشعارات الزوار (افصل بفاصلة ،)"></textarea>
+                <button class="btn-save" style="background:#8e44ad;" onclick="saveProof()">حفظ الإشعارات</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // نظام الحماية
+    // الحماية والخروج
     function checkPass() {
-        if(document.getElementById('admin-pass').value === '123') {
-            sessionStorage.setItem('isAdmin', 'true');
-            location.reload();
-        } else { alert('كلمة المرور خطأ!'); }
+        if(document.getElementById('admin-pass').value === '123') { 
+            sessionStorage.setItem('mashily_admin', 'true'); 
+            location.reload(); 
+        } else { alert('خطأ!'); }
     }
-
-    if(sessionStorage.getItem('isAdmin') === 'true') {
+    function logoutAdmin() {
+        sessionStorage.removeItem('mashily_admin');
+        location.reload();
+    }
+    if(sessionStorage.getItem('mashily_admin') === 'true') {
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display = 'block';
     }
 
-    function logout() { sessionStorage.clear(); location.reload(); }
-
-    // معالجة الصورة
-    function handleImg(input) {
-        let reader = new FileReader();
-        reader.onload = function(e) { document.getElementById('img-base64').value = e.target.result; };
-        reader.readAsDataURL(input.files[0]);
-    }
-
-    // إدارة البيانات
     let products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+    let categories = JSON.parse(localStorage.getItem('storeCategories')) || ['الكل', 'رسيفرات'];
     let videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
 
-    document.getElementById('ticker-input').value = localStorage.getItem('tickerText') || "";
-    document.getElementById('proof-input').value = localStorage.getItem('proofText') || "";
-
-    function addProduct() {
-        const name = document.getElementById('name').value;
-        const img = document.getElementById('img-base64').value;
-        if(!name || !img) return alert('أكمل البيانات والصورة!');
-        
-        products.push({
-            id: Date.now(),
-            name: name,
-            price: document.getElementById('price').value,
-            desc: document.getElementById('desc').value,
-            category: document.getElementById('cat').value,
-            image: img
-        });
-        localStorage.setItem('storeProducts', JSON.stringify(products));
-        alert('تم الحفظ!'); location.reload();
+    function init() {
+        renderCats(); renderProducts(); renderVideos();
+        document.getElementById('ticker-input').value = localStorage.getItem('tickerText') || "";
+        document.getElementById('proof-input').value = localStorage.getItem('proofText') || "";
     }
 
-    function saveTicker() {
-        localStorage.setItem('tickerText', document.getElementById('ticker-input').value);
-        alert('تم تحديث شريط الأخبار ✅');
-    }
-
-    function saveProof() {
-        localStorage.setItem('proofText', document.getElementById('proof-input').value);
-        alert('تم تحديث قائمة الإشعارات ✅');
-    }
-
-    function addVideo() {
-        videos.push({ title: document.getElementById('v-title').value, url: document.getElementById('v-url').value });
+    // الأكاديمية
+    function saveVideo() {
+        const id = document.getElementById('v-id').value;
+        const name = document.getElementById('v-name').value;
+        const url = document.getElementById('v-url').value;
+        if(id) {
+            let idx = videos.findIndex(v => v.id == id);
+            videos[idx] = { ...videos[idx], title: name, url: url };
+        } else {
+            videos.push({ id: Date.now(), title: name, url: url });
+        }
         localStorage.setItem('academyVideos', JSON.stringify(videos));
         location.reload();
     }
-
-    function renderAdmin() {
-        document.getElementById('product-list').innerHTML = products.map(p => `
+    function renderVideos() {
+        document.getElementById('video-list-area').innerHTML = videos.map(v => `
             <div class="item-row">
-                <div style="display:flex; align-items:center;">
-                    <img src="${p.image}">
-                    <span>${p.name}</span>
-                </div>
-                <button class="delete-btn" onclick="deleteP(${p.id})"><i class="fas fa-trash"></i></button>
-            </div>
-        `).join('') || "لا يوجد منتجات";
-
-        let orders = JSON.parse(localStorage.getItem('orderHistory')) || [];
-        document.getElementById('order-logs').innerHTML = orders.map(o => `
-            <div style="padding:5px; border-bottom:1px solid #ddd;">
-                <small style="color:orange">${o.date}</small> - ${o.details}
-            </div>
-        `).join('') || "لا يوجد طلبات مسجلة";
+                <span>${v.title}</span>
+                <div class="action-btns"><i class="fas fa-edit edit-i" onclick="editV(${v.id})"></i><i class="fas fa-trash del-i" onclick="deleteV(${v.id})"></i></div>
+            </div>`).join('');
     }
+    function editV(id) {
+        const v = videos.find(x => x.id == id);
+        document.getElementById('v-id').value = v.id;
+        document.getElementById('v-name').value = v.title;
+        document.getElementById('v-url').value = v.url;
+        document.getElementById('v-btn').innerText = "تحديث الدرس";
+    }
+    function deleteV(id) { if(confirm('حذف؟')) { videos = videos.filter(v=>v.id!=id); localStorage.setItem('academyVideos', JSON.stringify(videos)); renderVideos(); } }
 
-    function deleteP(id) {
-        if(confirm('حذف هذا المنتج؟')) {
-            products = products.filter(p => p.id !== id);
-            localStorage.setItem('storeProducts', JSON.stringify(products));
-            renderAdmin();
+    // المنتجات والأقسام
+    function handleImg(input) { let r = new FileReader(); r.onload = (e) => document.getElementById('p-img-base64').value = e.target.result; r.readAsDataURL(input.files[0]); }
+    function saveProduct() {
+        const id = document.getElementById('p-id').value;
+        const name = document.getElementById('p-name').value;
+        const price = document.getElementById('p-price').value;
+        const desc = document.getElementById('p-desc').value;
+        const cat = document.getElementById('p-cat-select').value;
+        const img = document.getElementById('p-img-base64').value;
+        if(id) {
+            let idx = products.findIndex(p => p.id == id);
+            products[idx] = { ...products[idx], name, price, desc, category: cat, image: img || products[idx].image };
+        } else {
+            products.push({ id: Date.now(), name, price, desc, category: cat, image: img });
         }
+        localStorage.setItem('storeProducts', JSON.stringify(products));
+        location.reload();
     }
+    function renderCats() {
+        document.getElementById('cat-list-area').innerHTML = categories.map((c,i)=>`<div class="item-row"><span>${c}</span>${c!=='الكل'?`<i class="fas fa-trash del-i" onclick="deleteCat(${i})"></i>`:''}</div>`).join('');
+        document.getElementById('p-cat-select').innerHTML = categories.map(c=>`<option value="${c}">${c}</option>`).join('');
+    }
+    function addCategory() { let n = document.getElementById('new-cat-input').value; if(n){categories.push(n); localStorage.setItem('storeCategories', JSON.stringify(categories)); location.reload();}}
+    function deleteCat(i) { categories.splice(i,1); localStorage.setItem('storeCategories', JSON.stringify(categories)); renderCats(); }
+    function renderProducts() {
+        document.getElementById('product-list-area').innerHTML = products.map(p => `
+            <div class="item-row">
+                <div style="display:flex; align-items:center; gap:8px;"><img src="${p.image}" style="width:30px; height:30px; object-fit:contain;"><b>${p.name}</b></div>
+                <div class="action-btns"><i class="fas fa-edit edit-i" onclick="editP(${p.id})"></i><i class="fas fa-trash del-i" onclick="deleteP(${p.id})"></i></div>
+            </div>`).join('');
+    }
+    function editP(id) {
+        const p = products.find(x => x.id == id);
+        document.getElementById('p-id').value = p.id;
+        document.getElementById('p-name').value = p.name;
+        document.getElementById('p-price').value = p.price;
+        document.getElementById('p-desc').value = p.desc;
+        document.getElementById('p-cat-select').value = p.category;
+        document.getElementById('p-btn').innerText = "تحديث المنتج";
+        window.scrollTo(0,0);
+    }
+    function deleteP(id) { if(confirm('حذف؟')){products=products.filter(p=>p.id!=id); localStorage.setItem('storeProducts', JSON.stringify(products)); renderProducts();}}
+    function saveTicker() { localStorage.setItem('tickerText', document.getElementById('ticker-input').value); alert('تم ✅'); }
+    function saveProof() { localStorage.setItem('proofText', document.getElementById('proof-input').value); alert('تم ✅'); }
 
-    renderAdmin();
+    init();
 </script>
-
 </body>
 </html>
