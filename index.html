@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+<<<<<<< HEAD
     <header style="background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding-bottom: 0;">
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; flex-wrap: nowrap;">
         
@@ -39,6 +40,25 @@
         </a>
     </div>
 </header>
+=======
+    <header>
+        <div class="header-top">
+            <a href="index.html" class="logo">⚡ مشالى</a>
+            <div style="flex:1; max-width:300px;"><input type="text" id="search-input" onkeyup="searchProducts()" placeholder="ابحث عن رسيفر، وصلة..."></div>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <a href="manager.html" style="color:var(--text); font-size:1.1rem;"><i class="fas fa-user-shield"></i></a>
+                <div onclick="toggleDarkMode()" style="cursor:pointer; color:var(--text); font-size:1.1rem;"><i id="theme-icon" class="fas fa-moon"></i></div>
+                <div onclick="toggleCart(true)" style="position:relative; cursor:pointer; color:var(--text); font-size:1.1rem;">
+                    <i class="fas fa-shopping-basket"></i>
+                    <span id="cart-badge" class="badge">0</span>
+                </div>
+            </div>
+        </div>
+        <div style="text-align:center; padding:10px; background:#fcfcfc;" id="sub-nav">
+            <a href="academy.html" class="academy-link">📺 الأكاديمية التعليمية (شروحات)</a>
+        </div>
+    </header>
+>>>>>>> 0b88c1e71730a42d318c35c4387243749e2e8cfb
 
     <div class="cat-nav-scroll" id="product-cats"></div>
 
