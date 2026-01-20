@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أكاديمية مشالى | شروحات تقنية</title>
+    <title>أكاديمية مشالى | المحتوى الحصري</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .lock-overlay { position:absolute; top:0; left:0; width:100%; height:180px; background:rgba(0,0,0,0.8); display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; border-radius:15px 15px 0 0; cursor:pointer; }
+        .thumb-img { width:100%; height:180px; object-fit:cover; border-radius:15px 15px 0 0; }
+        .modal { display:none; position:fixed; z-index:1000; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; }
+        .modal-content { background:white; padding:25px; border-radius:15px; width:90%; max-width:400px; text-align:center; }
+    </style>
 </head>
 <body style="background:#f8f9fa;">
-    <header style="background:#fff; border-bottom:2px solid #e67e22; padding:15px;">
+    <header style="background:#fff; border-bottom:2px solid #e67e22; padding:15px; position:sticky; top:0; z-index:100;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <a href="index.html" style="text-decoration:none; color:#333;"><i class="fas fa-arrow-right"></i> المتجر</a>
             <h3 style="color:#e67e22; margin:0;">📺 أكاديمية مشالى</h3>
@@ -17,50 +23,100 @@
     </header>
 
     <div style="padding:15px;">
-        <input type="text" id="v-search" onkeyup="renderAcademy()" placeholder="ابحث في الدروس..." style="width:100%; padding:12px; border-radius:25px; border:1px solid #ddd; outline:none;">
+        <input type="text" id="v-search" onkeyup="renderAcademy()" placeholder="ابحث عن درس..." style="width:100%; padding:12px; border-radius:25px; border:1px solid #ddd; outline:none; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
     </div>
 
     <main class="products-grid" id="v-grid" style="padding:15px;"></main>
 
+    <div id="pass-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">🔐 الدرس محمي</h3>
+            <p style="font-size:0.8rem; color:#666; margin-bottom:15px;">أدخل كود التفعيل لمشاهدة هذا الشرح</p>
+            <input type="password" id="unlock-pass" placeholder="أدخل الكود هنا..." style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:8px; text-align:center;">
+            <button onclick="verifyPass()" style="width:100%; padding:12px; background:#27ae60; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:10px;">تفعيل الآن</button>
+            <a id="wa-link" href="#" target="_blank" style="text-decoration:none; color:#c0392b; font-size:0.8rem; font-weight:bold;">
+                <i class="fab fa-whatsapp"></i> اطلب الكود من مشالي
+            </a>
+            <button onclick="closeModal()" style="display:block; margin:15px auto 0; background:none; border:none; color:#999;">إغلاق</button>
+        </div>
+    </div>
+
     <script>
-        function renderAcademy() {
+        let currentVidId = null;
+        const unlockedVids = JSON.parse(localStorage.getItem('unlockedVids')) || [];
+
+function renderAcademy() {
             const grid = document.getElementById('v-grid');
             const vids = JSON.parse(localStorage.getItem('academyVideos')) || [];
-            const likes = JSON.parse(localStorage.getItem('videoLikes')) || {};
             const term = document.getElementById('v-search').value.toLowerCase();
-
             let filtered = vids.filter(v => v.title.toLowerCase().includes(term));
 
             grid.innerHTML = filtered.map(v => {
-                let vId = v.url.split('v=')[1] || v.url.split('/').pop();
+                const isLocked = v.type === 'locked' && !unlockedVids.includes(v.id);
+                const vId = v.url.split('v=')[1] || v.url.split('/').pop();
+                
                 return `
-                <div class="product-card" style="padding:0; overflow:hidden; background:white; border-radius:15px; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-                    <iframe width="100%" height="180" src="https://www.youtube.com/embed/${vId}" frameborder="0" allowfullscreen></iframe>
-                    <div style="padding:15px;">
-                        <h4 style="font-size:0.9rem; margin-bottom:12px;">${v.title}</h4>
-                        
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:12px;">
-                            ${v.fileUrl ? `<a href="${v.fileUrl}" target="_blank" style="text-decoration:none; background:#27ae60; color:white; padding:6px; border-radius:8px; font-size:0.7rem; text-align:center;"><i class="fas fa-file-download"></i> ملف الشرح</a>` : ''}
-                            <a href="https://ssyoutube.com/en1/youtube-video-downloader?url=${v.url}" target="_blank" style="text-decoration:none; background:#c0392b; color:white; padding:6px; border-radius:8px; font-size:0.7rem; text-align:center;"><i class="fas fa-video"></i> تحميل الفيديو</a>
+                <div class="product-card" style="padding:0; position:relative; overflow:hidden; background:var(--card-bg); border-radius:15px; box-shadow:0 4px 10px rgba(0,0,0,0.05); border:1px solid var(--border);">
+                    ${isLocked ? `
+                        <div class="lock-overlay" onclick="openPassModal(${v.id})" style="height:180px;">
+                            <i class="fas fa-lock fa-3x" style="margin-bottom:10px;"></i>
+                            <span>محتوى حصري - اطلب الكود</span>
                         </div>
+                        <img src="${v.image || 'https://via.placeholder.com/400x225?text=Mashily+Academy'}" class="thumb-img" style="height:180px;">
+                    ` : `
+                        <iframe width="100%" height="180" src="https://www.youtube.com/embed/${vId}" frameborder="0" allowfullscreen></iframe>
+                    `}
+                    
+                    <div style="padding:15px;">
+                        <h4 style="font-size:0.9rem; margin-bottom:12px; color:var(--text); height:35px; overflow:hidden;">${v.title}</h4>
+                        
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="background:${v.type==='locked'?'#fff0f0':'#f0fff4'}; color:${v.type==='locked'?'#e74c3c':'#27ae60'}; padding:3px 8px; border-radius:5px; font-size:0.7rem; font-weight:bold;">
+                                    ${v.type==='locked'?'🔒 مغلق':'🔓 مجاني'}
+                                </span>
+                                ${!isLocked ? `<a href="${v.url}" target="_blank" style="color:#e67e22; text-decoration:none; font-size:0.8rem;"><i class="fab fa-youtube"></i> يوتيوب</a>` : ''}
+                            </div>
 
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <button onclick="likeV(${v.id})" style="background:none; border:1px solid #eee; padding:5px 12px; border-radius:10px; cursor:pointer;">
-                                👍 <span id="l-${v.id}">${likes[v.id]||0}</span>
-                            </button>
-                            <span style="color:#e67e22; font-size:0.75rem; font-weight:bold;">#${v.category}</span>
+                            ${!isLocked ? `
+                                <a href="https://ssyoutube.com/en1/youtube-video-downloader?url=${v.url}" 
+                                   target="_blank" 
+                                   style="text-decoration:none; background:#27ae60; color:white; padding:8px; border-radius:8px; font-size:0.8rem; text-align:center; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px;">
+                                    <i class="fas fa-download"></i> تحميل الفيديو
+                                </a>
+                            ` : `
+                                <button disabled style="background:#ccc; color:#666; padding:8px; border-radius:8px; border:none; font-size:0.8rem; cursor:not-allowed;">
+                                    <i class="fas fa-lock"></i> التحميل متاح بعد التفعيل
+                                </button>
+                            `}
                         </div>
                     </div>
                 </div>
             `}).join('');
         }
-
-        function likeV(id){
-            let l = JSON.parse(localStorage.getItem('videoLikes')) || {};
-            l[id] = (l[id]||0)+1;
-            localStorage.setItem('videoLikes', JSON.stringify(l));
-            document.getElementById('l-'+id).innerText = l[id];
+        function openPassModal(id) {
+            currentVidId = id;
+            const v = (JSON.parse(localStorage.getItem('academyVideos')) || []).find(x => x.id == id);
+            document.getElementById('modal-title').innerText = "🔐 تفعيل: " + v.title;
+            document.getElementById('wa-link').href = `https://wa.me/201551831308?text=السلام عليكم يا مشالي، عاوز كود تفعيل درس: ${v.title}`;
+            document.getElementById('pass-modal').style.display = 'flex';
         }
+
+        function verifyPass() {
+            const input = document.getElementById('unlock-pass').value;
+            const v = (JSON.parse(localStorage.getItem('academyVideos')) || []).find(x => x.id == currentVidId);
+            
+            if(input === v.password) {
+                unlockedVids.push(currentVidId);
+                localStorage.setItem('unlockedVids', JSON.stringify(unlockedVids));
+                alert('تم التفعيل بنجاح! مشاهدة ممتعة ✅');
+                location.reload();
+            } else {
+                alert('الكود غير صحيح! تواصل مع مشالي للحصول عليه.');
+            }
+        }
+
+        function closeModal() { document.getElementById('pass-modal').style.display = 'none'; }
         window.onload = renderAcademy;
     </script>
 </body>

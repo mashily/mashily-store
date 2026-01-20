@@ -2,63 +2,83 @@ let products = JSON.parse(localStorage.getItem('storeProducts')) || [];
 let cart = JSON.parse(localStorage.getItem('MASHILY_CART')) || [];
 
 function init() {
+    // 1. تطبيق الثيم المحفوظ (ليلي / نهاري)
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const themeIcon = document.getElementById('theme-icon');
+    if(themeIcon) themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+
+    // 2. تحديث شريط الأخبار السفلي
     const ticker = document.getElementById('ticker-text');
-    if(ticker) {
-        ticker.innerText = localStorage.getItem('tickerText') || "🔥 أهلاً بكم في متجر مشالى للإلكترونيات 🔥";
-    }
+    if(ticker) ticker.innerText = localStorage.getItem('tickerText') || "🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥";
+
+    // 3. عرض الأقسام والمنتجات مع تأثير التحميل
     renderCats();
-    renderProducts(products);
+    showSkeletons();
+    setTimeout(() => {
+        renderProducts(products);
+    }, 700);
+
     updateCartUI();
 
-    // كود زر ESC المطور والمضمون
-    window.addEventListener('keydown', function(event) {
-        if (event.key === "Escape" || event.keyCode === 27) {
-            toggleCart(false); // إغلاق السلة فوراً
+    // 4. مستمع لوحة المفاتيح (إغلاق السلة أو بيانات المنتج بـ ESC)
+    window.addEventListener('keydown', (e) => {
+        if (e.key === "Escape") {
+            toggleCart(false);
+            hideAllInfos();
         }
     });
 }
 
-// نظام إشعارات المشترين (Social Proof)
-const buyers = ["أحمد من القاهرة", "محمد من الإسكندرية", "محمود من المنصورة", "ياسين من طنطا", "خالد من الزقازيق", "إبراهيم من أسوان", "علاء من المحلة"];
-const actions = ["اشترى الآن رسيفر سيناتور 🔥", "طلب قطعة واي فاي ⚡", "انضم للأكاديمية التعليمية ✅", "طلب تحديث سوفت وير 🆕", "طلب ريموت كنترول أصلي 🎮"];
+// --- وظائف الوضع الليلي ---
+function toggleDarkMode() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const target = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', target);
+    localStorage.setItem('theme', target);
+    document.getElementById('theme-icon').className = target === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+}
 
-function showSocialProof() {
-    const div = document.createElement('div');
-    div.className = 'social-proof-toast';
-    const randomBuyer = buyers[Math.floor(Math.random() * buyers.length)];
-    const randomAction = actions[Math.floor(Math.random() * actions.length)];
+// --- وظائف عرض المنتجات ببياناتها الجديدة ---
+function renderProducts(items) {
+    const grid = document.getElementById('products-grid');
+    if(!grid) return;
+    if(items.length === 0) { grid.innerHTML = "<p style='grid-column:1/-1; text-align:center; padding:50px; opacity:0.5;'>لا توجد منتجات حالياً في هذا القسم</p>"; return; }
     
-    div.innerHTML = `
-        <div style="display:flex; align-items:center; gap:10px;">
-            <div style="background:#e67e22; color:white; border-radius:50%; width:35px; height:35px; display:flex; align-items:center; justify-content:center;">
-                <i class="fas fa-shopping-bag"></i>
+    grid.innerHTML = items.map(p => {
+        const isOut = p.stock === 'out';
+        return `
+        <div class="product-card" onmouseleave="hideAllInfos()">
+            <div class="badge-premium">${isOut ? 'نفدت الكمية ❌' : 'أصلي ✅'}</div>
+            <div class="img-container" onclick="toggleProductInfo(this)">
+                <img src="${p.image}" alt="${p.name}">
+                <div class="product-info-overlay">${p.desc || 'منتج أصلي من متجر مشالي'}</div>
             </div>
-            <div style="text-align:right;">
-                <div style="font-size:0.7rem; font-weight:bold;">${randomBuyer}</div>
-                <div style="font-size:0.65rem; color:#666;">${randomAction}</div>
+            <div class="product-details">
+                <h4>${p.name}</h4>
+                <div class="price-tag">${p.price} ج.م</div>
+                <button class="qty-btn" style="background:${isOut?'#95a5a6':'var(--primary)'}" 
+                    onclick="${isOut ? "alert('عذراً، المنتج غير متوفر حالياً')" : `addToCart(${p.id})`}">
+                    ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
+                </button>
             </div>
         </div>
-    `;
-    document.body.appendChild(div);
-    setTimeout(() => div.classList.add('show'), 100);
-    setTimeout(() => {
-        div.classList.remove('show');
-        setTimeout(() => div.remove(), 500);
-    }, 5000);
-}
-setInterval(showSocialProof, 20000); // إشعار كل 20 ثانية
-
-// دالة تحويل ملف الصورة لكود Base64 (تستخدم في الإدارة)
-function encodeImageFileAsURL(element, targetId) {
-    let file = element.files[0];
-    let reader = new FileReader();
-    reader.onloadend = function() {
-        document.getElementById(targetId).value = reader.result;
-    }
-    reader.readAsDataURL(file);
+    `}).join('');
 }
 
-// باقي دوال المتجر (Render, Add to Cart, etc.)
+// فتح/إغلاق بيانات الصنف عند الضغط على الصورة
+function toggleProductInfo(element) {
+    const card = element.closest('.product-card');
+    const isAlreadyOpen = card.classList.contains('show-info');
+    hideAllInfos(); // إغلاق أي بيانات أخرى مفتوحة
+    if(!isAlreadyOpen) card.classList.add('show-info');
+}
+
+function hideAllInfos() {
+    document.querySelectorAll('.product-card').forEach(c => c.classList.remove('show-info'));
+}
+
+// --- وظائف الأقسام ---
 function renderCats() {
     const nav = document.getElementById('product-cats');
     if(!nav) return;
@@ -73,25 +93,7 @@ function filterP(cat, btn) {
     renderProducts(cat === 'الكل' ? products : products.filter(p => p.category === cat));
 }
 
-function renderProducts(items) {
-    const grid = document.getElementById('products-grid');
-    if(!grid) return;
-    grid.innerHTML = items.map(p => {
-        const isOut = p.stock === 'out';
-        return `
-        <div class="product-card">
-            <div class="badge-premium">${isOut ? 'نفدت الكمية ❌' : 'أصلي ✅'}</div>
-            <div class="img-container"><img src="${p.image}" onerror="this.src='https://via.placeholder.com/150'"></div>
-            <h4 style="font-size:0.8rem; height:2.4em; overflow:hidden; padding:0 5px;">${p.name}</h4>
-            <div style="color:#e67e22; font-weight:bold; margin:8px 0;">${p.price} ج.م</div>
-            <button class="qty-btn" style="width:90%; height:35px; font-size:0.75rem; margin-bottom:10px; background:${isOut?'#95a5a6':'#e67e22'}" 
-                onclick="${isOut ? "alert('عذراً، غير متوفر حالياً')" : `addToCart(${p.id})`}">
-                ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
-            </button>
-        </div>
-    `}).join('');
-}
-
+// --- وظائف السلة ---
 function addToCart(id) {
     let p = products.find(x => x.id === id);
     let f = cart.find(x => x.id === id);
@@ -104,30 +106,43 @@ function updateCartUI() {
     localStorage.setItem('MASHILY_CART', JSON.stringify(cart));
     const badge = document.getElementById('cart-badge');
     const total = document.getElementById('total-price');
+    
     if(badge) badge.innerText = cart.reduce((s,i)=>s+i.qty, 0);
     if(total) total.innerText = cart.reduce((s,i)=>s+(i.price*i.qty), 0);
+    
     const container = document.getElementById('cart-items');
     if(!container) return;
+
     container.innerHTML = cart.map((item, idx) => `
         <div class="cart-item-compact">
-            <div style="flex:1;"><b>${item.name.substring(0,18)}..</b><br><small>${item.price} ج.م</small></div>
+            <img src="${item.image}" class="cart-item-img">
+            <div style="flex:1;">
+                <b style="font-size:0.8rem; display:block; line-height:1.2;">${item.name}</b>
+                <small style="color:var(--primary); font-weight:bold;">${item.price} ج.م</small>
+            </div>
             <div style="display:flex; align-items:center; gap:5px;">
-                <button onclick="changeQty(${idx},-1)" class="qty-btn" style="width:22px;height:22px;">-</button>
-                <span>${item.qty}</span>
-                <button onclick="changeQty(${idx},1)" class="qty-btn" style="width:22px;height:22px;">+</button>
-                <button onclick="removeFromCart(${idx})" style="background:none; border:none; color:red; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                <button onclick="changeQty(${idx},1)" style="width:22px; height:22px; background:var(--primary); color:white; border:none; border-radius:4px; cursor:pointer;">+</button>
+                <span style="font-weight:bold; font-size:0.9rem;">${item.qty}</span>
+                <button onclick="changeQty(${idx},-1)" style="width:22px; height:22px; background:#ddd; border:none; border-radius:4px; cursor:pointer;">-</button>
+                <button onclick="removeFromCart(${idx})" style="color:#e74c3c; background:none; border:none; margin-right:5px; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
             </div>
         </div>
-    `).join('');
+    `).join('') || `
+        <div style="text-align:center; padding:40px 20px; opacity:0.5;">
+            <i class="fas fa-shopping-basket fa-3x" style="margin-bottom:10px;"></i>
+            <p>السلة فارغة حالياً</p>
+        </div>
+    `;
 }
 
 function changeQty(i,v){ cart[i].qty+=v; if(cart[i].qty<1) removeFromCart(i); updateCartUI(); }
 function removeFromCart(i){ cart.splice(i,1); updateCartUI(); }
+
 function toggleCart(s){ 
     const c = document.getElementById('cart-sidebar');
     const o = document.getElementById('overlay');
-    if(c) { s ? c.classList.add('active') : c.classList.remove('active'); }
-    if(o) { s ? o.classList.add('active') : o.classList.remove('active'); }
+    if(s) { c.classList.add('active'); o.classList.add('active'); }
+    else { c.classList.remove('active'); o.classList.remove('active'); }
 }
 
 function sendToWhatsApp() {
@@ -135,14 +150,64 @@ function sendToWhatsApp() {
     let details = cart.map(i => i.name + " (" + i.qty + ")").join(' , ');
     let history = JSON.parse(localStorage.getItem('orderHistory')) || [];
     history.unshift({ date: new Date().toLocaleString('ar-EG'), details: details });
-    localStorage.setItem('orderHistory', JSON.stringify(history.slice(0, 20)));
-    let m = "طلب جديد من متجر مشالى:\n" + details + "\nالإجمالي: " + document.getElementById('total-price').innerText + " ج.م";
-    window.open(`https://wa.me/201551831308?text=${encodeURIComponent(m)}`);
+    localStorage.setItem('orderHistory', JSON.stringify(history.slice(0, 15)));
+    window.open(`https://wa.me/201551831308?text=${encodeURIComponent("طلب جديد من متجر مشالى:\n" + details + "\nالإجمالي: " + document.getElementById('total-price').innerText + " ج.م")}`);
 }
 
+// --- نظام البحث ---
 function searchProducts() {
     let t = document.getElementById('search-input').value.toLowerCase();
     renderProducts(products.filter(p => p.name.toLowerCase().includes(t)));
 }
 
+// --- تأثير التحميل الذكي (Skeletons) ---
+function showSkeletons() {
+    const grid = document.getElementById('products-grid');
+    if(!grid) return;
+    grid.innerHTML = Array(6).fill(0).map(() => `<div class="skeleton-card"></div>`).join('');
+}
+
+// نظام إشعارات المشترين المتعددة (قائمة تلقائية)
+function showSocialProof() {
+    // قائمة الإشعارات الافتراضية إذا لم يحدد المدير قائمة مخصصة
+    const defaultMessages = [
+        "أحمد من القاهرة اشترى رسيفر سيناتور 🔥",
+        "محمد من المنصورة طلب قطعة واي فاي ⚡",
+        "خالد من طنطا انضم للأكاديمية الآن ✅",
+        "عميل جديد طلب وصلة HDMI أصلية 🔌",
+        "تم شحن طلب جديد إلى الإسكندرية بنجاح 🚚"
+    ];
+
+    // جلب القائمة من لوحة المدير (مفصولة بفاصلة) أو استخدام الافتراضية
+    const savedText = localStorage.getItem('proofText');
+    const messages = savedText ? savedText.split(',') : defaultMessages;
+    
+    // اختيار رسالة عشوائية
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+
+    let toast = document.getElementById('social-toast');
+    if(!toast) {
+        toast = document.createElement('div');
+        toast.id = 'social-toast';
+        toast.className = 'social-proof-toast';
+        document.body.appendChild(toast);
+    }
+    
+    toast.innerHTML = `<i class="fas fa-bullhorn" style="margin-left:8px; color:var(--primary);"></i> ${randomMessage}`;
+    toast.classList.add('show');
+    
+    setTimeout(() => { toast.classList.remove('show'); }, 5000);
+}
+
+// تشغيل إشعار كل 20 ثانية (رسالة مختلفة كل مرة)
+setInterval(showSocialProof, 20000);
+
+// بدء العمل عند تحميل الصفحة
 window.onload = init;
+
+// هذا السطر يوضع في نهاية دالة updateCartUI داخل السكريبت
+container.innerHTML += `
+    <button onclick="sendToWhatsApp()" class="order-btn">
+        <i class="fab fa-whatsapp"></i> إرسال الطلب عبر واتساب
+    </button>
+`;
