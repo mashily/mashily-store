@@ -47,7 +47,7 @@
         <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1;">
             <span style="font-size: 0.7rem; color: #666; font-weight: bold; margin-bottom: 2px; margin-right: 2px;">متجر</span>
             <a href="index.html" style="text-decoration: none; color: var(--text); font-size: 1.8rem; font-weight: 900; display: block; margin-bottom: 4px;">⚡ مشالى</a>
-            <span style="font-size: 0.7rem; color: var(--primary); font-weight: bold; white-space: nowrap;">للإلكترونيات والفيديوهات التعليمية</span>
+            <span onclick="triggerAdmin()" style="font-size: 0.7rem; color: var(--primary); font-weight: bold; white-space: nowrap; cursor: default; user-select: none;">للإلكترونيات والفيديوهات التعليمية</span>
         </div>
 
         <a href="academy.html" style="text-decoration: none; background: #fff; padding: 5px 15px; border-radius: 50px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #eee; transition: transform 0.2s; display: flex; align-items: center; gap: 5px;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
@@ -61,7 +61,7 @@
                        style="width: 100%; padding: 7px 12px; border-radius: 20px; border: 1px solid #eee; font-size: 0.8rem; outline: none;">
             </div>
             
-            <div style="display: flex; gap: 15px; align-items: center; margin-right: 5px;"> <a href="manager.html" title="لوحة المدير" style="color: var(--text); font-size: 1.1rem;"><i class="fas fa-user-shield"></i></a>
+            <div style="display: flex; gap: 15px; align-items: center; margin-right: 5px;">
                 <div onclick="toggleDarkMode()" style="cursor:pointer; color:var(--text); font-size:1.1rem;"><i id="theme-icon" class="fas fa-moon"></i></div>
                 <div onclick="toggleCart(true)" style="position:relative; cursor:pointer; color:var(--text); font-size:1.1rem;">
                     <i class="fas fa-shopping-basket"></i>
@@ -82,7 +82,10 @@
     <div id="cart-sidebar" class="cart-sidebar">
         <div style="display:flex; justify-content:space-between; align-items:center; padding:15px;">
             <h4>🛒 سلة مشترياتك</h4>
-            <button onclick="toggleCart(false)" style="background:none; border:none; font-size:1.5rem;">✕</button>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button onclick="clearCart()" title="تفريغ السلة" style="background:none; border:none; color:#e74c3c; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; gap:4px;"><i class="fas fa-trash-alt"></i> تفريغ</button>
+                <button onclick="toggleCart(false)" style="background:none; border:none; font-size:1.5rem; cursor:pointer; line-height:1;">✕</button>
+            </div>
         </div>
         <div id="cart-items" style="padding:10px; overflow-y:auto; height:calc(100% - 200px);"></div>
        <div class="cart-footer">

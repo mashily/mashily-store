@@ -137,6 +137,13 @@ function updateCartUI() {
 
 function changeQty(i,v){ cart[i].qty+=v; if(cart[i].qty<1) removeFromCart(i); updateCartUI(); }
 function removeFromCart(i){ cart.splice(i,1); updateCartUI(); }
+function clearCart() {
+    if(cart.length === 0) return;
+    if(confirm('هل أنت متأكد من حذف جميع المنتجات من السلة؟')) {
+        cart = [];
+        updateCartUI();
+    }
+}
 
 function toggleCart(s){ 
     const c = document.getElementById('cart-sidebar');
@@ -217,3 +224,13 @@ setInterval(showSocialProof, 20000);
 
 // بدء العمل عند تحميل الصفحة
 window.onload = init;
+
+// --- الدخول السري للوحة التحكم ---
+let adminClicks = 0;
+function triggerAdmin() {
+    adminClicks++;
+    if(adminClicks === 5) {
+        window.location.href = 'manager.html';
+    }
+    setTimeout(() => { adminClicks = 0; }, 1000); // إعادة التصفير إذا توقف النقر
+}
