@@ -145,13 +145,26 @@ function toggleCart(s){
     else { c.classList.remove('active'); o.classList.remove('active'); }
 }
 
+// تبديل عرض معلومات فودافون كاش
+function togglePayment(method) {
+    const info = document.getElementById('vodafone-info');
+    if(info) info.style.display = method === 'vodafone' ? 'block' : 'none';
+}
+
 function sendToWhatsApp() {
     if(cart.length === 0) return;
+    
+    // معرفة طريقة الدفع المختارة
+    const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+    const paymentText = paymentMethod === 'vodafone' ? 'فودافون كاش (يرجى مراجعة التحويل)' : 'الدفع عند الاستلام';
+
     let details = cart.map(i => i.name + " (" + i.qty + ")").join(' , ');
     let history = JSON.parse(localStorage.getItem('orderHistory')) || [];
     history.unshift({ date: new Date().toLocaleString('ar-EG'), details: details });
     localStorage.setItem('orderHistory', JSON.stringify(history.slice(0, 15)));
-    window.open(`https://wa.me/201551831308?text=${encodeURIComponent("طلب جديد من متجر مشالى:\n" + details + "\nالإجمالي: " + document.getElementById('total-price').innerText + " ج.م")}`);
+    
+    const msg = `طلب جديد من متجر مشالى:\n${details}\n\n💰 الإجمالي: ${document.getElementById('total-price').innerText} ج.م\n💳 طريقة الدفع: ${paymentText}`;
+    window.open(`https://wa.me/201551831308?text=${encodeURIComponent(msg)}`);
 }
 
 // --- نظام البحث ---
@@ -204,10 +217,3 @@ setInterval(showSocialProof, 20000);
 
 // بدء العمل عند تحميل الصفحة
 window.onload = init;
-
-// هذا السطر يوضع في نهاية دالة updateCartUI داخل السكريبت
-container.innerHTML += `
-    <button onclick="sendToWhatsApp()" class="order-btn">
-        <i class="fab fa-whatsapp"></i> إرسال الطلب عبر واتساب
-    </button>
-`;
