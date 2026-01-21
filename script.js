@@ -60,31 +60,42 @@ function toggleDarkMode() {
     document.getElementById('theme-icon').className = target === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
 }
 
+// دالة مساعدة لإنشاء كارت المنتج (لإعادة الاستخدام)
+function createProductCard(p) {
+    const isOut = p.stock === 'out';
+    const hasTimer = p.offerEnds && new Date(p.offerEnds) > new Date();
+    
+    return `
+    <div class="product-card" onmouseleave="hideAllInfos()">
+        <div class="img-container" onclick="toggleProductInfo(this)">
+            ${!isOut ? `<div class="pro-badge ${p.status==='عرض خاص'?'offer':''}">${p.status || 'مميز ✨'}</div>` : ''}
+            <img src="${p.image}" alt="${p.name}" style="${isOut ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
+            ${isOut ? '<div class="out-badge">نفدت الكمية ❌</div>' : ''}
+            <div class="product-info-overlay">${p.desc || 'منتج أصلي من متجر مشالي'}</div>
+        </div>
+        <div class="product-details">
+            <h4>${p.name}</h4>
+            <div class="price-tag">
+                ${p.oldPrice ? `<s style="color:#95a5a6; font-size:0.8rem; margin-left:5px;">${p.oldPrice}</s>` : ''}
+                ${p.price} ج.م
+            </div>
+            ${hasTimer ? `<div class="countdown-timer" data-ends="${p.offerEnds}">جاري التحميل...</div>` : ''}
+            <button class="qty-btn" style="background:${isOut?'#95a5a6':'var(--primary)'}" 
+                onclick="${isOut ? "alert('عذراً، المنتج غير متوفر حالياً')" : `addToCart(${p.id})`}">
+                ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
+            </button>
+        </div>
+    </div>
+    `;
+}
+
 // --- وظائف عرض المنتجات ببياناتها الجديدة ---
 function renderProducts(items) {
     const grid = document.getElementById('products-grid');
     if(!grid) return;
     if(items.length === 0) { grid.innerHTML = "<p style='grid-column:1/-1; text-align:center; padding:50px; opacity:0.5;'>لا توجد منتجات حالياً في هذا القسم</p>"; return; }
     
-    grid.innerHTML = items.map(p => {
-        const isOut = p.stock === 'out';
-        return `
-        <div class="product-card" onmouseleave="hideAllInfos()">
-            <div class="badge-premium">${isOut ? 'نفدت الكمية ❌' : 'أصلي ✅'}</div>
-            <div class="img-container" onclick="toggleProductInfo(this)">
-                <img src="${p.image}" alt="${p.name}">
-                <div class="product-info-overlay">${p.desc || 'منتج أصلي من متجر مشالي'}</div>
-            </div>
-            <div class="product-details">
-                <h4>${p.name}</h4>
-                <div class="price-tag">${p.price} ج.م</div>
-                <button class="qty-btn" style="background:${isOut?'#95a5a6':'var(--primary)'}" 
-                    onclick="${isOut ? "alert('عذراً، المنتج غير متوفر حالياً')" : `addToCart(${p.id})`}">
-                    ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
-                </button>
-            </div>
-        </div>
-    `}).join('');
+    grid.innerHTML = items.map(p => createProductCard(p)).join('');
 }
 
 // فتح/إغلاق بيانات الصنف عند الضغط على الصورة
@@ -103,28 +114,43 @@ function hideAllInfos() {
 function renderCategories() {
     const catContainer = document.getElementById('product-cats');
     if(!catContainer) return;
-    let rawCats = JSON.parse(localStorage.getItem('storeCategories'));
+    let rawCats = JSON.parse(localStorage.getItem('storeCategories')) || [];
     
     // تحويل البيانات القديمة (نصوص) إلى كائنات لضمان التوافق
-    let categories = [];
-    if (!rawCats || rawCats.length === 0) {
-        categories = [{name: 'الكل', icon: 'fas fa-layer-group'}];
-    } else {
-        categories = typeof rawCats[0] === 'string' ? rawCats.map(c => ({ name: c, icon: 'fas fa-tag' })) : rawCats;
-    }
+    let categoriesFromStorage = (rawCats.length > 0 && typeof rawCats[0] === 'string') 
+        ? rawCats.map(c => ({ name: c, icon: 'fas fa-tag' })) 
+        : rawCats;
+
+    // التأكد من وجود قسم "الكل" دائماً في البداية وإزالة أي تكرار له من القائمة الأصلية
+    const categories = [{name: 'الكل', icon: 'fas fa-layer-group'}, ...categoriesFromStorage.filter(c => c.name !== 'الكل')];
     
-    catContainer.innerHTML = categories.map(cat => `
+    catContainer.innerHTML = categories.map(cat => {
+        let btn = `
         <button class="cat-btn ${currentCategory === cat.name ? 'active' : ''}" 
                 onclick="filterByCategory('${cat.name}')">
-            <i class="${cat.icon}"></i> ${cat.name}
-        </button>
-    `).join('');
+            <i class="${cat.icon}"></i> ${cat.name === 'الكل' ? 'كل الأصناف' : cat.name}
+        </button>`;
+        
+        // إضافة زر العروض المؤقتة بعد زر "الكل"
+        if(cat.name === 'الكل') {
+            btn += `
+            <button class="cat-btn cat-btn-offer ${currentCategory === 'offers' ? 'active' : ''}" 
+                    onclick="filterByCategory('offers')">
+                <i class="fas fa-fire-alt"></i> عروض مؤقتة
+            </button>`;
+        }
+        return btn;
+    }).join('');
 }
 
 function filterByCategory(cat) {
     currentCategory = cat;
     renderCategories(); // لتحديث اللون النشط
-    const filtered = cat === 'الكل' ? products : products.filter(p => p.category === cat);
+    
+    let filtered;
+    if (cat === 'الكل') filtered = products;
+    else if (cat === 'offers') filtered = products.filter(p => p.offerEnds && new Date(p.offerEnds) > new Date());
+    else filtered = products.filter(p => p.category === cat);
     
     // تطبيق الترتيب
     if(currentSort === 'price_low') {
@@ -270,6 +296,26 @@ function showSocialProof() {
 
 // تشغيل إشعار كل 20 ثانية (رسالة مختلفة كل مرة)
 setInterval(showSocialProof, 20000);
+
+// --- تحديث العداد التنازلي للعروض ---
+setInterval(() => {
+    document.querySelectorAll('.countdown-timer').forEach(el => {
+        const end = new Date(el.dataset.ends).getTime();
+        const now = new Date().getTime();
+        const diff = end - now;
+        
+        if(diff < 0) {
+            el.innerHTML = "انتهى العرض ⌛";
+            el.style.color = "#7f8c8d"; el.style.borderColor = "#ccc"; el.style.background = "#eee";
+        } else {
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+            el.innerHTML = `🔥 باقي ${d}ي ${h}س ${m}د ${s}ث`;
+        }
+    });
+}, 1000);
 
 // بدء العمل عند تحميل الصفحة
 window.onload = init;

@@ -63,10 +63,19 @@
                 <input id="p-name" placeholder="اسم المنتج">
                 <div style="display:flex; gap:10px;">
                     <input id="p-price" type="number" placeholder="السعر">
+                    <input id="p-old-price" type="number" placeholder="السعر القديم (قبل الخصم)">
                     <select id="p-cat-select"></select>
                 </div>
+                <div style="display:flex; align-items:center; gap:10px; margin:5px 0; background:#fff; padding:5px; border:1px solid #ccc; border-radius:8px;">
+                    <label style="font-size:0.8rem; color:#555; white-space:nowrap;">⏳ نهاية العرض:</label>
+                    <input type="datetime-local" id="p-offer-ends" style="border:none; margin:0; padding:5px;">
+                </div>
+                <select id="p-stock" style="margin: 5px 0; background: #fff; border-color: #3498db;">
+                    <option value="in">✅ متوفر بالمتجر</option>
+                    <option value="out">❌ غير متوفر (نفدت الكمية)</option>
+                </select>
                 <div style="display:flex; gap:10px;">
-                    <select id="p-status-select"></select>
+                    <select id="p-status-select" title="اختر الشارة التي تظهر فوق الصورة"></select>
                     <input type="file" accept="image/*" onchange="handleImg(this, 'p-img-base64')" style="padding:7px;">
                 </div>
                 <textarea id="p-desc" placeholder="وصف المنتج..."></textarea>
@@ -132,8 +141,9 @@
                 </div>
                 <div class="item-list" id="cat-list-area" style="max-height:120px;"></div>
                 <hr>
+                <h5 style="margin:10px 0 5px 0; color:#e67e22;">🏷️ شارات العروض (فوق الصورة)</h5>
                 <div style="display:flex; gap:5px;">
-                    <input id="new-status-input" placeholder="اسم حالة جديدة (أصلي/ضمان)">
+                    <input id="new-status-input" placeholder="مثال: عرض نار 🔥 / خصم 20%">
                     <button class="btn-save" style="width:80px; background:#f39c12;" onclick="addItem('status')">إضافة</button>
                 </div>
                 <div class="item-list" id="status-list-area" style="max-height:120px; margin-top:10px;"></div>
@@ -216,7 +226,7 @@
         categories = [{name: 'الكل', icon: 'fas fa-layer-group'}, {name: 'رسيفرات', icon: 'fas fa-tv'}];
     }
 
-    let statuses = JSON.parse(localStorage.getItem('storeStatuses')) || ['أصلي', 'ضمان سنة'];
+    let statuses = JSON.parse(localStorage.getItem('storeStatuses')) || ['عرض خاص 🔥', 'وصل حديثاً 🆕', 'الأكثر مبيعاً ⭐', 'خصم حصري ٪'];
     let videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
     let academyCats = JSON.parse(localStorage.getItem('academyCategories')) || [{name:'عام', image:''}];
     let proofs = [];
@@ -453,8 +463,11 @@
             id: id ? parseInt(id) : Date.now(),
             name: document.getElementById('p-name').value,
             price: document.getElementById('p-price').value,
+            oldPrice: document.getElementById('p-old-price').value,
+            offerEnds: document.getElementById('p-offer-ends').value,
             category: document.getElementById('p-cat-select').value,
             status: document.getElementById('p-status-select').value,
+            stock: document.getElementById('p-stock').value,
             desc: document.getElementById('p-desc').value,
             image: document.getElementById('p-img-base64').value
         };
@@ -478,10 +491,13 @@
         document.getElementById('p-id').value = p.id;
         document.getElementById('p-name').value = p.name;
         document.getElementById('p-price').value = p.price;
+        document.getElementById('p-old-price').value = p.oldPrice || "";
+        document.getElementById('p-offer-ends').value = p.offerEnds || "";
         document.getElementById('p-desc').value = p.desc;
         document.getElementById('p-img-base64').value = p.image || "";
         document.getElementById('p-cat-select').value = p.category;
         document.getElementById('p-status-select').value = p.status;
+        document.getElementById('p-stock').value = p.stock || 'in';
         document.getElementById('p-btn').innerText = "تحديث المنتج";
         window.scrollTo(0,0);
     }

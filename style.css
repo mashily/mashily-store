@@ -98,17 +98,54 @@ header {
 }
 .product-card{cursor: pointer;}
 
-/* كلمة أصلي ملتصقة بالصورة تماماً */
-.badge-premium { 
-    background: var(--primary); 
+/* --- شارة المنتج الاحترافية الجديدة --- */
+.pro-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px; /* تظهر في الزاوية اليسرى العلوية */
+    background: var(--primary);
     color: white; 
-    font-size: 0.7rem; 
-    padding: 3px 0; 
-    font-weight: bold; 
-    width: 100%; 
-    display: block;
-    margin-bottom: 0; /* مسافة صفر */
+    font-size: 0.75rem; 
+    padding: 5px 12px; 
+    font-weight: 900; 
+    border-radius: 8px 0 8px 0; /* حواف مائلة عصرية */
+    z-index: 10;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    overflow: hidden; /* لإخفاء لمعان الحركة */
+    animation: badgePulse 3s infinite;
 }
+
+/* لون خاص للعروض */
+.pro-badge.offer {
+    background: #e74c3c;
+    animation: badgeShake 4s infinite;
+}
+
+/* حركة اللمعان الاحترافية */
+.pro-badge::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 2.5s infinite;
+}
+
+/* شارة نفدت الكمية */
+.out-badge {
+    position: absolute; z-index: 2;
+    background: rgba(52, 73, 94, 0.95);
+    color: white; padding: 8px 15px;
+    border-radius: 30px; font-weight: bold;
+    font-size: 0.85rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    backdrop-filter: blur(2px);
+}
+
+/* تعريف الحركات */
+@keyframes shimmer { 100% { left: 100%; } }
+@keyframes badgePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes badgeShake { 0%, 100% { transform: rotate(0deg); } 10% { transform: rotate(5deg); } 20% { transform: rotate(-5deg); } 30% { transform: rotate(0deg); } }
 
 /* توحيد مقاسات الصور */
 .img-container { 
@@ -170,15 +207,6 @@ header {
     flex-direction: column;
 }
 
-/* كلمة أصلي ملتصقة بالصورة */
-.badge-premium { 
-    background: var(--primary); 
-    color: white; 
-    font-size: 0.65rem; 
-    padding: 2px 0; 
-    font-weight: bold; 
-    width: 100%;
-}
 
 /* توحيد مقاسات الصور وضغطها */
 .img-container { 
@@ -225,6 +253,21 @@ header {
     margin: 0px 0 4px 0; 
     font-size: 0.95rem; 
 }
+
+/* عداد العروض الخاصة */
+.countdown-timer {
+    font-size: 0.7rem;
+    color: #c0392b;
+    font-weight: bold;
+    background: #fff5f5;
+    padding: 3px 8px;
+    border-radius: 15px;
+    margin: 2px 0 6px 0;
+    border: 1px dashed #e74c3c;
+    display: inline-block;
+    animation: pulseTimer 2s infinite;
+}
+@keyframes pulseTimer { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
 
 .qty-btn { 
     background: var(--primary); 

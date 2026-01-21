@@ -102,6 +102,25 @@
             border-color: var(--primary);
             box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3);
         }
+
+        /* --- زر العروض المميز --- */
+        .cat-btn.cat-btn-offer {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            animation: pulse-offer-btn 2s infinite;
+        }
+        .cat-btn.cat-btn-offer.active, .cat-btn.cat-btn-offer:hover {
+            background: linear-gradient(45deg, #ff6b5a, #e74c3c);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+        }
+        .cat-btn.cat-btn-offer i {
+            animation: fa-beat 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-offer-btn {
+            0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); }
+        }
     </style>
 </header>
 
