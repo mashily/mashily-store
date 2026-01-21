@@ -1,7 +1,27 @@
-let products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+let products = [];
 let cart = JSON.parse(localStorage.getItem('MASHILY_CART')) || [];
+let currentCategory = 'الكل';
 
-function init() {
+async function init() {
+    // محاولة جلب البيانات من السيرفر (GitHub)
+    try {
+        const response = await fetch('db.json?v=' + new Date().getTime()); // منع التخزين المؤقت
+        if (response.ok) {
+            const data = await response.json();
+            // تحديث البيانات المحلية ببيانات السيرفر
+            if(data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
+            if(data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
+            if(data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
+            if(data.ticker) localStorage.setItem('tickerText', data.ticker);
+            if(data.proof) localStorage.setItem('proofText', data.proof);
+        }
+    } catch (e) {
+        console.log('وضع الأوفلاين أو لم يتم رفع ملف db.json بعد');
+    }
+
+    // تحميل البيانات للمتغيرات
+    products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+
     // 1. تطبيق الثيم المحفوظ (ليلي / نهاري)
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
@@ -13,7 +33,7 @@ function init() {
     if(ticker) ticker.innerText = localStorage.getItem('tickerText') || "🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥";
 
     // 3. عرض الأقسام والمنتجات مع تأثير التحميل
-    renderCats();
+    renderCategories();
     showSkeletons();
     setTimeout(() => {
         renderProducts(products);
@@ -79,18 +99,32 @@ function hideAllInfos() {
 }
 
 // --- وظائف الأقسام ---
-function renderCats() {
-    const nav = document.getElementById('product-cats');
-    if(!nav) return;
-    const cats = ['الكل', ...new Set(products.map(p => p.category).filter(c => c))];
-    nav.innerHTML = cats.map(c => `<button class="cat-btn-chip" onclick="filterP('${c}', this)">${c}</button>`).join('');
-    if(nav.firstChild) nav.firstChild.classList.add('active');
+function renderCategories() {
+    const catContainer = document.getElementById('product-cats');
+    if(!catContainer) return;
+    let rawCats = JSON.parse(localStorage.getItem('storeCategories'));
+    
+    // تحويل البيانات القديمة (نصوص) إلى كائنات لضمان التوافق
+    let categories = [];
+    if (!rawCats || rawCats.length === 0) {
+        categories = [{name: 'الكل', icon: 'fas fa-layer-group'}];
+    } else {
+        categories = typeof rawCats[0] === 'string' ? rawCats.map(c => ({ name: c, icon: 'fas fa-tag' })) : rawCats;
+    }
+    
+    catContainer.innerHTML = categories.map(cat => `
+        <button class="cat-btn ${currentCategory === cat.name ? 'active' : ''}" 
+                onclick="filterByCategory('${cat.name}')">
+            <i class="${cat.icon}"></i> ${cat.name}
+        </button>
+    `).join('');
 }
 
-function filterP(cat, btn) {
-    document.querySelectorAll('.cat-btn-chip').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderProducts(cat === 'الكل' ? products : products.filter(p => p.category === cat));
+function filterByCategory(cat) {
+    currentCategory = cat;
+    renderCategories(); // لتحديث اللون النشط
+    const filtered = cat === 'الكل' ? products : products.filter(p => p.category === cat);
+    renderProducts(filtered);
 }
 
 // --- وظائف السلة ---

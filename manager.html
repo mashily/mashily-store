@@ -24,6 +24,8 @@
         .edit-i { color: #3498db; cursor: pointer; }
         .del-i { color: #e74c3c; cursor: pointer; }
         .lock-badge { background: #e74c3c; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; margin-right: 5px;}
+        .icon-grid i { cursor: pointer; font-size: 1.3rem; color: #555; padding: 8px; border-radius: 5px; transition: 0.2s; border: 1px solid transparent; }
+        .icon-grid i:hover { background: var(--primary); color: white; transform: scale(1.1); }
     </style>
 </head>
 <body>
@@ -49,6 +51,7 @@
             <div style="display:flex; gap:10px;">
                 <a href="index.html" class="logout-btn" style="background:#3498db; text-decoration:none;">🛍️ المتجر</a>
                 <a href="academy.html" class="logout-btn" style="background:#f39c12; text-decoration:none;">🎓 الأكاديمية</a>
+                <button class="logout-btn" style="background:#27ae60;" onclick="downloadDB()">💾 حفظ البيانات للنشر</button>
                 <button class="logout-btn" onclick="logoutAdmin()">خروج <i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
@@ -78,21 +81,37 @@
                 <input id="v-name" placeholder="عنوان الفيديو">
                 <input id="v-url" placeholder="رابط يوتيوب">
                 
-                <div style="display:flex; gap:10px;">
-                    <select id="v-type" onchange="toggleLockField()">
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <select id="v-type" onchange="toggleLockField()" style="flex:1;">
                         <option value="free">🔓 درس مجاني</option>
                         <option value="locked">🔒 مطلوب كلمة سر</option>
                     </select>
-                    <input id="v-pass" placeholder="كلمة سر الفيديو" style="display:none; background:#fff8f8;">
+                    <select id="v-cat-select" style="flex:1;"></select>
                 </div>
+                <input id="v-pass" placeholder="كلمة سر الفيديو" style="display:none; background:#fff8f8; margin-top:5px;">
 
-                <div style="background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:10px;">
+                <div style="background:#f9f9f9; padding:10px; border-radius:8px; margin:10px 0;">
                     <label style="font-size:0.8rem; font-weight:bold;">صورة الدرس (Thumbnail):</label>
                     <input type="file" accept="image/*" onchange="handleImg(this, 'v-img-base64')" style="padding:5px;">
                     <input type="hidden" id="v-img-base64">
                 </div>
 
                 <button class="btn-save" id="v-btn" style="background:#e74c3c;" onclick="saveVideo()">حفظ الدرس في الأكاديمية</button>
+                
+                <hr style="margin:15px 0; border-top:1px dashed #ccc;">
+                
+                <h5 style="margin:0 0 10px 0; color:#c0392b; font-size:0.9rem;">📂 أقسام الأكاديمية (مع صور)</h5>
+                <div style="display:flex; gap:5px; margin-bottom:10px;">
+                    <input id="new-acad-cat" placeholder="اسم القسم" style="flex:1;">
+                    <label class="btn-save" style="width:40px; background:#7f8c8d; display:flex; align-items:center; justify-content:center; cursor:pointer; margin:10px 0;" title="صورة القسم">
+                        <i class="fas fa-image"></i>
+                        <input type="file" accept="image/*" onchange="handleImg(this, 'acad-cat-img')" style="display:none;">
+                    </label>
+                    <input type="hidden" id="acad-cat-img">
+                    <button class="btn-save" style="width:50px; background:#c0392b;" onclick="addAcademyCat()">+</button>
+                </div>
+                <div class="item-list" id="acad-cat-list" style="max-height:100px; margin-bottom:15px;"></div>
+
                 <div class="item-list" id="video-list-area" style="margin-top:15px;"></div>
             </div>
         </div>
@@ -101,8 +120,15 @@
             <div class="card">
                 <h4>📂 إدارة الأقسام والحالات</h4>
                 <div style="display:flex; gap:5px; margin-bottom:10px;">
-                    <input id="new-cat-input" placeholder="اسم قسم جديد">
-                    <button class="btn-save" style="width:80px; background:#3498db;" onclick="addItem('cat')">إضافة</button>
+                    <input id="new-cat-input" placeholder="اسم القسم" style="flex: 2;">
+                    <input id="new-cat-icon" placeholder="أيقونة (مثال: fas fa-tv)" style="flex: 1;">
+                    <button class="btn-save" style="width:80px; background:#3498db;" onclick="addCategory()">إضافة</button>
+                </div>
+                <div style="margin-bottom:10px;">
+                    <small style="color:#666; display:block; margin-bottom:5px;">أو اختر أيقونة سريعة:</small>
+                    <div class="icon-grid" style="display:flex; gap:5px; flex-wrap:wrap; background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #eee;">
+                        <i class="fas fa-tv" onclick="pickIcon('fas fa-tv')" title="شاشات / رسيفرات"></i> <i class="fas fa-mobile-alt" onclick="pickIcon('fas fa-mobile-alt')" title="موبايلات"></i> <i class="fas fa-headphones" onclick="pickIcon('fas fa-headphones')" title="سماعات"></i> <i class="fas fa-laptop" onclick="pickIcon('fas fa-laptop')" title="لابتوب"></i> <i class="fas fa-gamepad" onclick="pickIcon('fas fa-gamepad')" title="ألعاب"></i> <i class="fas fa-camera" onclick="pickIcon('fas fa-camera')" title="كاميرات"></i> <i class="fas fa-plug" onclick="pickIcon('fas fa-plug')" title="شواحن"></i> <i class="fas fa-wifi" onclick="pickIcon('fas fa-wifi')" title="شبكات"></i> <i class="fas fa-stopwatch" onclick="pickIcon('fas fa-stopwatch')" title="ساعات"></i> <i class="fas fa-tools" onclick="pickIcon('fas fa-tools')" title="صيانة"></i> <i class="fas fa-tshirt" onclick="pickIcon('fas fa-tshirt')" title="ملابس"></i> <i class="fas fa-shoe-prints" onclick="pickIcon('fas fa-shoe-prints')" title="أحذية"></i> <i class="fas fa-home" onclick="pickIcon('fas fa-home')" title="منزل"></i> <i class="fas fa-car" onclick="pickIcon('fas fa-car')" title="سيارات"></i> <i class="fas fa-book" onclick="pickIcon('fas fa-book')" title="كتب"></i> <i class="fas fa-gift" onclick="pickIcon('fas fa-gift')" title="هدايا"></i> <i class="fas fa-star" onclick="pickIcon('fas fa-star')" title="مميز"></i> <i class="fas fa-tag" onclick="pickIcon('fas fa-tag')" title="عام"></i>
+                    </div>
                 </div>
                 <div class="item-list" id="cat-list-area" style="max-height:120px;"></div>
                 <hr>
@@ -117,8 +143,12 @@
                 <h4>📢 إعدادات الموقع والإشعارات</h4>
                 <input id="ticker-input" placeholder="شريط الأخبار المتحرك">
                 <button class="btn-save" style="background:#2c3e50; margin-bottom:10px;" onclick="saveSetting('tickerText', 'ticker-input')">حفظ الشريط</button>
-                <textarea id="proof-input" placeholder="إشعارات الزوار (افصل بفاصلة ،)"></textarea>
-                <button class="btn-save" style="background:#8e44ad;" onclick="saveSetting('proofText', 'proof-input')">حفظ الإشعارات</button>
+                <hr style="margin: 15px 0; border-top: 1px solid #eee;">
+                <div style="display:flex; gap:5px; margin-bottom:10px;">
+                    <input id="new-proof-input" placeholder="إشعار شراء جديد (مثال: تم شحن طلب للقاهرة)">
+                    <button class="btn-save" style="width:80px; background:#8e44ad;" onclick="addProof()">إضافة</button>
+                </div>
+                <div class="item-list" id="proof-list-area" style="max-height:150px;"></div>
             </div>
         </div>
     </div>
@@ -151,14 +181,27 @@
     if(sessionStorage.getItem('mashily_admin')==='true'){document.getElementById('auth-screen').style.display='none';document.getElementById('admin-panel').style.display='block';}
 
     let products = JSON.parse(localStorage.getItem('storeProducts')) || [];
-    let categories = JSON.parse(localStorage.getItem('storeCategories')) || ['الكل', 'رسيفرات'];
+    
+    // تحميل الأقسام مع دعم الهيكلة الجديدة (اسم + أيقونة)
+    let rawCats = JSON.parse(localStorage.getItem('storeCategories'));
+    let categories = [];
+    if (rawCats && rawCats.length > 0) {
+        // تحويل البيانات القديمة (نصوص) إلى كائنات إذا لزم الأمر
+        categories = typeof rawCats[0] === 'string' ? rawCats.map(c => ({ name: c, icon: 'fas fa-tag' })) : rawCats;
+    } else {
+        categories = [{name: 'الكل', icon: 'fas fa-layer-group'}, {name: 'رسيفرات', icon: 'fas fa-tv'}];
+    }
+
     let statuses = JSON.parse(localStorage.getItem('storeStatuses')) || ['أصلي', 'ضمان سنة'];
     let videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    let academyCats = JSON.parse(localStorage.getItem('academyCategories')) || [{name:'عام', image:''}];
+    let proofs = [];
 
     function init() {
-        renderCats(); renderStatuses(); renderProducts(); renderVideos();
+        let savedProofs = localStorage.getItem('proofText');
+        proofs = savedProofs ? savedProofs.split(',') : [];
+        renderCats(); renderStatuses(); renderProducts(); renderVideos(); renderProofs(); renderAcademyCats();
         document.getElementById('ticker-input').value = localStorage.getItem('tickerText') || "";
-        document.getElementById('proof-input').value = localStorage.getItem('proofText') || "";
     }
 
     function toggleLockField() {
@@ -189,7 +232,7 @@
             type: document.getElementById('v-type').value,
             password: rawPass ? simpleHash(rawPass) : "", // حفظ كلمة السر مشفرة
             image: document.getElementById('v-img-base64').value,
-            category: "عام",
+            category: document.getElementById('v-cat-select').value || "عام",
             likes: oldData.likes || 0,
             dislikes: oldData.dislikes || 0,
             comments: oldData.comments || []
@@ -209,7 +252,7 @@
     function renderVideos() {
         document.getElementById('video-list-area').innerHTML = videos.map(v => `
             <div class="item-row">
-                <span>${v.type==='locked'?'🔒':'🔓'} ${v.title}</span>
+                <span>${v.type==='locked'?'🔒':'🔓'} <small style="color:#e67e22">[${v.category||'عام'}]</small> ${v.title}</span>
                 <div class="action-btns">
                     <i class="fas fa-comments edit-i" style="color:#f39c12; font-size:0.9rem;" onclick="manageComments(${v.id})" title="إدارة التعليقات"></i>
                     <i class="fas fa-edit edit-i" onclick="editV(${v.id})"></i>
@@ -225,6 +268,7 @@
         document.getElementById('v-url').value = v.url;
         document.getElementById('v-type').value = v.type;
         document.getElementById('v-pass').value = ""; // لا نعرض كلمة السر المشفرة
+        document.getElementById('v-cat-select').value = v.category || 'عام';
         document.getElementById('v-img-base64').value = v.image || "";
         toggleLockField();
         document.getElementById('v-btn').innerText = "تحديث الدرس";
@@ -265,15 +309,88 @@
         alert('تم حذف التعليق');
     };
 
+    // --- إدارة أقسام الأكاديمية ---
+    function renderAcademyCats() {
+        const select = document.getElementById('v-cat-select');
+        if(select) select.innerHTML = academyCats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        
+        const list = document.getElementById('acad-cat-list');
+        if(list) {
+            list.innerHTML = academyCats.map((c, i) => `
+                <div class="item-row">
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        ${c.image ? `<img src="${c.image}" style="width:30px; height:30px; border-radius:4px; object-fit:cover;">` : '<i class="fas fa-folder" style="color:#c0392b;"></i>'}
+                        <span>${c.name}</span>
+                    </div>
+                    ${c.name !== 'عام' ? `<i class="fas fa-trash del-i" onclick="deleteAcadCat(${i})"></i>` : ''}
+                </div>
+            `).join('');
+        }
+    }
+    function addAcademyCat() {
+        const name = document.getElementById('new-acad-cat').value.trim();
+        const img = document.getElementById('acad-cat-img').value;
+        if(name && !academyCats.some(c => c.name === name)) {
+            academyCats.push({name, image: img});
+            localStorage.setItem('academyCategories', JSON.stringify(academyCats));
+            document.getElementById('new-acad-cat').value = '';
+            document.getElementById('acad-cat-img').value = '';
+            renderAcademyCats();
+        }
+    }
+    function deleteAcadCat(i) { if(confirm('حذف القسم؟')) { academyCats.splice(i, 1); localStorage.setItem('academyCategories', JSON.stringify(academyCats)); renderAcademyCats(); } }
+
     // بقية الوظائف
+    function downloadDB() {
+        const db = {
+            products: JSON.parse(localStorage.getItem('storeProducts')) || [],
+            categories: JSON.parse(localStorage.getItem('storeCategories')) || [],
+            academyCats: JSON.parse(localStorage.getItem('academyCategories')) || [],
+            statuses: JSON.parse(localStorage.getItem('storeStatuses')) || [],
+            videos: JSON.parse(localStorage.getItem('academyVideos')) || [],
+            ticker: localStorage.getItem('tickerText') || "",
+            proof: localStorage.getItem('proofText') || ""
+        };
+        
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "db.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+        alert('تم تحميل ملف db.json ✅\nقم برفعه بجانب ملف index.html على GitHub ليظهر للجميع.');
+    }
+
+    function pickIcon(icon) {
+        document.getElementById('new-cat-icon').value = icon;
+    }
+
+    function addCategory() {
+        let newCat = document.getElementById('new-cat-input').value.trim();
+        let newIcon = document.getElementById('new-cat-icon').value.trim() || 'fas fa-tag';
+        if(newCat) {
+            // التحقق من التكرار بناءً على الاسم
+            if(!categories.some(c => c.name === newCat)) {
+                categories.push({ name: newCat, icon: newIcon });
+                localStorage.setItem('storeCategories', JSON.stringify(categories));
+                document.getElementById('new-cat-input').value = '';
+                document.getElementById('new-cat-icon').value = '';
+                renderCats(); // تحديث القائمة في لوحة المدير
+                alert('تم إضافة القسم بنجاح ✅');
+            } else {
+                alert('القسم موجود بالفعل!');
+            }
+        }
+    }
     function addItem(type) {
         if(type==='cat') { categories.push(document.getElementById('new-cat-input').value); localStorage.setItem('storeCategories', JSON.stringify(categories)); }
         else { statuses.push(document.getElementById('new-status-input').value); localStorage.setItem('storeStatuses', JSON.stringify(statuses)); }
         location.reload();
     }
     function renderCats() { 
-        document.getElementById('cat-list-area').innerHTML = categories.map((c,i)=>`<div class="item-row"><span>${c}</span>${c!=='الكل'?`<i class="fas fa-trash del-i" onclick="deleteItem('cat',${i})"></i>`:''}</div>`).join('');
-        document.getElementById('p-cat-select').innerHTML = categories.map(c=>`<option value="${c}">${c}</option>`).join('');
+        document.getElementById('cat-list-area').innerHTML = categories.map((c,i)=>`<div class="item-row"><span><i class="${c.icon}" style="margin-left:5px; color:var(--primary);"></i> ${c.name}</span>${c.name!=='الكل'?`<i class="fas fa-trash del-i" onclick="deleteItem('cat',${i})"></i>`:''}</div>`).join('');
+        document.getElementById('p-cat-select').innerHTML = categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
     }
     function renderStatuses() {
         document.getElementById('status-list-area').innerHTML = statuses.map((s,i)=>`<div class="item-row"><span>${s}</span><i class="fas fa-trash del-i" onclick="deleteItem('status',${i})"></i></div>`).join('');
@@ -281,6 +398,18 @@
     }
     function deleteItem(type, i) { if(type==='cat') categories.splice(i,1); else statuses.splice(i,1); localStorage.setItem(type==='cat'?'storeCategories':'storeStatuses', JSON.stringify(type==='cat'?categories:statuses)); location.reload(); }
     
+    // إدارة إشعارات الزوار
+    function renderProofs() {
+        document.getElementById('proof-list-area').innerHTML = proofs.map((p, i) => `
+            <div class="item-row"><span>💬 ${p}</span><i class="fas fa-trash del-i" onclick="deleteProof(${i})"></i></div>
+        `).join('');
+    }
+    function addProof() {
+        const val = document.getElementById('new-proof-input').value.trim();
+        if(val) { proofs.push(val); localStorage.setItem('proofText', proofs.join(',')); document.getElementById('new-proof-input').value = ''; renderProofs(); }
+    }
+    function deleteProof(i) { proofs.splice(i, 1); localStorage.setItem('proofText', proofs.join(',')); renderProofs(); }
+
     function saveProduct() {
         const id = document.getElementById('p-id').value;
         const pObj = {
@@ -295,16 +424,44 @@
         if(id) { let idx=products.findIndex(p=>p.id==id); products[idx]=pObj; } else { products.push(pObj); }
         localStorage.setItem('storeProducts', JSON.stringify(products)); location.reload();
     }
-    function renderProducts() { document.getElementById('product-list-area').innerHTML = products.map(p=>`<div class="item-row"><b>${p.name}</b><i class="fas fa-edit edit-i" onclick="editP(${p.id})"></i></div>`).join(''); }
+    function renderProducts() {
+        document.getElementById('product-list-area').innerHTML = products.map(p => `
+            <div class="item-row">
+                <span><b>${p.name}</b></span>
+                <div class="action-btns">
+                    <i class="fas fa-copy edit-i" style="color:#27ae60;" onclick="duplicateP(${p.id})" title="نسخ المنتج"></i>
+                    <i class="fas fa-edit edit-i" onclick="editP(${p.id})" title="تعديل المنتج"></i>
+                    <i class="fas fa-trash del-i" onclick="deleteP(${p.id})" title="حذف المنتج"></i>
+                </div>
+            </div>
+        `).join('');
+    }
     function editP(id) {
         const p = products.find(x => x.id == id);
         document.getElementById('p-id').value = p.id;
         document.getElementById('p-name').value = p.name;
         document.getElementById('p-price').value = p.price;
         document.getElementById('p-desc').value = p.desc;
+        document.getElementById('p-img-base64').value = p.image || "";
         document.getElementById('p-cat-select').value = p.category;
         document.getElementById('p-status-select').value = p.status;
+        document.getElementById('p-btn').innerText = "تحديث المنتج";
         window.scrollTo(0,0);
+    }
+    function deleteP(id) {
+        if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+            products = products.filter(p => p.id != id);
+            localStorage.setItem('storeProducts', JSON.stringify(products));
+            location.reload();
+        }
+    }
+    function duplicateP(id) {
+        const originalProduct = products.find(p => p.id == id);
+        if (!originalProduct) return;
+        const newProduct = { ...originalProduct, id: Date.now(), name: originalProduct.name + " (نسخة)" };
+        products.push(newProduct);
+        localStorage.setItem('storeProducts', JSON.stringify(products));
+        location.reload();
     }
     function saveSetting(key, inputId) { localStorage.setItem(key, document.getElementById(inputId).value); alert('تم الحفظ ✅'); }
 

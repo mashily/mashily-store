@@ -70,7 +70,34 @@
             </div>
         </div>
     </div>
-    <div class="cat-nav-scroll" id="product-cats"></div>
+    <div class="categories-wrapper" style="background: var(--bg); padding: 10px 0; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;">
+        <div id="product-cats" style="display: flex; gap: 10px; overflow-x: auto; padding: 5px 15px; scrollbar-width: none; -ms-overflow-style: none;">
+        </div>
+    </div>
+    <style>
+        /* إخفاء شريط التمرير المزعج مع الحفاظ على التمرير */
+        #product-cats::-webkit-scrollbar { display: none; }
+        
+        .cat-btn {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+    
+        .cat-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3);
+        }
+    </style>
 </header>
 
     <div class="news-ticker">

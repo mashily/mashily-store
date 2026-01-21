@@ -6,6 +6,8 @@
     --bg: #f4f7f6;
     --card: #ffffff;
     --text: #333;
+    --card-bg: #ffffff;
+    --border: rgba(0,0,0,0.1);
     --ticker-bg: #2c3e50;
 }
 
@@ -14,6 +16,8 @@
     --bg: #121212;
     --card: #1e1e1e;
     --text: #f0f0f0;
+    --card-bg: #1e1e1e;
+    --border: rgba(255,255,255,0.1);
     --ticker-bg: #000000;
 }
 
@@ -361,4 +365,8 @@ header {
 
 .social-proof-toast {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.cat-btn i {
+    margin-left: 8px;
 }
