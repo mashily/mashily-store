@@ -174,10 +174,28 @@
         <h3 style="margin-top:0;">🚀 نشر البيانات على الموقع</h3>
         <p style="font-size:0.9rem; color:#666; line-height: 1.6;">
             <b>الخطوة 1:</b> اضغط "نسخ الكود".<br>
-            <b>الخطوة 2:</b> اذهب إلى ملف <a href="#" target="_blank" id="github-link" style="color:var(--primary); font-weight:bold;">db.json</a> في حسابك على GitHub.<br>
-            <b>الخطوة 3:</b> اضغط على أيقونة التعديل (القلم ✏️)، الصق الكود الجديد، ثم احفظ التغييرات (Commit changes).
+            <b>الخطوة 2:</b> اذهب إلى ملف <a href="#" target="_blank" id="github-link" style="color:var(--primary); font-weight:bold;">db.json</a> في GitHub (أو أنشئه إذا لم يكن موجوداً).<br>
+            <b>الخطوة 3:</b> امسح أي كود قديم، الصق الكود الجديد، ثم اضغط (Commit changes).
+            <br><a href="#" onclick="resetRepoUrl(); return false;" style="font-size:0.8rem; color:#e74c3c;">(تغيير رابط المستودع)</a>
         </p>
         <textarea id="db-code-output" style="width:100%; height:200px; font-family:monospace; direction:ltr; text-align:left; border:1px solid #ccc; border-radius:8px;"></textarea>
+        
+        <hr style="margin:15px 0; border-top:1px dashed #ccc;">
+        <h4 style="margin:0 0 10px 0; color:#2c3e50;">⚡ النشر التلقائي (GitHub API)</h4>
+        <div style="background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #eee;">
+            <label style="font-size:0.85rem; color:#555; font-weight:bold;">1. الصق الكود السري (Token) هنا:</label>
+            <input id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxx..." style="margin-bottom:8px; direction:ltr; font-family:monospace;">
+            <div style="display:flex; gap:10px;">
+                <input id="gh-owner" placeholder="2. اسم المستخدم (Username)">
+                <input id="gh-repo" placeholder="3. اسم المستودع (Repo Name)">
+            </div>
+            <button class="btn-save" style="background:#2c3e50; margin-top:10px;" onclick="publishToGitHub()">🚀 نشر التحديثات تلقائياً</button>
+            <div style="display:flex; gap:10px; margin-top:10px; border-top: 1px solid #ddd; padding-top:10px;">
+                <button class="btn-save" style="background:#3498db; font-size:0.8rem;" onclick="importApiSettings()">📥 استيراد الإعدادات</button>
+                <button class="btn-save" style="background:#9b59b6; font-size:0.8rem;" onclick="exportApiSettings()">📤 تصدير الإعدادات</button>
+            </div>
+        </div>
+
         <div style="display:flex; gap:10px; margin-top:15px;">
             <button class="btn-save" style="background:#27ae60;" onclick="copyDbCode()">📋 نسخ الكود</button>
             <button class="btn-save" style="background:#7f8c8d;" onclick="document.getElementById('publish-modal').style.display='none'">إغلاق</button>
@@ -400,6 +418,16 @@
         if (repoUrl) {
             document.getElementById('github-link').href = `${repoUrl}/blob/main/db.json`;
         }
+        
+        // استرجاع بيانات API المحفوظة
+        document.getElementById('gh-token').value = localStorage.getItem('gh_token') || '';
+        document.getElementById('gh-owner').value = localStorage.getItem('gh_owner') || '';
+        document.getElementById('gh-repo').value = localStorage.getItem('gh_repo') || '';
+    }
+
+    function resetRepoUrl() {
+        localStorage.removeItem('githubRepoUrl');
+        prepareForPublish();
     }
 
     function copyDbCode() {
@@ -407,6 +435,83 @@
         textarea.select();
         document.execCommand('copy');
         alert('✅ تم نسخ الكود بنجاح! يمكنك الآن لصقه في GitHub.');
+    }
+
+    async function publishToGitHub() {
+        const token = document.getElementById('gh-token').value.trim();
+        const owner = document.getElementById('gh-owner').value.trim();
+        const repo = document.getElementById('gh-repo').value.trim();
+        const content = document.getElementById('db-code-output').value;
+
+        if(!token || !owner || !repo) return alert('يرجى ملء بيانات GitHub (Token, Username, Repo)');
+
+        // حفظ البيانات للمرات القادمة
+        localStorage.setItem('gh_token', token);
+        localStorage.setItem('gh_owner', owner);
+        localStorage.setItem('gh_repo', repo);
+
+        const path = 'db.json';
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+        const btn = document.querySelector('button[onclick="publishToGitHub()"]');
+        
+        try {
+            btn.innerText = "جاري النشر... ⏳"; btn.disabled = true;
+
+            // 1. جلب SHA الملف الحالي (مطلوب للتحديث)
+            let sha = null;
+            try {
+                const getRes = await fetch(apiUrl, { headers: { 'Authorization': `token ${token}` } });
+                if(getRes.ok) { const data = await getRes.json(); sha = data.sha; }
+            } catch(e) { console.log('New file creation'); }
+
+            // 2. تحويل المحتوى إلى Base64 (يدعم العربية)
+            const base64Content = btoa(unescape(encodeURIComponent(content)));
+
+            // 3. إرسال التحديث
+            const body = { message: "Update db.json via Mashily Admin", content: base64Content, sha: sha };
+            const putRes = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if(putRes.ok) { alert('تم النشر بنجاح! 🚀\nسيظهر التحديث على الموقع خلال دقيقة.'); document.getElementById('publish-modal').style.display='none'; }
+            else { const err = await putRes.json(); alert('فشل النشر: ' + (err.message || 'خطأ غير معروف')); }
+        } catch(err) { alert('خطأ في الاتصال: ' + err.message); }
+        finally { btn.innerText = "🚀 نشر التحديثات تلقائياً"; btn.disabled = false; }
+    }
+
+    function exportApiSettings() {
+        const settings = {
+            token: document.getElementById('gh-token').value,
+            owner: document.getElementById('gh-owner').value,
+            repo: document.getElementById('gh-repo').value
+        };
+
+        if (!settings.token || !settings.owner || !settings.repo) {
+            return alert('لا توجد إعدادات لتصديرها. يرجى ملء الخانات أولاً.');
+        }
+
+        const settingsString = btoa(JSON.stringify(settings));
+        prompt("✅ تم تصدير الإعدادات بنجاح!\nانسخ هذا الكود واحفظه في مكان آمن (مثل تطبيق الملاحظات) لاستخدامه على جهاز آخر.", settingsString);
+    }
+
+    function importApiSettings() {
+        const settingsString = prompt("الصق كود الإعدادات الذي نسخته مسبقاً:");
+        if (!settingsString) return;
+
+        try {
+            const decodedString = atob(settingsString);
+            const settings = JSON.parse(decodedString);
+
+            if (settings.token && settings.owner && settings.repo) {
+                document.getElementById('gh-token').value = settings.token;
+                document.getElementById('gh-owner').value = settings.owner;
+                document.getElementById('gh-repo').value = settings.repo;
+                localStorage.setItem('gh_token', settings.token); localStorage.setItem('gh_owner', settings.owner); localStorage.setItem('gh_repo', settings.repo);
+                alert('✅ تم استيراد وحفظ الإعدادات بنجاح!');
+            } else { alert('خطأ: كود الإعدادات غير مكتمل.'); }
+        } catch (e) { alert('خطأ: كود الإعدادات غير صالح.'); }
     }
 
     function pickIcon(icon) {
