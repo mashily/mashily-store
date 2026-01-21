@@ -52,6 +52,7 @@
                 <a href="index.html" class="logout-btn" style="background:#3498db; text-decoration:none;">🛍️ المتجر</a>
                 <a href="academy.html" class="logout-btn" style="background:#f39c12; text-decoration:none;">🎓 الأكاديمية</a>
                 <button class="logout-btn" style="background:#27ae60;" onclick="downloadDB()">💾 حفظ البيانات للنشر</button>
+                <button class="logout-btn" style="background:#27ae60;" onclick="prepareForPublish()">🚀 نشر التحديثات</button>
                 <button class="logout-btn" onclick="logoutAdmin()">خروج <i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
@@ -150,6 +151,23 @@
                 </div>
                 <div class="item-list" id="proof-list-area" style="max-height:150px;"></div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Publishing -->
+<div id="publish-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:3000; align-items:center; justify-content:center;">
+    <div style="background:white; padding:25px; border-radius:10px; width:90%; max-width:600px; text-align:right;">
+        <h3 style="margin-top:0;">🚀 نشر البيانات على الموقع</h3>
+        <p style="font-size:0.9rem; color:#666; line-height: 1.6;">
+            <b>الخطوة 1:</b> اضغط "نسخ الكود".<br>
+            <b>الخطوة 2:</b> اذهب إلى ملف <a href="#" target="_blank" id="github-link" style="color:var(--primary); font-weight:bold;">db.json</a> في حسابك على GitHub.<br>
+            <b>الخطوة 3:</b> اضغط على أيقونة التعديل (القلم ✏️)، الصق الكود الجديد، ثم احفظ التغييرات (Commit changes).
+        </p>
+        <textarea id="db-code-output" style="width:100%; height:200px; font-family:monospace; direction:ltr; text-align:left; border:1px solid #ccc; border-radius:8px;"></textarea>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn-save" style="background:#27ae60;" onclick="copyDbCode()">📋 نسخ الكود</button>
+            <button class="btn-save" style="background:#7f8c8d;" onclick="document.getElementById('publish-modal').style.display='none'">إغلاق</button>
         </div>
     </div>
 </div>
@@ -342,6 +360,7 @@
 
     // بقية الوظائف
     function downloadDB() {
+    function prepareForPublish() {
         const db = {
             products: JSON.parse(localStorage.getItem('storeProducts')) || [],
             categories: JSON.parse(localStorage.getItem('storeCategories')) || [],
@@ -350,6 +369,8 @@
             videos: JSON.parse(localStorage.getItem('academyVideos')) || [],
             ticker: localStorage.getItem('tickerText') || "",
             proof: localStorage.getItem('proofText') || ""
+            ticker: localStorage.getItem('tickerText') || "", // Note: proofText is split by comma, so we save the string
+            proof: localStorage.getItem('proofText') || "" 
         };
         
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
@@ -360,6 +381,27 @@
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
         alert('تم تحميل ملف db.json ✅\nقم برفعه بجانب ملف index.html على GitHub ليظهر للجميع.');
+        const dataStr = JSON.stringify(db, null, 2); // Pretty-print JSON
+        
+        document.getElementById('db-code-output').value = dataStr;
+        document.getElementById('publish-modal').style.display = 'flex';
+
+        // Ask for repo URL to create a direct link
+        let repoUrl = localStorage.getItem('githubRepoUrl');
+        if (!repoUrl) {
+            repoUrl = prompt("للتسهيل، أدخل رابط مستودع GitHub الخاص بك (مثال: https://github.com/user/repo)");
+            if (repoUrl) localStorage.setItem('githubRepoUrl', repoUrl);
+        }
+        if (repoUrl) {
+            document.getElementById('github-link').href = `${repoUrl}/blob/main/db.json`;
+        }
+    }
+
+    function copyDbCode() {
+        const textarea = document.getElementById('db-code-output');
+        textarea.select();
+        document.execCommand('copy');
+        alert('✅ تم نسخ الكود بنجاح! يمكنك الآن لصقه في GitHub.');
     }
 
     function pickIcon(icon) {
