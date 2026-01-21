@@ -149,6 +149,10 @@
                     <button class="btn-save" style="width:80px; background:#8e44ad;" onclick="addProof()">إضافة</button>
                 </div>
                 <div class="item-list" id="proof-list-area" style="max-height:150px;"></div>
+                <hr style="margin: 15px 0; border-top: 1px solid #eee;">
+                <h4 style="font-size: 1rem; border:none;">🔐 تغيير كلمة المرور</h4>
+                <input type="password" id="new-admin-pass" placeholder="كلمة المرور الجديدة">
+                <button class="btn-save" style="background:#c0392b;" onclick="changeAdminPass()">تحديث كلمة المرور</button>
             </div>
         </div>
     </div>
@@ -186,7 +190,10 @@
     // كلمة السر "123" مشفرة هي "48690"
     function checkPass() { 
         const input = document.getElementById('admin-pass').value;
-        if(simpleHash(input) === '48690'){
+        // استخدام الهاش المخزن أو الافتراضي لكلمة "M@shily"
+        const currentHash = localStorage.getItem('admin_hash') || simpleHash('M@shily');
+        
+        if(simpleHash(input) === currentHash){
             sessionStorage.setItem('mashily_admin','true');
             location.reload();
         } else {
@@ -494,6 +501,15 @@
         location.reload();
     }
     function saveSetting(key, inputId) { localStorage.setItem(key, document.getElementById(inputId).value); alert('تم الحفظ ✅'); }
+
+    function changeAdminPass() {
+        const newPass = document.getElementById('new-admin-pass').value;
+        if(newPass) {
+            localStorage.setItem('admin_hash', simpleHash(newPass));
+            alert('تم تغيير كلمة المرور بنجاح ✅\nيرجى استخدام الكلمة الجديدة عند الدخول القادم.');
+            document.getElementById('new-admin-pass').value = '';
+        }
+    }
 
     init();
 </script>
