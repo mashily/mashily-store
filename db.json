@@ -38,23 +38,14 @@
     {
       "id": 3,
       "name": "ماوس لاسلكي أنيق",
-      "price": 250,
-      "originalPrice": 300,
-      "description": "تصميم مريح لليد، يعمل ببطارية تدوم طويلاً.",
-      "image": "https://picsum.photos/300/200?random=3",
-      "category": "accessories",
-      "specs": [
-        "DPI قابل للتعديل حتى 3200",
-        "تقنية Bluetooth 5.0",
-        "بطارية تدوم 6 أشهر",
-        "تصميم مريح لليد",
-        "زر إضافي للتحكم",
-        "عمل سلس على جميع الأسطح"
-      ],
-      "tags": [],
-      "stock": 25,
-      "rating": 4,
-      "reviewCount": 12
+      "price": "100",
+      "oldPrice": "150",
+      "offerEnds": "2026-01-22T18:21",
+      "category": "عروض",
+      "status": "وصل حديثاً 🆕",
+      "stock": "in",
+      "desc": "ماوس باشا ",
+      "image": "https://picsum.photos/300/200?random=3"
     },
     {
       "id": 4,
