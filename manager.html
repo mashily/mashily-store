@@ -51,7 +51,6 @@
             <div style="display:flex; gap:10px;">
                 <a href="index.html" class="logout-btn" style="background:#3498db; text-decoration:none;">🛍️ المتجر</a>
                 <a href="academy.html" class="logout-btn" style="background:#f39c12; text-decoration:none;">🎓 الأكاديمية</a>
-                <button class="logout-btn" style="background:#27ae60;" onclick="downloadDB()">💾 حفظ البيانات للنشر</button>
                 <button class="logout-btn" style="background:#27ae60;" onclick="prepareForPublish()">🚀 نشر التحديثات</button>
                 <button class="logout-btn" onclick="logoutAdmin()">خروج <i class="fas fa-sign-out-alt"></i></button>
             </div>
@@ -359,7 +358,6 @@
     function deleteAcadCat(i) { if(confirm('حذف القسم؟')) { academyCats.splice(i, 1); localStorage.setItem('academyCategories', JSON.stringify(academyCats)); renderAcademyCats(); } }
 
     // بقية الوظائف
-    function downloadDB() {
     function prepareForPublish() {
         const db = {
             products: JSON.parse(localStorage.getItem('storeProducts')) || [],
@@ -367,20 +365,10 @@
             academyCats: JSON.parse(localStorage.getItem('academyCategories')) || [],
             statuses: JSON.parse(localStorage.getItem('storeStatuses')) || [],
             videos: JSON.parse(localStorage.getItem('academyVideos')) || [],
-            ticker: localStorage.getItem('tickerText') || "",
-            proof: localStorage.getItem('proofText') || ""
             ticker: localStorage.getItem('tickerText') || "", // Note: proofText is split by comma, so we save the string
             proof: localStorage.getItem('proofText') || "" 
         };
         
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "db.json");
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-        alert('تم تحميل ملف db.json ✅\nقم برفعه بجانب ملف index.html على GitHub ليظهر للجميع.');
         const dataStr = JSON.stringify(db, null, 2); // Pretty-print JSON
         
         document.getElementById('db-code-output').value = dataStr;
