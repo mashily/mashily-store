@@ -1,6 +1,7 @@
 let products = [];
 let cart = JSON.parse(localStorage.getItem('MASHILY_CART')) || [];
 let currentCategory = 'الكل';
+let currentSort = 'default';
 
 async function init() {
     // محاولة جلب البيانات من السيرفر (GitHub)
@@ -124,6 +125,14 @@ function filterByCategory(cat) {
     currentCategory = cat;
     renderCategories(); // لتحديث اللون النشط
     const filtered = cat === 'الكل' ? products : products.filter(p => p.category === cat);
+    
+    // تطبيق الترتيب
+    if(currentSort === 'price_low') {
+        filtered.sort((a, b) => a.price - b.price);
+    } else if(currentSort === 'price_high') {
+        filtered.sort((a, b) => b.price - a.price);
+    }
+    
     renderProducts(filtered);
 }
 
@@ -212,6 +221,12 @@ function sendToWhatsApp() {
 function searchProducts() {
     let t = document.getElementById('search-input').value.toLowerCase();
     renderProducts(products.filter(p => p.name.toLowerCase().includes(t)));
+}
+
+// --- نظام الترتيب ---
+function sortProducts(sortType) {
+    currentSort = sortType;
+    filterByCategory(currentCategory); // إعادة تطبيق الفلتر مع الترتيب الجديد
 }
 
 // --- تأثير التحميل الذكي (Skeletons) ---

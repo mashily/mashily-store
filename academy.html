@@ -18,6 +18,20 @@
         /* تنسيق الشبكة لعرض 3 فيديوهات */
         #v-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; gap: 20px; }
         @media (min-width: 900px) { #v-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+        
+        /* تنسيق أزرار الأقسام */
+        .cat-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 10px 15px; scrollbar-width: none; margin-bottom: 10px; }
+        .cat-scroll::-webkit-scrollbar { display: none; }
+        .cat-btn {
+            background: white; border: 1px solid #ddd; padding: 8px 20px; border-radius: 20px;
+            white-space: nowrap; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: 0.3s; color: #555;
+        }
+        .cat-btn.active {
+            background: #e67e22; color: white; border-color: #e67e22; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3);
+        }
+        .cat-btn:hover:not(.active) {
+            background: #f0f0f0;
+        }
     </style>
 </head>
 <body style="background:#f8f9fa;">
@@ -37,6 +51,9 @@
     <div style="padding:15px;">
         <input type="text" id="v-search" onkeyup="renderAcademy()" placeholder="ابحث عن درس..." style="width:100%; padding:12px; border-radius:25px; border:1px solid #ddd; outline:none; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
     </div>
+    
+    <!-- شريط الأقسام -->
+    <div id="academy-cats" class="cat-scroll"></div>
 
     <main class="products-grid" id="v-grid" style="padding:15px;"></main>
 
@@ -55,13 +72,36 @@
 
     <script>
         let currentVidId = null;
+        let currentCat = 'الكل';
         const unlockedVids = JSON.parse(localStorage.getItem('unlockedVids')) || [];
 
-function renderAcademy() {
+        function renderAcademyCats() {
+            const cats = JSON.parse(localStorage.getItem('academyCategories')) || [{name:'عام'}];
+            const allCats = [{name: 'الكل'}, ...cats];
+            
+            document.getElementById('academy-cats').innerHTML = allCats.map(c => `
+                <button class="cat-btn ${currentCat === c.name ? 'active' : ''}" onclick="filterCat('${c.name}')">
+                    ${c.name}
+                </button>
+            `).join('');
+        }
+
+        function filterCat(catName) {
+            currentCat = catName;
+            renderAcademyCats();
+            renderAcademy();
+        }
+
+        function renderAcademy() {
             const grid = document.getElementById('v-grid');
             const vids = JSON.parse(localStorage.getItem('academyVideos')) || [];
             const term = document.getElementById('v-search').value.toLowerCase();
-            let filtered = vids.filter(v => v.title.toLowerCase().includes(term));
+            
+            let filtered = vids.filter(v => {
+                const matchesSearch = v.title.toLowerCase().includes(term);
+                const matchesCat = currentCat === 'الكل' || (v.category || 'عام') === currentCat;
+                return matchesSearch && matchesCat;
+            });
 
             grid.innerHTML = filtered.map(v => {
                 // تهيئة المشاهدات
@@ -215,7 +255,10 @@ function renderAcademy() {
         }
 
         function closeModal() { document.getElementById('pass-modal').style.display = 'none'; }
-        window.onload = renderAcademy;
+        window.onload = function() {
+            renderAcademyCats();
+            renderAcademy();
+        };
 
         // --- عداد المشاهدات التلقائي ---
         setInterval(() => {

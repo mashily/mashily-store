@@ -57,6 +57,11 @@
         </a>
 
         <div style="display: flex; align-items: center; gap: 25px;"> <div style="max-width: 140px;">
+                <select onchange="sortProducts(this.value)" style="width: 100%; padding: 5px; border-radius: 15px; border: 1px solid #eee; font-size: 0.75rem; outline: none; margin-bottom: 5px; background: #f9f9f9; cursor: pointer;">
+                    <option value="default">ترتيب افتراضي</option>
+                    <option value="price_low">السعر: الأقل أولاً</option>
+                    <option value="price_high">السعر: الأعلى أولاً</option>
+                </select>
                 <input type="text" id="search-input" onkeyup="searchProducts()" placeholder="ابحث.." 
                        style="width: 100%; padding: 7px 12px; border-radius: 20px; border: 1px solid #eee; font-size: 0.8rem; outline: none;">
             </div>
