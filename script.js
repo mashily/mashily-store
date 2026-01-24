@@ -3,6 +3,7 @@ let cart = JSON.parse(localStorage.getItem('MASHILY_CART')) || [];
 let currentCategory = 'الكل';
 let currentSort = 'default';
 let appliedCoupon = null;
+let selectedPaymentMethod = 'cash';
 
 async function init() {
     // التحقق مما إذا كان المستخدم مديراً (لتجنب مسح التعديلات المحلية عند التحديث)
@@ -620,6 +621,7 @@ function toggleCart(s){
 
 // تبديل عرض معلومات فودافون كاش
 function togglePayment(method) {
+    selectedPaymentMethod = method;
     const vfInfo = document.getElementById('vodafone-info');
     const ipInfo = document.getElementById('instapay-info');
     if(vfInfo) vfInfo.style.display = method === 'vodafone' ? 'block' : 'none';
@@ -667,10 +669,13 @@ function applyCoupon() {
 }
 
 function sendToWhatsApp() {
-    if(cart.length === 0) return;
+    if(cart.length === 0) {
+        alert('السلة فارغة! الرجاء إضافة منتجات أولاً.');
+        return;
+    }
     
     // معرفة طريقة الدفع المختارة
-    const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+    const paymentMethod = selectedPaymentMethod;
     let paymentText = 'الدفع عند الاستلام';
     if (paymentMethod === 'vodafone') paymentText = 'فودافون كاش (يرجى مراجعة التحويل)';
     else if (paymentMethod === 'instapay') paymentText = 'InstaPay (يرجى مراجعة التحويل)';
