@@ -2,22 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>دخول</title>
-    <style>body{display:flex; align-items:center; justify-content:center; height:100vh; background:#2c3e50; font-family:sans-serif;}</style>
+    <title>Redirecting...</title>
+    <script>window.location.href = 'admin.html';</script>
 </head>
-<body>
-    <div style="background:white; padding:30px; border-radius:10px; text-align:center;">
-        <h3>دخول المدير</h3><br>
-        <input type="text" id="u" placeholder="الاسم"><br><br>
-        <input type="password" id="p" placeholder="الباسورد"><br><br>
-        <button onclick="login()" style="padding:10px 30px; cursor:pointer;">دخول</button>
-    </div>
-    <script>
-        function login(){
-            if(document.getElementById('u').value==='admin' && document.getElementById('p').value==='M@shily'){
-                sessionStorage.setItem('mashily_admin','true'); window.location.href='manager.html';
-            }else{alert('خطأ');}
-        }
-    </script>
-</body>
+<body></body>
 </html>

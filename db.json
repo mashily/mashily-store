@@ -2,271 +2,117 @@
   "products": [
     {
       "id": 1,
-      "name": "هارد SSD 500GB",
-      "price": "1500",
-      "oldPrice": "2000",
-      "offerEnds": "2026-01-24T15:03",
-      "category": "عروض",
-      "status": "عرض خاص 🔥",
-      "stock": "out",
-      "desc": "جديددددددددددددددد♥♥♥♥",
-      "image": "https://picsum.photos/300/200?random=1"
+      "name": "هارد SSD 1TB",
+      "price": "1200",
+      "oldPrice": "1500",
+      "image": "images/1.webp",
+      "category": "التخزين",
+      "stock": "in",
+      "status": "عرض خاص",
+      "desc": "هارد SSD عالي السرعة بسعة 1 تيرابايت",
+      "offerEnds": "2026-02-22T23:59:59"
     },
     {
       "id": 2,
-      "name": "كابل USB عالي الجودة",
-      "price": 100,
-      "originalPrice": 120,
-      "description": "متين ويدعم الشحن السريع ونقل البيانات.",
-      "image": "https://picsum.photos/300/200?random=2",
-      "category": "accessories",
-      "specs": [
-        "طول 1.5 متر",
-        "يدعم الشحن السريع 3.0A",
-        "جميع أجهزة Android وiOS",
-        "قابل للطي والتخزين",
-        "غطاء واقي للمنفذ",
-        "مقاوم للالتواء"
-      ],
-      "tags": [
-        "🆕 جديد"
-      ],
-      "stock": 50,
-      "rating": 4.2,
-      "reviewCount": 18
+      "name": "رام DDR4 16GB",
+      "price": "800",
+      "oldPrice": "1000",
+      "image": "images/download.jfif",
+      "category": "الذاكرة",
+      "stock": "in",
+      "status": "مميز ✨",
+      "desc": "ذاكرة عشوائية عالية الأداء"
     },
     {
       "id": 3,
-      "name": "ماوس لاسلكي أنيق",
-      "price": "100",
-      "oldPrice": "150",
-      "offerEnds": "2026-01-22T18:21",
-      "category": "عروض",
-      "status": "وصل حديثاً 🆕",
+      "name": "كارت شاشة RTX 3060",
+      "price": "4500",
+      "oldPrice": "5500",
+      "image": "images/1.webp",
+      "category": "كروت الشاشة",
       "stock": "in",
-      "desc": "ماوس باشا ",
-      "image": "https://picsum.photos/300/200?random=3"
+      "status": "عرض خاص",
+      "desc": "كارت شاشة قوي للألعاب والتصميم",
+      "offerEnds": "2026-01-31T23:59:59"
     },
     {
       "id": 4,
-      "name": "لمبة ذكية LED",
-      "price": 120,
-      "originalPrice": 150,
-      "description": "تحكم بالإضاءة عبر تطبيق الموبايل بألوان مختلفة.",
-      "image": "https://picsum.photos/300/200?random=4",
-      "category": "smart",
-      "specs": [
-        "10 واط، 16 مليون لون",
-        "متوافقة مع Google Home وAlexa",
-        "تطبيق Tuya Smart أو Smart Life",
-        "تحكم بالصوت والجوال",
-        "ضمان سنتين",
-        "توفير في الطاقة 80%"
-      ],
-      "tags": [
-        "عرض خاص"
-      ],
-      "stock": 40,
-      "rating": 4.7,
-      "reviewCount": 31
+      "name": "معالج Intel I7",
+      "price": "3200",
+      "oldPrice": "4000",
+      "image": "images/download.jfif",
+      "category": "المعالجات",
+      "stock": "in",
+      "status": "مميز ✨",
+      "desc": "معالج قوي من الجيل الثاني عشر"
     },
     {
       "id": 5,
-      "name": "سماعات رأس بلوتوث",
-      "price": 400,
-      "originalPrice": 500,
-      "description": "صوت نقي ومايك مدمج لإجراء المكالمات.",
-      "image": "https://picsum.photos/300/200?random=5",
-      "category": "audio",
-      "specs": [
-        "Bluetooth 5.2",
-        "بطارية 400mAh",
-        "شحن كامل خلال ساعتين",
-        "تشغيل حتى 20 ساعة",
-        "مايكروفون مدمج",
-        "تحكم باللمس"
-      ],
-      "tags": [
-        "🔥 الأكثر مبيعاً"
-      ],
-      "stock": 20,
-      "rating": 4.3,
-      "reviewCount": 27
+      "name": "ماذربورد ASUS",
+      "price": "2000",
+      "image": "images/1.webp",
+      "category": "اللوحات الأم",
+      "stock": "in",
+      "status": "مميز ✨",
+      "desc": "لوحة أم عالية الجودة والأداء"
+    },
+    {
+      "id": 6,
+      "name": "كابل HDMI",
+      "price": "150",
+      "oldPrice": "200",
+      "image": "images/download.jfif",
+      "category": "الملحقات",
+      "stock": "in",
+      "status": "عرض خاص",
+      "desc": "كابل HDMI 2.1 عالي الجودة"
+    },
+    {
+      "id": 7,
+      "name": "كيبورد ميكانيكي RGB",
+      "price": "1800",
+      "oldPrice": "2200",
+      "image": "images/1.webp",
+      "category": "الملحقات",
+      "stock": "in",
+      "status": "عرض خاص",
+      "desc": "لوحة مفاتيح ميكانيكية مع إضاءة RGB"
     },
     {
       "id": 8,
-      "name": "حامل موبايل للسيارة",
-      "price": 90,
-      "originalPrice": 120,
-      "description": "تثبيت قوي وآمن لهاتفك أثناء القيادة.",
-      "image": "https://picsum.photos/300/200?random=8",
-      "category": "accessories",
-      "specs": [
-        "تثبيت بماصة هواء قوية",
-        "تدوير 360 درجة",
-        "يناسب الهواتف حتى 6.8 بوصة",
-        "تثبيت على الزجاج الأمامي",
-        "قاعدة قابلة للتعديل",
-        "ضمان عدم السقوط"
-      ],
-      "tags": [],
-      "stock": 60,
-      "rating": 3.9,
-      "reviewCount": 8
-    },
-    {
-      "id": 9,
-      "name": "لوحة مفاتيح لاسلكية",
-      "price": 350,
-      "originalPrice": 400,
-      "description": "لوحة مفاتيح ميكانيكية مع إضاءة RGB.",
-      "image": "https://picsum.photos/300/200?random=9",
-      "category": "accessories",
-      "specs": [
-        "تصميم ميكانيكي",
-        "إضاءة RGB قابلة للتخصيص",
-        "بطارية تدوم 30 يوم",
-        "اتصال Bluetooth 5.1",
-        "مفاتيح مقاومة للسوائل",
-        "دعم جميع أنظمة التشغيل"
-      ],
-      "tags": [
-        "عرض خاص"
-      ],
-      "stock": 18,
-      "rating": 4.4,
-      "reviewCount": 23
-    },
-    {
-      "id": 10,
-      "name": "سماعات بلوتوث صغيرة",
-      "price": 180,
-      "originalPrice": 220,
-      "description": "سماعات بلوتوث صغيرة الحجم عالية الجودة.",
-      "image": "https://picsum.photos/300/200?random=10",
-      "category": "audio",
-      "specs": [
-        "وزن خفيف 15 جرام",
-        "تشغيل حتى 8 ساعات",
-        "شحن سريع 15 دقيقة",
-        "مقاومة للعرق",
-        "صوت ستيريو عالي",
-        "حقيبة شحن صغيرة"
-      ],
-      "tags": [],
-      "stock": 35,
-      "rating": 4,
-      "reviewCount": 19
-    },
-    {
-      "id": 11,
-      "name": "شاحن سيارة سريع",
-      "price": 120,
-      "originalPrice": 150,
-      "description": "شاحن سيارة بمنفذين يدعم الشحن السريع.",
-      "image": "https://picsum.photos/300/200?random=11",
-      "category": "accessories",
-      "specs": [
-        "منفذين USB",
-        "شحن سريع 30W",
-        "حماية من السخونة",
-        "كابل تثبيت مرن",
-        "مؤشر ضوئي",
-        "مناسب لجميع السيارات"
-      ],
-      "tags": [],
-      "stock": 45,
-      "rating": 3.8,
-      "reviewCount": 11
-    },
-    {
-      "id": 12,
-      "name": "حافظة لابتوب",
-      "price": 220,
-      "originalPrice": 280,
-      "description": "حافظة لابتوب مقاومة للماء والصدمات.",
-      "image": "https://picsum.photos/300/200?random=12",
-      "category": "accessories",
-      "specs": [
-        "مقاسات 13-15 بوصة",
-        "مقاومة للماء والصدمات",
-        "جيب داخلي للشاحن",
-        "حزام كتف قابل للإزالة",
-        "تصميم عصري",
-        "ضمان 6 أشهر"
-      ],
-      "tags": [
-        "🆕 جديد"
-      ],
-      "stock": 22,
-      "rating": 4.2,
-      "reviewCount": 16
-    },
-    {
-      "id": 13,
-      "name": "حافظة لابتوب مقاومة للماء",
-      "price": 220,
-      "originalPrice": 280,
-      "description": "حافظة لابتوب مقاومة للماء والصدمات.",
+      "name": "ماوس لاسلكي",
+      "price": "350",
       "image": "images/download.jfif",
-      "category": "accessories",
-      "specs": [
-        "مقاسات 13-15 بوصة",
-        "مقاومة للماء والصدمات",
-        "جيب داخلي للشاحن",
-        "حزام كتف قابل للإزالة",
-        "تصميم عصري",
-        "ضمان 6 أشهر"
-      ],
-      "tags": [
-        "🆕 جديد"
-      ],
-      "stock": 22,
-      "rating": 4.2,
-      "reviewCount": 16
-    },
-    {
-      "id": 14,
-      "name": "بطارية لاب توب HP",
-      "price": 150,
-      "originalPrice": 180,
-      "description": "بطارية لاب توب نوع HP.",
-      "image": "images/1.webp",
-      "category": "accessories",
-      "specs": [
-        "مقاسات 13-15 بوصة",
-        "مقاومة للماء والصدمات",
-        "جيب داخلي للشاحن",
-        "حزام كتف قابل للإزالة",
-        "تصميم عصري",
-        "ضمان 6 أشهر"
-      ],
-      "tags": [
-        "🆕 الاكثر طلبا"
-      ],
-      "stock": 22,
-      "rating": 4.2,
-      "reviewCount": 16
+      "category": "الملحقات",
+      "stock": "out",
+      "status": "مميز ✨",
+      "desc": "ماوس لاسلكي دقيق وسريع"
     }
   ],
   "categories": [
-    "عروض",
-    "اكسسوارات"
+    "التخزين",
+    "الذاكرة",
+    "كروت الشاشة",
+    "المعالجات",
+    "اللوحات الأم",
+    "الملحقات"
   ],
-  "academyCats": [],
-  "statuses": [],
-  "videos": [
+  "coupons": [
     {
-      "id": 1768907832387,
-      "title": "قران",
-      "url": "https://www.youtube.com/watch?v=uMqqEiWGQ0E",
-      "type": "free",
-      "password": "123",
-      "image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxISEhUSExIVFhUXFxcVFxUXFxUVFRUVFRUXFhUVFRUYHSggGBolGxUVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OGxAQGi0lHyUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAKgBKwMBEQACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAACAwEEBQAGB//EAEUQAAEDAgMFBAYGBwcFAQAAAAEAAhEDIQQSMQVBUWFxE4GR8CIyobHB0UJigpLS4QYUI1JyovEWM0NjssLiJFNzk/IV/8QAGgEAAgMBAQAAAAAAAAAAAAAAAgMAAQQFBv/EADkRAAICAQIDBQcDAwMEAwAAAAABAhEDITESQVEEYZGh8BMiMnGBsdEFweEUUvFCcsIVI6KyJENT/9oADAMBAAIRAxEAPwD4wF1giQrLJVlnBQgkvKXxOxTkyTUMQqlJ1ROJ1QAKFFBwmpcyHOUZbJarRaLlAyE5amzE21qOARDkgmhWEkEArCSJAUCoIqF0dChdHZVZOEnKrJR0KynEhwVg0AQrAaBIUoBoEqAsFUwaF1klgZDqQlHBWVBWHGoRNcgq3QkoBTIUBBIS5ohWcFmaENUzgpzIiy0aI3uaY8hFUXKW1qIn8TAQNAkIGWcqIPC1jCVCyVCyC6FG0im6EJIo5UQ4IkrKLdVuVoHnmt+SChjSGtVGissgsNoRINF2honR2NuH4RwCIekEAoEkGArDSCAUCSJAUC4ScqhfCTlVl8J2VWThOLUSBcSHDkroBxAIVi2gCFdC2gSFAGgCFVAsXUFkhoqatC6ToKuDpiYumPfqmMfLR2JcENCZAFVQAVNsyoocRcVZWrtWSaoVkWotALLTNyYaY8hNcXQS3FZF7wCF6A7AJLKOVEHhaxhKhZKhYqqbpc9xUtwEBRyiKHYVknpdbeyYuOfyCitQsU+T0si7VPinXQubtigswKGtEpm4yKsvsbuTkjoxjSoYAoNUQgFYaQYCgaiGGqDFEINUDUAwxQNQC7NQv2ZHZokTgOyIgHEW5qMU4i3NVipIAtV0KaAIUoW0AQqoBi3pM1qC3SK8pZme45xThjk2CVCmCVTQLDojVHjQUBWIbqs+aGoORXZUWQzFmkbeCbyNENgmgdo2QCJEz1hU9w1Syx4thu2aAaWkADUWtfyUOaNND/1HFGEk4qkZqzs5xyog8LUMJChZKssQ43SHuJe5CohwRJFF2gMrSfPJdns8fY4HkfMJaIqlct6sEloUQaRbwrLzwToo04I27LjQmG6KGgKjQkFCsutQ2tUGxiNa1UNUBjWKWOjjGikpY1YgxRUsasJJoK0yPAwHUUxCpYRL6aNGaeMS9iMzSiKc1XQiSANPej4NLEtCKhh0cLd6RxWxM3UqFPCHJEBlchJM7GNNuibHVBJ6EoqIRCqiUHSESmY9LCiqE1HiVmyTi3oA2uIrVWwVmkqYiapjaOitfCNx7HYkaKTLzcmX9qelSDuh8QmZ43BM39sftMMZmMVhZyTkJCQYRp0RMe0p6djE7Odoo9i3sISBRyiKDpMkwtGDG8k1FcyFnFu0b55LqfqE1FLGi2VlyiIYwI4oYjRw9OAnJHRw42ojmtUNMYjAFBtD200TRojBBsahGRiWKVGUJqxYnJlluGI3KPQ2R7OzVw2xXZQ+o5tJhuHVJGYcWMALnjmBHNJeXktQ+KEXwxTk+i5fN7L6u+4sRg2f96qRwy0Wn2OMeCpLK+i8y/8AvP8Atj4yf/Ffc47Qwu7CDvq1J9kJixT/ALvIFxyf/p/4o79YwT/Wo1Gc2VA7+V7f9yNQyrZ39PwLftF/qT+arzT/AGBfsKnV/uKzXH9x37N/QScrjyDieSasjj8S9eu4zzf98a71qvyvqjCx2znsJa5pBGoIgjqCtUGpK0ZMkFujOfTTKMc4kY7COFNr9x15Tp7lnnO5UV2nss4YY5b0fl0Ke0GEOGb1ovvng6RrISYmLtcJRl7/AMXP833iDcJ+8TPuiu8LO0JluRTKuLplJj8tpC0cK4bQytLAQAkvnKYVTTcHRcropuWOSM7CeJEqSVqwpaxs7DncqhsTFvQdcWHncrktA8nwpl3DHPRLeAI+IWnHHjwtGrC+PA49DHK5jRzSEFFnK0QdTNk+OwcSX6KT2LlsJSBZyNFFrBs1Pnmuz+mYt8jIKqPkkrDnye0yORCAElIJFigySAnRQ/HHikkabQmnWiqDAQjUXcFQzAz0Vo3dlwcabYWSLImEo0yabEtjccDW2XhC5wABJ0AAkkmwAG8pblR0cUVCPFI2cS5mGMANfWGpMOZRPADR7xvPqgi06pdPIu77gpvOrdqHg5ful5tb1sYmKxbnuLnOLnG5cTJPUlPhBJaBucYR4YqkVjUToxM8soBemKIl5Ac6NRAeQZSxBG9HwAPKehwO2W1WiliBnboH61Kf8JOo+qbcISnhcXxQ0+zM8usdPs/XUo7Z2IaRkEOY67Ht9VzeI4HiDcFOxZOL59BDmmZDaQe00TE6sP1uHeqywr30Nx1mg8EvnH5mbXYX07j06ViN+T8is9U/mZMsXl7Pr8WPR/7f4M1joKZHR6nKTpgVWoJRpgzQpKFj8MZBb3haMLtOIzG7TiA4qpaA2MpOBsihJNUGpJqirVbBIWTJGm0IkqdE0tOh96CG1BwVxFNs5CtJUKWkh9UeifPNE17o6esWM2XUglvET4J/Yn7zj1L7LOpNdSpjKeV7hz96ydox8GRoRkjwyaErMAQhRY2mtEdgonVShm9KLkLS0LJCZFWQuVPRZHd8138//wAfsygt36ZRVC4jCQbAiig0i9hGb06Ju7NHmXUTN6DYye5C9BkY2zaw9PIyeU96uO538UPZYLZUhFIxpFihTSWbMMLZ6rAf9NRz6Vag9E76dK4zDg51wDuaJ+kk1xyrkgpx9vk4P9Ed++XT5L7/ACPP1jJWpKzRkZVemKJhm2txbimJGdyAJRpC3IglNSFuRAKNIByHUnq6Eykeq/R7HNe04eqf2b9HH/DfoHjluI3juWfNja9+O6810/BmyS5ow9u7PdRe4EQ5hjoQdy0YpKcb5MFZeaKe06eR/axwbUG4hws4DgbjqFkpPQ6GVuGRZWu6S+fM8/j8PkeW7tQeLToVN0cXtWH2WRx5cvkV5lC9RC1QkhLaFsKk+CCig+GVki6dnpNk4elWpPw5EVJztdxtYjpvHArYoxkqKye6zzuIpOpuLTZzTBWOScWRMXVM3SpysuXVnYfeEMVqXi3oCs32IZrmBNDW3HUfkjWqYador0KmVwPA+zel4Z8E0xMJcMky3tancO7vktf6jj1U0N7RumZy5QghLRY2ktEPhRcQHm6VJ2yMhRAjsMyT0uuj+n4faZVey1KYWKfJjgnfqGXiy10ILCwIJDqYRodFG5WoANpubo5o8RYo4s72TBGEYShs15rcUUQBcwVKSBxMnoEL3N3ZcfE1Hr9kamOMNA4pkFodXtktooqtarkjLFWzW2LhBUqNa6zdXHgxoLnn7oKz5XSNrl7LE5Lfl83sW9p4kvJcRE7v3RoGjkAAO5XjjSHY4LHBR6em/qzMaJK0JUA3bF40hNjHQx55JvQplMUTG2C5GkLbBRpC2yIRpCpSLOGp7yowS/QOVwKlaGfK6PR7cpdvhqdf6Tf2T/siaZP2bfYWbD7mV4+W6/fzMKnUmjzbTnYQRLmAgj9+mdR1sO8Dijy4+GVrZnYw5va46e680YmPw0sI1NO4P71J12nu+aW0Zs8OPFXOPnF7GJvQNHMW4NQIJIGSFoAC/s3EtbUpudMNN4JB4A26+xacUk9y5axJ2zs7snAtM03XY7dGsT0Q58XDqthUJXoZztFkaGvVHUTcKovUkHUg6uquW9BT3IoqY+hUOhWqWJWaWjoS9yxVq5mDl8F0MuT2vZ13FuVqiquVZQKUQNjoTYSqJAECISjSKLlAZWz55L0HY4+w7O8j3fpFFYlcaUm3ZAmK4jEWKITEPx7nocC8Pw7mb2HMOh1+KpaM9J2WXteyShzi7KYEmEZkWro1tmMkk/ZHQKkjtdginJz+iCxT5dO7cnxRWafFksmmqkXj3PRbEZFOs/6jaf8A7Hif5GPHesuXWSXrQ05fixx72/BaebKGOddaIoe3oJpiAmpCJOkUqxvqtCRzpysUW87o0hLZzmQYNjod2ljPBEkKcieztMo0hMpBZfPREJchtEQYPXjHVU0Up8i+ynI86oE6YOTVHpNi+nhsRT+o2oORY8A/yvcs2f3csJd9eK/Jyc0qkePxLzTeHjd7RvC3OPEqNeHK4SUkRicoc1zbgguaOLT/AHjI/mHMOCyuPI6HGk1JbftzX7nmtp4Xs3lu7Vp4tNx55JckczNDgk0iq5LkA3YopLFvQhroKuMuFg3qb+xawqt/VqnquksO9rrm3tPWeK345KS4ZbMVlhK+KCMfG4V1J5Y7UeBG4jkseXG4Sph45qStAYKmC6+gBPDRY8jcVoa+y44Tye/tTZVdVO9A8j5mRzb3CNTfxROeloLiEuMpEmAw6RuOqdgm+JR7yIsuwzZXVn+n4ZSb1RdFFeeKOVpkOVJkDYJK0YkpySKHVKk2Gi6Pae1e09yPwopIABZIxt0GFCKqZaDdVgQNd5QSyVohnHUaQ7Z2ONN0jQ2cNxHBBGWpp7J2ueCdx5796NKm6Zc3QfFa+HS0dHHNSuUS3SecsDgj4VRtx5GocKNg0m9lTIH0TPWxJ96JLajZgVx1KlMKNBYnqer2RSPYVTGrqJHSKyyz+NDssv8Auw+Uv2MXEXcTzstMFoNnITXfAjinQjZlyzpFJzQnJGKUiEaQpyOARJCWyAiFSYWnTd7ESQlsNlTiioVxUzXwV7cbd+4/BJaCcj036PU4Fc/5FTxsPesfanrD/cjk9pfvHidqjVdOI7G9DzOJqkPkSHAzPuWbJdjZyWnDuXXvGIpRYVGXA/eZqY6axuhLriClkU4a7oqbYwNSi/JUbB3EXDhxaRYhKmuZnXaIZlcDOKQy9wEAA/AYs0qjHxOVwdHGDJHeiU2tA8eR45KXQ0Mc99emKxb6p7Mvtc6id8xv0WtyWbHXNAxxVxSS0vw7jHcudLQpi6jN4/okzjzQMlzFFKBOVECp6jqjwuskfmizQJXouIMzF5WwDlGQhUiBBNhuUGtKLDamw0VkAc9Z55OhGyEshYw9GbnRaMWLi1ew6EbNGjiMsw0XERuWpyrSjfhzezukWKdTjwRyjw1Zpx5XzDoOL3tBJieJ70KVsZCTnkUWzcoYO2t9RwtqCibs7cMajuz1mx3zQqtGppyB/wCMg/6Q8rLlVST9ag5X78JdHXiedrNutcRs5GfiKklaIow5JWxLimJGdsglEkKkzpR0JbIyq0hTkGAiEyZLQioTJmls8nRBOIvj5HtsAQ3B16p1cGUh/EXBzo+yz2rm5dc8IdLZhyy4meI2lSBK6UWaYOjztTDBzi02NwD9aPRHQmPFFOPEhjVmW7Mx28OB6EELDJOLFu0yxjdo1cjGl2ZhbZrgCGkEg5TqO46GEvJka+oiWOMZcUd2Zzao3rL7RcxsZrmdUeJshb6Fzkm9ACVTYNmns/aZZRq0Q2e0ymZjLlubRewHBMx5XDY0YszjCUK3M8jMTHVVTzSbiu8RuRT0SVsFHYS9vgkSjQpoBAUGwXHUJkEuNfNFl5d0MzV5h6AEFU9SEq0QloToIoNaCEOcgnkb0LBSiizhcOXGPIWjFjvVj8OJ5JUi5WcBDG6DU8TxWhvkjVkcV7kdl5smjBN0zFUpe8VFmljqDWtY4G7gZHSLjkZ9hR5nczoZIRhCLT1e47ZGHJD6nCGD+J2v8oPiqgtRnYo8UnLoaTcUMr7hoZAk6uJMZQOgce5W2kzof1EU6ZqbE2rD2PFwLQd4NnDvFu9Bkx8URinHNjaQ3buE7N5Au03aeLXCWnwIRYHxIp5eKN8+fzMqhg5l7jDBv48gtaMOTLTpblCrqY09qYkLcgCjFtkokhLkECrEthSiSFOQxjUQiUjT2aCDyOqCa0MmTLwo9ft7Efq9Knh94/aVR/mPFm9WsgdSVzOzx9rOWX6L5L8sHs8nHIpNHk8dTaRnY4RrHDkt2NyumdXtMcUUpwe/LoefxVEuJyi4GYjkN6bxLYDZaisZRFRpIAzQL77c+Pv8EvJjUlYElehg1QYAOgmOAnVc/JHqIlEruprNLGL4RZCzyTRROZV7Rlkh6vjT3LsOk+DKbiyOEk0EnQYNypNpybChuC0atKFJO0ykrdMS9kGEhxp0wGqdBU9R1RY/iS7yIuLs2MM0rzTYs5RECTKshIT0qKOJQSnZCEJY6jRlaMeLqFGNs0j6DYGp3rYlSOi2sUOGO7K5O9A6aszDMPrKPHzYzG9dR1StJ5buQUu9RzyWaB2sGUadKmLg53Oj6ZJsBvGXIO5TirYbi7W8cOGO7AwWDz+k90WkDUnl9VEscnqx2HC8jubru5/waeD9Gw0CfwpKjpQSiqiev2YRiqYou9dv90T9IG5pz1kjmSN6zyXs5cXLn+Rc5Ne8tuf5/JVfh29o0VR6DSJbuAGsj3rQpNr3TNkShBuOsjC2sxnav7OMk+jFxECY5TK0wutTNGUuH3tykWJiBcjg1EhMpBtaiQpyDaxWIlIuUsOSpZnyTo9ZsTBNoU/1qsBaexYf8R4+kR+4068SIXP7Tklll7DH9X0XT5s57k5u/Dv/AIPObdxzqlR7wcwc5zvrQXE3G5asWNQgo9Dp4JUqZhnHxI1B3aX4pmqNUsUZqtjNxBdmztcQd0WI6EJUo9CZITluiMNtAtPpCe+L81Ucr2YtMbicMx9MVGH05IczeRGYPjucCeXNDOPE3QXDZj1Ke7Q8FinATKNCXNSJICgSAeSU4Re5WgtzYSJ42igZS7aIG16NZOpadE03XCJTVlxeo6o2UySsbONleYKzubTsTsWBiAty7ZCtQuIprkAnBFEgQTo9WUcSqlJshyEsOmFpxwrUiLtAgCTu961R0jbNWKoriZNeuDGXfHceCPJNOuEF5XIEtIQyhKNWTUkPgK1KlQXFQVJpcY0UhFydBRuTpGo6mKYLGic2U5j60RIA4C/sT/ZqLpGyEIqOm5awuUM1MzcbssW75KdWlGzs+mr2LNLEAacIPMc1OCzUs3CnRaw+1Mpt+SL2aYiWVs9NTx1LGNDazslXdVM5X8BVi4P1vHikcEsLuGq6c18vwZJtx229bGVtLYdSkfSbrcHVrhxa4WcOi0YssZrRmd5UZrsMeCehcshHYIhLyBtw5VozyyouYXZznkNa0knQAEk8gBqpKcYq29DJk7QloekobNpYQZ8TBfq3Dgy6eNVw9QcvWPJYZZp5/dw6L+78dfnsZZTk3r4fnp9zB27tx9d+Zx5ACzWtGjWjcBwWvDgjijwx/wAmnDDW5bnn69aU43xRVec0kgEASbgGLDXU68+ig1abC6uHEZmOkbwbOHwPVA4suOSV00Uqo4hImuoUqluJLCND8ClNSXwsW4PkILSTG/nb3rPLcU+8ByW+8pgFqW49AaIhASgSEDiuaKINK0jT3JUsGlxKALSkOMkWc15CpTa2LTaOmdVbmnuUQgICgISEcSHKyBNaiSshJbCao1oUwgU1uixpqSB5CPjbSGcVpIJhi6NWnfMuOmoVyiqUtQrsu0MKInWCJ4w7QhaYYVw8SGJKLplujRa2ZiQcvUHRyesaiaMWktR+Fp5iZuRJuYBDROWeeghRpGmCvQ0drlrgwtblIGV02mAPSEa77qo95pakzPFIneEVk9mx9HCE/SH83yV8VF+z7zUwuzqu4E9G1D/tU448xE4pcz0+xm45gytp1HNNyx1J7mHq1zY79UjK8D1k0n1tJ/c5+WMepss2Qanr7PqNPGlnYPuva73hI/qFD4cq+tPzTRgna2Y3+yFPXscWOWSmfbI9yr/qD/uh4v8ABmlx9/gF/ZtjLtwWJqfxuaweDGknxU/rXLfLFfJX92JlCT5P7fZFfFjHMBbRwzqDTb9lSqZiOdSC4+ITIf00nc8nE+9qvDRC+CS5V8k/vueVxuycTcup1BxmlV9+VdGOfFykvFfkbBRjyMbFYB41MdWvHvCcpp7GiGSPqjMrYY/vD2/JFZqiyq7DniPaoNTIbTI3hUXaAZGYZtPPFU1YWh1DDse/LmDJMAn1Rff3JU8aojKlWj0PTkkTxNC21zK9enBsVknEGcK2EJPyFnTIhDVl22qBLDEoHF1qC06s5rLG/de/9FXC6KoC4ulaolNahZAQhlCLDpNWKcy8JMsbvQFqnQKW9CiEJCQmRISoQNukDUpi0Re6pBV3y4k77p0nrYLBaJUScmWlY9tM8E+MKGKDJaw8laTvUtRkP+iBO/gtX/0pXzD7i12oiOTR4Qmxa9m0aHKLaDpVBOiqDWw6ElexbafNypJ0bo6rUu0GB0a+CqU2kbcWKMuvgbmzNnUyQCXzwET4ahZ5ZZGz2UYrQ9jgcJSa0CHfzk+LUvikzDmb5GqwjdPeXt+IQ6+qObkRNTH1merUaPuu/wBUqLDjl8Ufv+xzcsV0M/E/pFXEziDv0bRC0Q7Hh/s82Y5qXJfcyf7RVpJ7UzxJpn3thaf6TFXw/f8AJmnin3+DNHCfpTXGtUGPouLL8hlASZ9gwvaPhf7meUs0XetfI9Ds39K6j7FtKf4ss9MxXPz/AKdCGqb8A4dqk9HXr6m/QxvaA2BGnovaSPBy588XA/4/g0xycX+TP2vsLD1mS5jjAMFj6o65g11+qfg7XmxuovxS/AueKD1o+c7a/R/DMa57WvImILqjiJ6C3eV6DB2nJNqMq8vyI9rNP3Zfb+DxeM7IE5GnvzD3roK+Zuxym/iZj13X0UZqiV3OSpSCsW5yU5EsW56TKQLkLqPlJk0wZTbFyl6AWQNZQpK7KXUkvtHNC9UG5e7RDDZSKpAp6EQlNF8gYgQlSjw6EW1AnUIF8SI9x0LQw6KS5YklM5EJCiIWsDWyva4C4J8CI+aeuGUe/wDYf2XK8eVSS2F1xLieZ6IuHoLy6zb7wqLoTcbp6Eg6GynN2MtsJQJBAc1bfIJJdRjQOPtRKWg2MV1H02jiPFWpOzRCEOq8S9SjiFcpSOjjUObRqYAibR1koJNtHV7Pw8mj2OyHSPWbG+PnKzvcZmNum4kWmORHw9ytHPlwveiriGn63zWiImU13GXi2ibn3/IrTBGLJ2ifKvX1MjE1mjQz54ynpGdPLJ66eBX7YeSjXyBnjdVxeS/I6jU3fFEqZze0YpR1ctPXebGBxzmaHL3NnxIS8mOM9/3OdwQbtPwt/uei2dtepMhxJ4G89IZqufm7NCqa9eINxi9JX4flnp8Hj6jrw4cQab573RE+brl5MMFpa8V+R6kydq1Q6m6Tlt6QcBEHjJAjvUwRqaryKyNNHyLb9RkmHUemvhBhepw3Wtg4E+88fiausZO7+qcdKKKD3JUmGJcVnkwGxTis0pAMWSkuQIM+f6oGyHFU2QhC3ZRyqyySVTkWSBZVo0EloCWgkIVFOSKa1G5U5w7wykAuWosSEAmIgc2iN4N+QO7vR0q19fQu9KCpui415J8a4dPIkZNO0Q433e9Bp61JJ29Th3/BGtSh1MpsXQ2LGBENSCDVG+oaiOYzkFE2h8YLoOa3zAKtSVjlBr/Bcp0zHn4opT6m7HilWiL2Dw0ka+z5qvaujo9n7Lb19eZ6zZGGpNiQD1Py1SZTbNc8bSpGx/8Ap5RDWCOUe1RGV9lU92Jq7cdwHfEeyE6NCp/p6fMy8Riy68NHSPinRyUB/wBMhs2/EzqxJufh8E5ZRS/Tsa1rzEZN/wAfmjWVisnYMbd15jqZ8khH7STMU/07Ata8y7h6ht8wis52fsmNLZI3dk4h7XDJv52ngQNVnzQjKPvHHyLHCW+vcz2+CqVokx0zajhy8FxMscd6DYNlvaIbUpHM0OEGziyxjeDPtSsNwmqdeIU1aPke32tEjI0RpERHncvU4W2txOBvkeGxtISYI6ej8FpOnB2ig9Imi2Kcs8kCJIWaSBBI70mRTREIeEh2XyEPCSiFVFaM4+d4VMsjzrCGkRV60Cnz+YU0CsgO8z8CpGSsq/X+Sc3I+Cb7SJWvTyK3m65nfXiUTPkIr7yjh0VruRAp5pl9WQ4ch8VafRFhQivqy6GMKYn0QaocEWvMfGgwRw8+Cu2MtIcx/Lz4KcL5j4ZEuXrwLNKty8+Cpo2Y8yvbX13F+hU5Hz3KnGtzpYct7J+voaeFOlvPgqOti229eBuYWi6JHhe/sVWSTRbdRdHq9+Y/gRxEua6+RXfQdqQfE/hT4xYmWeC3fkUMSeXv/CnRiuYmWST1i/IoVXnn3f8AynJR5UIk8tat/RV9xXaPi4PhH+1ElG9BMp5mrmvz/wCtBMJ4Hvn8KbExZk+afn+DQwr+vt/AraMM9dJXXruNrCvO6fbr9xLkvXpnPyrBdP7P8G/smrUOryL6Zi2/fTOqxZ4xXLy/kzyUVpFff8F7G457AYq0QY9Vzs8jdfspzLPjxRk/hfhX/Ipp+v8AB4La1TPbLabmZH+iV28apb+vErHHhfM8lj6DQTA897QnWbomS8cvPglyQbEujz/RZ5AOhbnefIWeUkDdCyQkOZVogu8/mg4im3zBkdELZNDjPVBZNfmRPchZLXyOM9UDZevzBzdQhsq18ifAqIvfvO7j57ldIr6MUsr72UdKtPoiExxRU+bIcCP6olRAhdFqywhHVXogkkgw5EpBLUY0I13jEhzFfF0HxSGMA8yr1HRULLdGPIKps24uHl+5foEcB4FC2zqYa6LwZo4bzYq9jpYle23yZ6DZ1+fLsyfbKoLLojQqvb9UR9Ua9x82TYGOpWZ9eo3iD9k/NPi0DOGTp4GXiTJ3eB+adxachSwarWS+rZWceQ+6UFmukuXkLNbkfun5psYmXLkSrR+DG0jI/wCJlGtDNP3l/A+jYj0QPsk6/nCem2tzk5IRT+Cu+jXwx85XfNA0Y5tbovfqzSM2SejXTHzGvjxQcTXMxTytSpsgYaiASauUxYGi4j2OHuVuc9lG/qvwLlKb5GJtJwiQWnnkc2e6bFaIWDjTbprzPLY5xJtljoZTrNcYtGXUHmEqaCaEPYs8kA4iys8kgdgS0FJkkVSewGiW6K1QNkDK0Z0eQhbJT3QJdyQMl9ToG5C2SlyOJO9DoXb5kCEcStAu9ETXqJWC0WdmU4mUdCtJlkyjTXIo4lS2QIBMXeQNr+CYu4JSGNR0NQwGEVdQ+JomnUVp2XDI7LdMnn4/mo6RtxtssUh18UV0accedvxNbA1t0O8T80po73Y83+lp+Z63AVIboSeGY/iQmrKnYbuntv3y5NiLaaKGJd1+9/yTkiRa57/Mzqr+vifmmU2CppW3+5WdV5Hx/NXw0A8qa0T9fUV2vU/a/NMjEyzy6r8/yCMbxB+8Z96fHFZiy9sS3j5l2jWzWLXcrn8SaoOJz82VZN0/Mt4TaDQ4CXX5uid4mUfBa2ONlnO/i0PS4Zxiwf8AeP4lmkuvryE2q3HPosZ6+YOPqjN4tntJ5gRx4JalJv3ar13CZttaHm9vVYJs/hqfxLbiWheE8VjKrpM+/wDNHO1sdGOxQe4rNKbBbYouSZagcQt11lm6JoxTlncmCyQ/vQ2y1I6J0UslJ7AobK2OzcUDZd3ucRwQtl10BkhA2Um0SCjjImhPem8a6lUj/9k=",
-      "category": "عام",
-      "views": 1390
+      "code": "SAVE10",
+      "discount": 10,
+      "type": "percentage",
+      "maxUses": 100,
+      "usedCount": 5
+    },
+    {
+      "code": "SAVE100",
+      "discount": 100,
+      "type": "fixed",
+      "maxUses": 50,
+      "usedCount": 2
     }
   ],
-  "ticker": "",
-  "proof": ""
+  "ticker": "عرض خاص هذا الأسبوع - خصم 20% على المعالجات!",
+  "proof": "نحن متخصصون في بيع الإلكترونيات والتكنولوجيا منذ 2020"
 }
