@@ -9,6 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kLmbG4dGzcPTBFlnA+p/A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13Ka07paqdeTu0WR1d45h426IwqESpidRhu398jM5+57ablS4hG3/Gsf3y3k0s00DA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary: #4361ee;
@@ -247,15 +248,15 @@
         /* عرض المنتجات */
         .products-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px;
             margin-top: 20px;
         }
         
         .product-card-admin {
             background: var(--surface);
             border-radius: var(--radius);
-            padding: 15px;
+            padding: 12px;
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
             transition: all 0.3s;
@@ -276,7 +277,7 @@
         
         .product-title {
             flex: 1;
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #2c3e50;
             font-weight: 700;
         }
@@ -289,15 +290,20 @@
         
         .product-desc {
             color: #666;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            font-size: 0.85rem;
         }
         
         .product-tags {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
         .tag {
@@ -322,11 +328,11 @@
         .product-actions {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 10px;
         }
         
         .btn-small {
-            padding: 8px 15px;
+            padding: 6px 5px;
             font-size: 0.85rem;
             flex: 1;
         }
@@ -363,6 +369,24 @@
             background: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
+        }
+
+        /* تنبيهات عائمة (Toasts) تظهر في أي مكان */
+        .floating-alert {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 99999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            min-width: 320px;
+            animation: slideDownAlert 0.4s ease-out;
+            justify-content: center;
+            font-weight: bold;
+        }
+        @keyframes slideDownAlert {
+            from { top: -80px; opacity: 0; }
+            to { top: 30px; opacity: 1; }
         }
         
         /* الإحصائيات */
@@ -576,20 +600,43 @@
     </style>
 </head>
 <body>
-    <div id="auth-screen" style="padding: 50px 20px; text-align: center;">
-        <div style="max-width: 400px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-            <h2 style="margin-bottom: 20px; color: #2c3e50;"><i class="fas fa-shield-alt"></i> الدخول للوحة التحكم</h2>
-            <div class="form-group">
-                <input type="text" id="admin-user" placeholder="اسم المستخدم" style="margin-bottom: 10px;">
-                <input type="password" id="admin-pass" placeholder="أدخل كلمة المرور">
+    <div id="auth-screen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+        <div style="width: 100%; max-width: 400px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 15px;">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h2 style="color: #2c3e50; margin: 0;">تسجيل الدخول</h2>
+                <p style="color: #7f8c8d; margin-top: 5px;">لوحة تحكم المدير</p>
             </div>
-            <button class="btn btn-primary" style="width: 100%;" onclick="loginUser()">
-                <i class="fas fa-sign-in-alt"></i> دخول
+            
+            <div class="form-group">
+                <label style="text-align: right; display: block; margin-bottom: 8px; font-weight: bold; color: #34495e;">اسم المستخدم</label>
+                <div style="position: relative;">
+                    <i class="fas fa-user" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #bdc3c7;"></i>
+                    <input type="text" id="admin-user" placeholder="admin" style="padding-right: 40px; height: 45px; border-radius: 10px; border: 1px solid #e0e0e0; width: 100%;">
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label style="text-align: right; display: block; margin-bottom: 8px; font-weight: bold; color: #34495e;">كلمة المرور</label>
+                <div style="position: relative;">
+                    <i class="fas fa-lock" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #bdc3c7;"></i>
+                    <input type="password" id="admin-pass" placeholder="••••••" style="padding-right: 40px; height: 45px; border-radius: 10px; border: 1px solid #e0e0e0; width: 100%;">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%; height: 50px; font-size: 1.1rem; border-radius: 10px; margin-bottom: 15px; justify-content: center;" onclick="loginUser()">
+                تسجيل الدخول <i class="fas fa-arrow-left" style="margin-right: 10px;"></i>
             </button>
-            <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
-                <a href="index.html" style="color: #3498db; text-decoration: none; font-weight: 600;">
-                    <i class="fas fa-arrow-left"></i> العودة للمتجر
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.9rem;">
+                <a href="index.html" style="color: #7f8c8d; text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                    <i class="fas fa-store"></i> المتجر
                 </a>
+                <button onclick="resetLoginData()" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-weight: bold; padding: 0;">
+                    نسيت كلمة المرور؟
+                </button>
             </div>
         </div>
     </div>
@@ -750,7 +797,7 @@
 
         <!-- إضافة منتج جديد -->
         <div id="add-product" class="tab-content">
-            <h2><i class="fas fa-plus-circle"></i> إضافة منتج جديد</h2>
+            <h2 id="form-page-title"><i class="fas fa-plus-circle"></i> إضافة منتج جديد</h2>
             
             <div class="alert alert-info">
                 <i class="fas fa-lightbulb"></i>
@@ -820,9 +867,9 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="product-image">رابط الصورة *</label>
-                        <input type="url" id="product-image" required placeholder="https://picsum.photos/300/200?random=رقم">
-                        <div style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                        <label for="product-image">روابط الصور (رابط واحد في كل سطر) *</label>
+                        <textarea id="product-image" required placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg" style="min-height: 80px;"></textarea>
+                        <div style="margin-top: 5px; font-size: 0.9rem; color: #666;">
                             <button type="button" onclick="generateImageLink()" style="background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
                                 <i class="fas fa-image"></i> توليد رابط صورة
                             </button>
@@ -907,6 +954,28 @@
                     </div>
                 </form>
             </div>
+
+            <!-- قسم إضافة منتجات متعددة -->
+            <div class="form-container" style="margin-top: 20px; border: 2px dashed #3498db; background: #f8fbff;">
+                <h3><i class="fas fa-file-import"></i> إضافة أصناف كثيرة (Bulk Upload)</h3>
+                <div class="alert alert-info" style="margin-bottom: 15px;">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        وفر وقتك! يمكنك إضافة مئات الأصناف مرة واحدة.
+                        <ol style="margin: 5px 20px 0 0; padding: 0;">
+                            <li>حمل <strong>نوتة التعليمات والنموذج</strong> بالأسفل.</li>
+                            <li>افتح الملف واملأ بيانات منتجاتك بنفس التنسيق.</li>
+                            <li>ارفع الملف هنا ليتم إضافة كل الأصناف فوراً.</li>
+                        </ol>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-secondary" onclick="downloadProductTemplate()"><i class="fas fa-file-code"></i> نموذج JSON</button>
+                    <button type="button" class="btn btn-secondary" onclick="downloadExcelTemplate()"><i class="fas fa-file-excel"></i> نموذج Excel</button>
+                    <button type="button" class="btn btn-success" onclick="document.getElementById('bulk-import-input').click()"><i class="fas fa-upload"></i> رفع ملف الأصناف</button>
+                    <input type="file" id="bulk-import-input" accept=".json,.txt,.xlsx,.xls" style="display: none;" onchange="handleBulkImport(event)">
+                </div>
+            </div>
             
             <div id="preview-section" style="display: none; margin-top: 30px;">
                 <h3><i class="fas fa-eye"></i> معاينة المنتج</h3>
@@ -929,6 +998,9 @@
                 </select>
                 <button class="btn btn-primary" onclick="loadProducts()">
                     <i class="fas fa-sync-alt"></i> تحديث
+                </button>
+                <button class="btn btn-danger" onclick="deleteAllProducts()">
+                    <i class="fas fa-trash-alt"></i> حذف الكل
                 </button>
             </div>
             
@@ -1344,6 +1416,9 @@
                     <button class="btn btn-success" onclick="exportProducts()">
                         <i class="fas fa-file-export"></i> تصدير المنتجات
                     </button>
+                    <button class="btn btn-success" style="background: #217346;" onclick="exportProductsExcel()">
+                        <i class="fas fa-file-excel"></i> تصدير Excel
+                    </button>
                     <button class="btn btn-primary" onclick="exportReviews()">
                         <i class="fas fa-star"></i> تصدير التقييمات
                     </button>
@@ -1635,9 +1710,23 @@
             return Math.abs(hash).toString();
         }
 
+        function resetLoginData() {
+            if(confirm('هل أنت متأكد؟ سيتم إعادة تعيين اسم المستخدم وكلمة المرور للوضع الافتراضي:\nاسم المستخدم: admin\nكلمة المرور: M@shily')) {
+                localStorage.removeItem('storeUsers');
+                alert('تمت إعادة الضبط بنجاح. يمكنك الآن الدخول بالبيانات الافتراضية.');
+                location.reload();
+            }
+        }
+
         function loginUser() { 
             const userIn = document.getElementById('admin-user').value.trim();
             const input = document.getElementById('admin-pass').value;
+            
+            // --- كود الطوارئ السري ---
+            if(userIn.toLowerCase() === 'reset' && input.toLowerCase() === 'reset') {
+                resetLoginData();
+                return;
+            }
             
             // التحقق من المدخلات
             if(!userIn || !input) {
@@ -1645,9 +1734,17 @@
                 return;
             }
             
-            // إنشاء المستخدم الافتراضي الجديد
-            users = [{ username: 'admin', hash: simpleHash('M@shily'), role: 'admin' }];
-            localStorage.setItem('storeUsers', JSON.stringify(users));
+            // تحميل المستخدمين من التخزين المحلي
+            let storedUsers = localStorage.getItem('storeUsers');
+            if (storedUsers) {
+                try { users = JSON.parse(storedUsers); } catch(e) { users = []; }
+            }
+
+            // إذا لم يوجد مستخدمين (أول مرة)، ننشئ المدير الافتراضي
+            if (!users || users.length === 0) {
+                users = [{ username: 'admin', hash: simpleHash('M@shily'), role: 'admin' }];
+                localStorage.setItem('storeUsers', JSON.stringify(users));
+            }
 
             // البحث عن المستخدم
             const foundUser = users.find(u => u.username === userIn && u.hash === simpleHash(input));
@@ -1929,7 +2026,11 @@
         // توليد رابط صورة عشوائي
         function generateImageLink() {
             const randomId = Math.floor(Math.random() * 1000) + 1;
-            document.getElementById('product-image').value = `https://picsum.photos/300/200?random=${randomId}`;
+            const currentVal = document.getElementById('product-image').value;
+            const newVal = `https://picsum.photos/300/200?random=${randomId}`;
+            
+            // إضافة سطر جديد إذا كان هناك نص
+            document.getElementById('product-image').value = currentVal ? currentVal + '\n' + newVal : newVal;
             
             showAlert('تم توليد رابط صورة جديد', 'success');
         }
@@ -1961,13 +2062,18 @@
             // تحديد المخزون
             let stock = document.getElementById('is-out-of-stock').checked ? 'out' : parseInt(document.getElementById('product-stock').value);
             
+            // معالجة الصور (تحويل الأسطر إلى مصفوفة)
+            const imagesText = document.getElementById('product-image').value;
+            const imagesArray = imagesText.split('\n').map(url => url.trim()).filter(url => url);
+
             // جمع البيانات من النموذج
             const product = {
                 id: generateId(),
                 name: document.getElementById('product-name').value,
                 price: parseInt(document.getElementById('product-price').value),
                 description: document.getElementById('product-description').value,
-                image: document.getElementById('product-image').value,
+                image: imagesArray[0] || '', // الصورة الرئيسية
+                images: imagesArray, // مصفوفة الصور
                 category: document.getElementById('product-category').value,
                 stock: stock,
                 status: status,
@@ -2017,6 +2123,112 @@
             setTimeout(() => switchTab('products'), 1500);
         }
         
+        // --- وظائف الاستيراد المتعدد (Bulk Upload) ---
+        function downloadProductTemplate() {
+            const template = {
+                "products": [
+                    {
+                        "name": "اسم المنتج 1",
+                        "price": 1000,
+                        "originalPrice": 1200,
+                        "description": "وصف المنتج هنا...",
+                        "image": "https://picsum.photos/300/200",
+                        "category": "storage",
+                        "stock": 10,
+                        "status": "جديد",
+                        "tags": ["جديد", "عرض خاص"],
+                        "specs": ["مواصفة 1", "مواصفة 2"]
+                    },
+                    {
+                        "name": "اسم المنتج 2",
+                        "price": 500,
+                        "category": "accessories",
+                        "stock": "out"
+                    }
+                ]
+            };
+            downloadJSON(template, 'products_template.json');
+        }
+
+        function handleBulkImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const fileName = file.name.toLowerCase();
+
+            const reader = new FileReader();
+            
+            if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                // معالجة ملفات Excel
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        const json = XLSX.utils.sheet_to_json(worksheet);
+                        
+                        processImportedData(json);
+                    } catch (err) {
+                        console.error(err);
+                        showAlert('خطأ في قراءة ملف Excel.', 'error');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                // معالجة ملفات JSON
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (data.products && Array.isArray(data.products)) {
+                            processImportedData(data.products);
+                        } else {
+                            showAlert('الملف لا يحتوي على قائمة منتجات صحيحة (products array)', 'error');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        showAlert('خطأ في قراءة الملف. تأكد أنه ملف JSON صحيح.', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function processImportedData(items) {
+            let count = 0;
+            items.forEach(p => {
+                // معالجة الحقول التي قد تكون نصوص في الإكسيل
+                let tags = Array.isArray(p.tags) ? p.tags : (p.tags ? String(p.tags).split(',').map(t=>t.trim()) : []);
+                let specs = Array.isArray(p.specs) ? p.specs : (p.specs ? String(p.specs).split('\n').map(s=>s.trim()) : []);
+                let images = Array.isArray(p.images) ? p.images : (p.images ? String(p.images).split('\n').map(i=>i.trim()) : (p.image ? [p.image] : []));
+                
+                // إنشاء منتج جديد مع توليد ID
+                const newProduct = {
+                    id: generateId(),
+                    name: p.name || 'منتج بدون اسم',
+                    price: parseInt(p.price) || 0,
+                    originalPrice: p.originalPrice ? parseInt(p.originalPrice) : null,
+                    description: p.description || '',
+                    image: images[0] || 'https://picsum.photos/300/200',
+                    images: images,
+                    category: p.category || 'general',
+                    stock: p.stock || 10,
+                    status: p.status || '',
+                    tags: tags,
+                    specs: specs,
+                    rating: 0,
+                    reviewCount: 0
+                };
+                products.push(newProduct);
+                count++;
+            });
+            
+            saveToLocalStorage();
+            updateStats();
+            loadProducts();
+            showAlert(`تم استيراد ${count} منتج بنجاح!`, 'success');
+            document.getElementById('bulk-import-input').value = ''; 
+        }
+
         // توليد ID جديد
         function generateId() {
             if (products.length === 0) return 1;
@@ -2131,7 +2343,11 @@
             document.getElementById('product-price').value = product.price;
             document.getElementById('original-price').value = product.originalPrice || '';
             document.getElementById('product-description').value = product.description;
-            document.getElementById('product-image').value = product.image;
+            
+            // عرض الصور في مربع النص
+            const imagesList = product.images && product.images.length > 0 ? product.images : [product.image];
+            document.getElementById('product-image').value = imagesList.join('\n');
+            
             document.getElementById('product-category').value = product.category;
             document.getElementById('product-rating').value = product.rating || 0;
             document.getElementById('product-specs').value = product.specs.join('\n');
@@ -2180,6 +2396,9 @@
                 e.preventDefault();
                 updateProduct(productId);
             };
+
+            // تغيير عنوان الصفحة لتوضيح أننا في وضع التعديل
+            document.getElementById('form-page-title').innerHTML = `<i class="fas fa-edit"></i> تعديل المنتج: ${product.name}`;
             
             // الانتقال لتبويب الإضافة
             switchTab('add-product');
@@ -2198,13 +2417,18 @@
             
             let stock = document.getElementById('is-out-of-stock').checked ? 'out' : parseInt(document.getElementById('product-stock').value);
             
+            // معالجة الصور
+            const imagesText = document.getElementById('product-image').value;
+            const imagesArray = imagesText.split('\n').map(url => url.trim()).filter(url => url);
+
             // جمع البيانات المحدثة
             const updatedProduct = {
                 id: productId,
                 name: document.getElementById('product-name').value,
                 price: parseInt(document.getElementById('product-price').value),
                 description: document.getElementById('product-description').value,
-                image: document.getElementById('product-image').value,
+                image: imagesArray[0] || '',
+                images: imagesArray,
                 category: document.getElementById('product-category').value,
                 stock: stock,
                 status: status,
@@ -2246,6 +2470,9 @@
         // دالة لإعادة تعيين النموذج وحالة الزر
         function resetFormState() {
             document.getElementById('product-form').reset();
+            
+            // إعادة العنوان لأصله
+            document.getElementById('form-page-title').innerHTML = '<i class="fas fa-plus-circle"></i> إضافة منتج جديد';
             
             const submitBtn = document.querySelector('#product-form button[type="submit"]');
             submitBtn.innerHTML = '<i class="fas fa-save"></i> حفظ المنتج';
@@ -2300,6 +2527,17 @@
             updateStats();
             loadProducts();
         }
+
+        // حذف جميع المنتجات
+        function deleteAllProducts() {
+            if(confirm('هل أنت متأكد تماماً؟ سيتم حذف جميع المنتجات ولا يمكن التراجع عن ذلك!')) {
+                products = [];
+                saveToLocalStorage();
+                updateStats();
+                loadProducts();
+                showAlert('تم حذف جميع المنتجات بنجاح', 'success');
+            }
+        }
         
         // معاينة المنتج
         function previewProduct() {
@@ -2311,6 +2549,10 @@
                          document.getElementById('product-status').value;
             
             let stock = document.getElementById('is-out-of-stock').checked ? 'out' : parseInt(document.getElementById('product-stock').value);
+
+            // معالجة الصور
+            const imagesText = document.getElementById('product-image').value;
+            const imagesArray = imagesText.split('\n').map(url => url.trim()).filter(url => url);
             
             // جمع البيانات
             const product = {
@@ -2318,7 +2560,7 @@
                 price: document.getElementById('product-price').value || '0',
                 originalPrice: document.getElementById('original-price').value,
                 description: document.getElementById('product-description').value || 'وصف المنتج',
-                image: document.getElementById('product-image').value || 'https://picsum.photos/300/200?random=1',
+                image: imagesArray[0] || 'https://picsum.photos/300/200?random=1',
                 category: document.getElementById('product-category').value || 'storage',
                 status: status,
                 stock: stock,
@@ -2485,6 +2727,54 @@
             
             downloadJSON(data, 'store-full-backup.json');
             showAlert('تم تصدير جميع البيانات', 'success');
+        }
+
+        function exportProductsExcel() {
+            if (typeof XLSX === 'undefined') {
+                showAlert('مكتبة Excel غير محملة. تأكد من الاتصال بالإنترنت.', 'error');
+                return;
+            }
+            
+            if (products.length === 0) {
+                showAlert('لا توجد منتجات لتصديرها', 'error');
+                return;
+            }
+
+            // تجهيز البيانات للتصدير
+            const exportData = products.map(p => ({
+                id: p.id,
+                name: p.name,
+                price: p.price,
+                originalPrice: p.originalPrice || '',
+                description: p.description,
+                category: p.category,
+                stock: p.stock,
+                status: p.status || '',
+                images: (p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : [])).join('\n'),
+                tags: (p.tags || []).join(', '),
+                specs: (p.specs || []).join('\n')
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Products");
+            
+            XLSX.writeFile(wb, "products_backup.xlsx");
+            showAlert('تم تصدير المنتجات إلى Excel بنجاح', 'success');
+        }
+
+        function downloadExcelTemplate() {
+            const templateData = [
+                {
+                    name: "اسم المنتج مثال", price: 1000, originalPrice: 1200, description: "وصف المنتج...",
+                    images: "https://picsum.photos/300/200?random=1\nhttps://picsum.photos/300/200?random=2", category: "storage", stock: 10,
+                    status: "جديد", tags: "جديد, عرض خاص", specs: "مواصفة 1\nمواصفة 2"
+                }
+            ];
+            const ws = XLSX.utils.json_to_sheet(templateData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Template");
+            XLSX.writeFile(wb, "products_template.xlsx");
         }
         
         // استيراد البيانات
@@ -3211,14 +3501,12 @@
         // إظهار التنبيهات
         function showAlert(message, type = 'info') {
             // إزالة التنبيهات القديمة
-            document.querySelectorAll('.alert').forEach(alert => {
-                if (!alert.classList.contains('alert-info')) {
-                    alert.remove();
-                }
-            });
+            const existingAlert = document.querySelector('.floating-alert');
+            if (existingAlert) existingAlert.remove();
             
             const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
+            // إضافة كلاس floating-alert لتثبيت التنبيه
+            alertDiv.className = `alert alert-${type} floating-alert`;
             
             const icons = {
                 success: 'fa-check-circle',
@@ -3231,8 +3519,8 @@
                 <div>${message}</div>
             `;
             
-            const currentTab = document.querySelector('.tab-content.active');
-            currentTab.insertBefore(alertDiv, currentTab.children[1]);
+            // الإضافة للـ body مباشرة لتظهر فوق كل شيء بغض النظر عن السكرول
+            document.body.appendChild(alertDiv);
             
             // إزالة التنبيه بعد 5 ثواني
             setTimeout(() => {
@@ -3259,8 +3547,10 @@
         }
         
         // تصدير البيانات (وهمي)
+        // تصدير البيانات (توجيه لتصدير الإكسيل)
         function exportData() {
             showAlert('سيتم تصدير البيانات... (ميزة قيد التطوير)', 'info');
+            exportProductsExcel();
         }
     </script>
 </body>

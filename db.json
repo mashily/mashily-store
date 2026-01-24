@@ -1,94 +1,5 @@
 {
-  "products": [
-    {
-      "id": 1,
-      "name": "هارد SSD 1TB",
-      "price": "1200",
-      "oldPrice": "1500",
-      "image": "images/1.webp",
-      "category": "التخزين",
-      "stock": "in",
-      "status": "عرض خاص",
-      "desc": "هارد SSD عالي السرعة بسعة 1 تيرابايت",
-      "offerEnds": "2026-02-22T23:59:59"
-    },
-    {
-      "id": 2,
-      "name": "رام DDR4 16GB",
-      "price": "800",
-      "oldPrice": "1000",
-      "image": "images/download.jfif",
-      "category": "الذاكرة",
-      "stock": "in",
-      "status": "مميز ✨",
-      "desc": "ذاكرة عشوائية عالية الأداء"
-    },
-    {
-      "id": 3,
-      "name": "كارت شاشة RTX 3060",
-      "price": "4500",
-      "oldPrice": "5500",
-      "image": "images/1.webp",
-      "category": "كروت الشاشة",
-      "stock": "in",
-      "status": "عرض خاص",
-      "desc": "كارت شاشة قوي للألعاب والتصميم",
-      "offerEnds": "2026-01-31T23:59:59"
-    },
-    {
-      "id": 4,
-      "name": "معالج Intel I7",
-      "price": "3200",
-      "oldPrice": "4000",
-      "image": "images/download.jfif",
-      "category": "المعالجات",
-      "stock": "in",
-      "status": "مميز ✨",
-      "desc": "معالج قوي من الجيل الثاني عشر"
-    },
-    {
-      "id": 5,
-      "name": "ماذربورد ASUS",
-      "price": "2000",
-      "image": "images/1.webp",
-      "category": "اللوحات الأم",
-      "stock": "in",
-      "status": "مميز ✨",
-      "desc": "لوحة أم عالية الجودة والأداء"
-    },
-    {
-      "id": 6,
-      "name": "كابل HDMI",
-      "price": "150",
-      "oldPrice": "200",
-      "image": "images/download.jfif",
-      "category": "الملحقات",
-      "stock": "in",
-      "status": "عرض خاص",
-      "desc": "كابل HDMI 2.1 عالي الجودة"
-    },
-    {
-      "id": 7,
-      "name": "كيبورد ميكانيكي RGB",
-      "price": "1800",
-      "oldPrice": "2200",
-      "image": "images/1.webp",
-      "category": "الملحقات",
-      "stock": "in",
-      "status": "عرض خاص",
-      "desc": "لوحة مفاتيح ميكانيكية مع إضاءة RGB"
-    },
-    {
-      "id": 8,
-      "name": "ماوس لاسلكي",
-      "price": "350",
-      "image": "images/download.jfif",
-      "category": "الملحقات",
-      "stock": "out",
-      "status": "مميز ✨",
-      "desc": "ماوس لاسلكي دقيق وسريع"
-    }
-  ],
+  "products": [],
   "categories": [
     "التخزين",
     "الذاكرة",
@@ -97,22 +8,7 @@
     "اللوحات الأم",
     "الملحقات"
   ],
-  "coupons": [
-    {
-      "code": "SAVE10",
-      "discount": 10,
-      "type": "percentage",
-      "maxUses": 100,
-      "usedCount": 5
-    },
-    {
-      "code": "SAVE100",
-      "discount": 100,
-      "type": "fixed",
-      "maxUses": 50,
-      "usedCount": 2
-    }
-  ],
+  "coupons": [],
   "ticker": "عرض خاص هذا الأسبوع - خصم 20% على المعالجات!",
   "proof": "نحن متخصصون في بيع الإلكترونيات والتكنولوجيا منذ 2020"
 }

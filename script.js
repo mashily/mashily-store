@@ -5,21 +5,26 @@ let currentSort = 'default';
 let appliedCoupon = null;
 
 async function init() {
-    // محاولة جلب البيانات من السيرفر (GitHub)
-    try {
-        const response = await fetch('db.json?v=' + new Date().getTime()); // منع التخزين المؤقت
-        if (response.ok) {
-            const data = await response.json();
-            // تحديث البيانات المحلية ببيانات السيرفر
-            if(data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
-            if(data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
-            if(data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
-            if(data.ticker) localStorage.setItem('tickerText', data.ticker);
-            if(data.proof) localStorage.setItem('proofText', data.proof);
-            if(data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
+    // التحقق مما إذا كان المستخدم مديراً (لتجنب مسح التعديلات المحلية عند التحديث)
+    const isAdmin = sessionStorage.getItem('mashily_user');
+
+    if (!isAdmin) {
+        // محاولة جلب البيانات من السيرفر (GitHub) للزوار فقط
+        try {
+            const response = await fetch('db.json?v=' + new Date().getTime()); // منع التخزين المؤقت
+            if (response.ok) {
+                const data = await response.json();
+                // تحديث البيانات المحلية ببيانات السيرفر
+                if(data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
+                if(data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
+                if(data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
+                if(data.ticker) localStorage.setItem('tickerText', data.ticker);
+                if(data.proof) localStorage.setItem('proofText', data.proof);
+                if(data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
+            }
+        } catch (e) {
+            console.log('وضع الأوفلاين أو لم يتم رفع ملف db.json بعد');
         }
-    } catch (e) {
-        console.log('وضع الأوفلاين أو لم يتم رفع ملف db.json بعد');
     }
 
     // تحميل البيانات للمتغيرات
@@ -99,6 +104,7 @@ async function init() {
             closeWishlist();
             document.getElementById('theme-menu').style.display = 'none';
             hideAllInfos();
+            closeProductModal(); // إغلاق نافذة المنتج
         }
     });
 }
@@ -164,14 +170,15 @@ function createProductCard(p) {
     const hasTimer = p.offerEnds && new Date(p.offerEnds) > new Date();
     const wishlist = JSON.parse(localStorage.getItem('MASHILY_WISHLIST')) || [];
     const isInWishlist = wishlist.some(item => item.id === p.id);
-    const discountPercent = p.oldPrice ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0;
+    const oldPrice = p.originalPrice || p.oldPrice;
+    const discountPercent = oldPrice ? Math.round(((oldPrice - p.price) / oldPrice) * 100) : 0;
     
     return `
     <div class="product-card" onmouseleave="hideAllInfos()">
         <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${p.id}, event)" title="${isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
             <i class="fas fa-heart"></i>
         </button>
-        <div class="img-container" onclick="toggleProductInfo(this)">
+        <div class="img-container" onclick="openProductDetails(${p.id})">
             ${!isOut ? `<div class="pro-badge ${p.status==='عرض خاص'?'offer':''}">${p.status || 'مميز ✨'}</div>` : ''}
             ${discountPercent > 0 ? `<div style="position:absolute;bottom:10px;left:10px;background:#e74c3c;color:white;padding:4px 8px;border-radius:6px;font-size:0.75rem;font-weight:bold;">-${discountPercent}%</div>` : ''}
             <img src="${p.image}" alt="${p.name}" style="${isOut ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
@@ -181,7 +188,7 @@ function createProductCard(p) {
         <div class="product-details">
             <h4>${p.name}</h4>
             <div class="price-tag">
-                ${p.oldPrice ? `<s style="color:#95a5a6; font-size:0.8rem; margin-left:5px;">${p.oldPrice}</s>` : ''}
+                ${oldPrice ? `<s style="color:#95a5a6; font-size:0.8rem; margin-left:5px;">${oldPrice}</s>` : ''}
                 ${p.price} ج.م
             </div>
             ${hasTimer ? `<div class="countdown-timer" data-ends="${p.offerEnds}">جاري التحميل...</div>` : ''}
@@ -194,10 +201,172 @@ function createProductCard(p) {
     `;
 }
 
+// --- وظائف نافذة تفاصيل المنتج (Modal & Gallery) ---
+let currentGalleryIndex = 0;
+let currentProductImages = [];
+
+function openProductDetails(id) {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    // إعداد الصور
+    currentProductImages = product.images && product.images.length > 0 ? product.images : [product.image];
+    currentGalleryIndex = 0;
+    updateGallery();
+
+    // تعبئة البيانات
+    document.getElementById('modal-title').innerText = product.name;
+    
+    // --- عرض التفاصيل الكاملة (ميتا داتا) ---
+    const oldPrice = product.originalPrice || product.oldPrice;
+    const discountPercent = oldPrice ? Math.round(((oldPrice - product.price) / oldPrice) * 100) : 0;
+    const hasTimer = product.offerEnds && new Date(product.offerEnds) > new Date();
+    
+    let metaHTML = '';
+    
+    // 1. شارة الحالة
+    if (product.status) {
+        metaHTML += `<span style="background:var(--primary); color:white; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:bold; box-shadow:0 2px 5px rgba(0,0,0,0.1);">${product.status}</span>`;
+    }
+    
+    // 2. شارة الخصم
+    if (discountPercent > 0) {
+        metaHTML += `<span style="background:#e74c3c; color:white; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:bold; box-shadow:0 2px 5px rgba(231, 76, 60, 0.3);">خصم ${discountPercent}%</span>`;
+    }
+    
+    // 3. حالة المخزون
+    if (product.stock === 'out') {
+        metaHTML += `<span style="background:#95a5a6; color:white; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:bold;">نفدت الكمية ❌</span>`;
+    } else {
+        metaHTML += `<span style="background:#27ae60; color:white; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:bold;">متوفر: ${product.stock} ✅</span>`;
+    }
+
+    // 4. عداد العرض (كامل العرض)
+    if (hasTimer) {
+        metaHTML += `<div class="countdown-timer" data-ends="${product.offerEnds}" style="width:100%; text-align:center; margin-top:8px; font-size:1rem; padding:10px; background:#fff3cd; color:#d35400; border:1px dashed #e67e22; border-radius:8px; font-weight:bold;">جاري التحميل...</div>`;
+    }
+
+    const metaContainer = document.getElementById('modal-meta');
+    if(metaContainer) metaContainer.innerHTML = metaHTML;
+    // ---------------------------------------
+
+    document.getElementById('modal-desc').innerText = product.description;
+    
+    // السعر
+    const priceHTML = `
+        ${oldPrice ? `<s style="color:#999; font-size:1.1rem; margin-left:10px;">${oldPrice} ج.م</s> ` : ''}
+        <span style="font-size:1.5rem; color:var(--primary);">${product.price} ج.م</span>
+    `;
+    document.getElementById('modal-price-area').innerHTML = priceHTML;
+
+    // المواصفات
+    const specsHTML = product.specs ? 
+        `<strong>المواصفات:</strong><ul style="margin:5px 20px 0 0;">${product.specs.map(s => `<li>${s}</li>`).join('')}</ul>` : '';
+    document.getElementById('modal-specs').innerHTML = specsHTML;
+
+    // زر الإضافة
+    const btn = document.getElementById('modal-add-btn');
+    if (product.stock === 'out') {
+        btn.innerText = 'غير متوفر';
+        btn.style.background = '#95a5a6';
+        btn.onclick = null;
+    } else {
+        btn.innerText = 'إضافة للسلة';
+        btn.style.background = 'var(--primary)';
+        btn.onclick = () => { addToCart(product.id); closeProductModal(); };
+    }
+
+    // زر المفضلة في النافذة المنبثقة
+    const wishlistBtn = document.getElementById('modal-wishlist-btn');
+    const wishlist = JSON.parse(localStorage.getItem('MASHILY_WISHLIST')) || [];
+    const isInWishlist = wishlist.some(item => item.id === product.id);
+    
+    // دالة لتحديث شكل الزر في النافذة
+    const updateModalWishlistUI = (active) => {
+        const icon = wishlistBtn.querySelector('i');
+        if (active) {
+            wishlistBtn.style.background = '#ffebee';
+            wishlistBtn.style.color = '#e74c3c';
+            wishlistBtn.style.borderColor = '#e74c3c';
+            icon.className = 'fas fa-heart';
+        } else {
+            wishlistBtn.style.background = '#f5f5f5';
+            wishlistBtn.style.color = '#777';
+            wishlistBtn.style.borderColor = '#ddd';
+            icon.className = 'far fa-heart';
+        }
+    };
+    updateModalWishlistUI(isInWishlist);
+
+    wishlistBtn.onclick = () => {
+        let currentWishlist = JSON.parse(localStorage.getItem('MASHILY_WISHLIST')) || [];
+        const index = currentWishlist.findIndex(item => item.id === product.id);
+        
+        // البحث عن الزر المقابل في الشبكة لتحديثه أيضاً
+        const gridBtn = document.querySelector(`.wishlist-btn[onclick*="toggleWishlist(${product.id},"]`);
+        
+        if (index > -1) {
+            currentWishlist.splice(index, 1);
+            updateModalWishlistUI(false);
+            if(gridBtn) gridBtn.classList.remove('active');
+        } else {
+            currentWishlist.push({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                addedAt: new Date().toISOString()
+            });
+            updateModalWishlistUI(true);
+            if(gridBtn) gridBtn.classList.add('active');
+        }
+        localStorage.setItem('MASHILY_WISHLIST', JSON.stringify(currentWishlist));
+        updateWishlistBadge();
+    };
+
+    // زر المشاركة
+    const shareBtn = document.getElementById('modal-share-btn');
+    if(shareBtn) {
+        shareBtn.onclick = () => {
+            const text = `شاهد هذا المنتج المميز من متجر مشالى: 🔥\n\n*${product.name}*\n\nالسعر: ${product.price} ج.م\n\n${product.description}\n\nرابط الصورة:\n${product.image}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        };
+    }
+
+    // إظهار النافذة
+    document.getElementById('product-details-modal').style.display = 'flex';
+}
+
+function closeProductModal() {
+    document.getElementById('product-details-modal').style.display = 'none';
+}
+
+function updateGallery() {
+    const img = document.getElementById('modal-img');
+    img.src = currentProductImages[currentGalleryIndex];
+    
+    // تحديث النقاط
+    const dotsContainer = document.getElementById('modal-dots');
+    dotsContainer.innerHTML = currentProductImages.map((_, i) => 
+        `<div class="dot ${i === currentGalleryIndex ? 'active' : ''}" onclick="currentGalleryIndex=${i}; updateGallery()"></div>`
+    ).join('');
+    
+    // إخفاء الأسهم إذا صورة واحدة
+    document.querySelectorAll('.gallery-btn').forEach(btn => btn.style.display = currentProductImages.length > 1 ? 'flex' : 'none');
+}
+
+function changeGalleryImage(dir) {
+    currentGalleryIndex += dir;
+    if (currentGalleryIndex >= currentProductImages.length) currentGalleryIndex = 0;
+    if (currentGalleryIndex < 0) currentGalleryIndex = currentProductImages.length - 1;
+    updateGallery();
+}
+
 // --- وظائف عرض المنتجات ببياناتها الجديدة ---
 function renderProducts(items) {
     const grid = document.getElementById('products-grid');
     if(!grid) return;
+    
     if(items.length === 0) { grid.innerHTML = "<p style='grid-column:1/-1; text-align:center; padding:50px; opacity:0.5;'>لا توجد منتجات حالياً في هذا القسم</p>"; return; }
     
     grid.innerHTML = items.map(p => createProductCard(p)).join('');
