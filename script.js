@@ -31,6 +31,28 @@ async function init() {
     // تحميل البيانات للمتغيرات
     products = JSON.parse(localStorage.getItem('storeProducts')) || [];
 
+    // --- إضافة منتج تجريبي (للتجربة) ---
+    // هذا المنتج سيظهر دائماً في البداية لتجربة التصميم الجديد
+    if (!products.some(p => p.id === 9999)) {
+        products.unshift({
+            id: 9999,
+            name: "ساعة ذكية Ultra Pro (منتج تجريبي)",
+            price: 1250,
+            originalPrice: 1800,
+            image: "https://img.freepik.com/free-photo/smart-watch-space-gray-aluminum-case-black-sport-band_1057-27347.jpg",
+            images: [
+                "https://img.freepik.com/free-photo/smart-watch-space-gray-aluminum-case-black-sport-band_1057-27347.jpg",
+                "https://img.freepik.com/free-vector/realistic-fitness-trackers_23-2148530529.jpg",
+                "https://img.freepik.com/free-photo/rendering-smart-home-device_23-2151039302.jpg"
+            ],
+            category: "الكل",
+            stock: 5,
+            status: "تجربة ✨",
+            desc: "هذا منتج تجريبي لاختبار شكل النافذة الجديد ومعرض الصور. يتميز هذا المنتج بوجود صور متعددة ومواصفات كاملة لتجربة التكبير والتنسيق.",
+            specs: ["شاشة AMOLED عالية الدقة", "بطارية تدوم طويلاً", "مقاومة للماء IP68", "دعم كامل للغة العربية", "حساسات رياضية دقيقة"]
+        });
+    }
+
     // تحميل إعدادات الدفع المخصصة
     const settings = JSON.parse(localStorage.getItem('storeSettings'));
     if(settings) {
@@ -108,6 +130,9 @@ async function init() {
             closeProductModal(); // إغلاق نافذة المنتج
         }
     });
+
+    // تفعيل تأثير التكبير في نافذة المنتج
+    setupZoomEffect();
 }
 
 // --- وظائف الثيمات ---
@@ -361,6 +386,33 @@ function changeGalleryImage(dir) {
     if (currentGalleryIndex >= currentProductImages.length) currentGalleryIndex = 0;
     if (currentGalleryIndex < 0) currentGalleryIndex = currentProductImages.length - 1;
     updateGallery();
+}
+
+// --- دالة تأثير التكبير (Zoom) ---
+function setupZoomEffect() {
+    const container = document.querySelector('.gallery-container');
+    const img = document.getElementById('modal-img');
+
+    if (!container || !img) return;
+
+    container.addEventListener('mousemove', function(e) {
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // حساب النسبة المئوية لمكان الماوس
+        const xPercent = (x / rect.width) * 100;
+        const yPercent = (y / rect.height) * 100;
+        
+        // تحريك نقطة الارتكاز وتكبير الصورة
+        img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+        img.style.transform = "scale(2)"; // نسبة التكبير
+    });
+
+    container.addEventListener('mouseleave', function() {
+        img.style.transformOrigin = "center center";
+        img.style.transform = "scale(1)";
+    });
 }
 
 // --- وظائف عرض المنتجات ببياناتها الجديدة ---
