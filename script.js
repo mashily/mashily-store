@@ -45,6 +45,7 @@ async function init() {
                 "https://img.freepik.com/free-vector/realistic-fitness-trackers_23-2148530529.jpg",
                 "https://img.freepik.com/free-photo/rendering-smart-home-device_23-2151039302.jpg"
             ],
+            videos: ["https://www.w3schools.com/html/mov_bbb.mp4"], // فيديو تجريبي
             category: "الكل",
             stock: 5,
             status: "تجربة ✨",
@@ -236,7 +237,17 @@ function openProductDetails(id) {
     if (!product) return;
 
     // إعداد الصور
-    currentProductImages = product.images && product.images.length > 0 ? product.images : [product.image];
+    currentProductImages = [];
+    if (product.images && product.images.length > 0) {
+        product.images.forEach(src => currentProductImages.push({type: 'image', src: src}));
+    } else if (product.image) {
+        currentProductImages.push({type: 'image', src: product.image});
+    }
+    
+    if (product.videos && product.videos.length > 0) {
+        product.videos.forEach(src => currentProductImages.push({type: 'video', src: src}));
+    }
+
     currentGalleryIndex = 0;
     updateGallery();
 
@@ -368,14 +379,45 @@ function closeProductModal() {
 }
 
 function updateGallery() {
+    const item = currentProductImages[currentGalleryIndex];
     const img = document.getElementById('modal-img');
-    img.src = currentProductImages[currentGalleryIndex];
+    const videoContainer = document.getElementById('modal-video');
+    const container = document.querySelector('.gallery-container');
+
+    if (item.type === 'image') {
+        img.style.display = 'block';
+        videoContainer.style.display = 'none';
+        videoContainer.innerHTML = ''; // إيقاف الفيديو عند الانتقال
+        img.src = item.src;
+        container.style.cursor = 'zoom-in';
+    } else {
+        img.style.display = 'none';
+        videoContainer.style.display = 'flex';
+        videoContainer.innerHTML = `<video controls autoplay style="max-width:100%; max-height:100%; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.2);"><source src="${item.src}" type="video/mp4">المتصفح لا يدعم الفيديو.</video>`;
+        container.style.cursor = 'default';
+    }
     
     // تحديث النقاط
     const dotsContainer = document.getElementById('modal-dots');
     dotsContainer.innerHTML = currentProductImages.map((_, i) => 
         `<div class="dot ${i === currentGalleryIndex ? 'active' : ''}" onclick="currentGalleryIndex=${i}; updateGallery()"></div>`
     ).join('');
+
+    // تحديث المصغرات (Thumbnails)
+    const thumbsContainer = document.getElementById('modal-thumbnails');
+    if(thumbsContainer) {
+        thumbsContainer.innerHTML = currentProductImages.map((item, i) => {
+            const activeClass = i === currentGalleryIndex ? 'active' : '';
+            if (item.type === 'image') {
+                return `<img src="${item.src}" class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()">`;
+            } else {
+                return `<div class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()" style="display:flex; align-items:center; justify-content:center; background:#000; color:#fff; font-size:1.5rem; cursor:pointer; border-radius:8px; width:60px; height:60px;"><i class="fas fa-play"></i></div>`;
+            }
+        }).join('');
+        
+        // إخفاء المصغرات إذا كانت صورة واحدة فقط
+        thumbsContainer.style.display = currentProductImages.length > 1 ? 'flex' : 'none';
+    }
     
     // إخفاء الأسهم إذا صورة واحدة
     document.querySelectorAll('.gallery-btn').forEach(btn => btn.style.display = currentProductImages.length > 1 ? 'flex' : 'none');
@@ -395,7 +437,11 @@ function setupZoomEffect() {
 
     if (!container || !img) return;
 
+    let isClickedZoom = false; // حالة الزوم في وضع ملء الشاشة
+
     container.addEventListener('mousemove', function(e) {
+        if (img.style.display === 'none') return; // لا تقم بالتكبير إذا كان المعروض فيديو
+
         const rect = container.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -404,16 +450,82 @@ function setupZoomEffect() {
         const xPercent = (x / rect.width) * 100;
         const yPercent = (y / rect.height) * 100;
         
-        // تحريك نقطة الارتكاز وتكبير الصورة
-        img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
-        img.style.transform = "scale(2)"; // نسبة التكبير
+        if (document.fullscreenElement) {
+            // في وضع ملء الشاشة: التحريك فقط إذا كان الزوم مفعلاً بالنقر
+            if (isClickedZoom) {
+                img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+            }
+        } else {
+            // في الوضع العادي: تكبير عند التحويم (Hover)
+            img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+            img.style.transform = "scale(2)"; 
+        }
     });
 
     container.addEventListener('mouseleave', function() {
-        img.style.transformOrigin = "center center";
-        img.style.transform = "scale(1)";
+        if (!document.fullscreenElement) {
+            img.style.transformOrigin = "center center";
+            img.style.transform = "scale(1)";
+        }
+    });
+
+    // إضافة النقر للتكبير في وضع ملء الشاشة
+    container.addEventListener('click', function(e) {
+        if (img.style.display === 'none') return; // لا تقم بالتكبير إذا كان المعروض فيديو
+        if (e.target.closest('button')) return; // تجاهل الأزرار
+
+        if (document.fullscreenElement) {
+            isClickedZoom = !isClickedZoom;
+            if (isClickedZoom) {
+                img.style.transform = "scale(2.5)"; // تكبير أكبر
+                img.style.cursor = "zoom-out";
+                
+                // تحديث المركز فوراً
+                const rect = container.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const xPercent = (x / rect.width) * 100;
+                const yPercent = (y / rect.height) * 100;
+                img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+            } else {
+                img.style.transform = "scale(1)";
+                img.style.cursor = "zoom-in";
+                img.style.transformOrigin = "center center";
+            }
+        }
+    });
+
+    // إعادة تعيين عند الخروج من ملء الشاشة
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            isClickedZoom = false;
+            img.style.transform = "scale(1)";
+            img.style.cursor = "zoom-in";
+            img.style.transformOrigin = "center center";
+        }
     });
 }
+
+// --- دالة تكبير الشاشة (Fullscreen) ---
+function toggleFullscreen() {
+    const container = document.querySelector('.gallery-container');
+    if (!document.fullscreenElement) {
+        if (container.requestFullscreen) container.requestFullscreen();
+        else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen(); // Safari
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+    }
+}
+
+// تغيير الأيقونة عند الدخول/الخروج من وضع ملء الشاشة
+document.addEventListener('fullscreenchange', () => {
+    const icon = document.querySelector('.fullscreen-btn i');
+    if (document.fullscreenElement) {
+        icon.classList.replace('fa-expand', 'fa-compress');
+    } else {
+        icon.classList.replace('fa-compress', 'fa-expand');
+    }
+});
 
 // --- وظائف عرض المنتجات ببياناتها الجديدة ---
 function renderProducts(items) {
@@ -1607,3 +1719,304 @@ function initInvoiceTab() {
 
 // استدعاء التهيئة عند تحميل الصفحة
 window.addEventListener('load', init);
+
+// ==========================================
+// 🎓 نظام الأكاديمية (Academy System)
+// ==========================================
+
+// متغير لتتبع الفيديو الحالي المفتوح
+let currentAcademyVideoId = null;
+let currentAcademyCategory = 'الكل'; // لتتبع القسم الحالي
+
+// دالة التشفير البسيطة (للتحقق من كلمات المرور)
+function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; 
+    }
+    return Math.abs(hash).toString();
+}
+
+function initAcademyPage() {
+    const grid = document.getElementById('academy-grid');
+    if(!grid) return; // لسنا في صفحة الأكاديمية
+
+    // عرض تأثير التحميل (Skeleton)
+    grid.innerHTML = Array(8).fill(0).map(() => `
+        <div class="skeleton-video">
+            <div class="skeleton-vid-top"></div>
+            <div class="skeleton-vid-bot">
+                <div class="skeleton-line" style="width:70%"></div>
+                <div class="skeleton-line" style="width:40%"></div>
+            </div>
+        </div>
+    `).join('');
+
+    const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const catsContainer = document.getElementById('academy-cats');
+    
+    // عرض الأقسام
+    const cats = ['الكل', ...new Set(videos.map(v => v.category))];
+    if(catsContainer) {
+        catsContainer.innerHTML = cats.map(c => 
+            `<button class="cat-btn-chip ${c === 'الكل' ? 'active' : ''}" onclick="filterAcademy('${c}', this)">${c}</button>`
+        ).join('');
+    }
+
+    // محاكاة وقت التحميل لإظهار التأثير
+    setTimeout(() => {
+        renderVideos(videos);
+        applyAcademyFilters(); // استخدام دالة الفلترة الشاملة بدلاً من العرض المباشر
+    }, 800);
+}
+
+function renderVideos(list) {
+    const grid = document.getElementById('academy-grid');
+    if(!grid) return;
+
+    if(list.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-light);">
+            <i class="fas fa-video-slash fa-3x" style="margin-bottom:15px; opacity:0.5;"></i>
+            <h3>لا توجد دروس حالياً</h3>
+            <p>ترقبوا المزيد من المحتوى قريباً!</p>
+        </div>`;
+        return;
+    }
+
+    grid.innerHTML = list.map(v => {
+        const isLocked = v.type === 'locked';
+        const durationHTML = v.duration ? `<span class="video-duration">${v.duration}</span>` : '';
+        return `
+        <div class="video-card ${isLocked ? 'locked' : ''}" onclick="playVideo(${v.id})">
+            <div class="video-thumbnail">
+                <img src="${v.image || 'https://img.freepik.com/free-vector/online-tutorials-concept_52683-37480.jpg'}" alt="${v.title}">
+                ${durationHTML}
+                <div class="play-icon-overlay"><i class="fas ${isLocked ? 'fa-lock' : 'fa-play'}"></i></div>
+            </div>
+            <div class="video-content">
+                <div class="video-meta">
+                    <span class="video-cat">${v.category}</span>
+                    <span style="font-size:0.7rem; opacity:0.7;"><i class="far fa-eye"></i> ${v.views || 0}</span>
+                    <span class="video-status" style="color:${isLocked ? '#e74c3c' : '#27ae60'}">
+                        <i class="fas ${isLocked ? 'fa-lock' : 'fa-unlock'}"></i> ${isLocked ? 'مشفر' : 'مجاني'}
+                    </span>
+                </div>
+                <h3 class="video-title">${v.title}</h3>
+                <button class="video-btn">
+                    ${isLocked ? '<i class="fas fa-key"></i> أدخل الكود للمشاهدة' : '<i class="fas fa-play-circle"></i> مشاهدة الآن'}
+                </button>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+function filterAcademy(cat, btn) {
+    document.querySelectorAll('.cat-btn-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const filtered = cat === 'الكل' ? videos : videos.filter(v => v.category === cat);
+    renderVideos(filtered);
+    currentAcademyCategory = cat;
+    applyAcademyFilters();
+}
+
+function searchAcademy() {
+    applyAcademyFilters();
+}
+
+function sortAcademyVideos() {
+    applyAcademyFilters();
+}
+
+// دالة مركزية لتطبيق كل الفلاتر (بحث + قسم + ترتيب)
+function applyAcademyFilters() {
+    let videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const term = document.getElementById('academy-search').value.toLowerCase();
+    const sortType = document.getElementById('academy-sort').value;
+
+    // 1. فلترة القسم
+    if (currentAcademyCategory !== 'الكل') {
+        videos = videos.filter(v => v.category === currentAcademyCategory);
+    }
+
+    // 2. فلترة البحث
+    if (term) {
+        videos = videos.filter(v => v.title.toLowerCase().includes(term));
+    }
+
+    // 3. الترتيب
+    videos.sort((a, b) => {
+        if (sortType === 'newest') return b.id - a.id; // الأحدث (بناءً على ID/Timestamp)
+        if (sortType === 'oldest') return a.id - b.id;
+        if (sortType === 'most_viewed') return (b.views || 0) - (a.views || 0);
+        if (sortType === 'most_liked') return (b.likes || 0) - (a.likes || 0);
+        return 0;
+    });
+
+    renderVideos(videos);
+}
+
+function playVideo(id) {
+    const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const videoIndex = videos.findIndex(v => v.id === id);
+    if(videoIndex === -1) return;
+
+    // زيادة عدد المشاهدات
+    videos[videoIndex].views = (videos[videoIndex].views || 0) + 1;
+    localStorage.setItem('academyVideos', JSON.stringify(videos));
+    
+    const video = videos[videoIndex];
+
+    currentAcademyVideoId = id; // حفظ المعرف الحالي
+
+    if(video.type === 'locked') {
+        const userPass = prompt("🔒 هذا المحتوى خاص ومشفر. الرجاء إدخال كود التفعيل:");
+        if(!userPass || simpleHash(userPass) !== video.password) {
+            alert("❌ كود التفعيل غير صحيح!");
+            return;
+        }
+    }
+
+    const modal = document.getElementById('video-player-modal');
+    const container = document.getElementById('video-frame-container');
+    const progressContainer = document.getElementById('video-progress-container');
+    const progressBar = document.getElementById('video-progress-bar');
+    const attachmentsContainer = document.getElementById('video-attachments-container');
+    
+    // إعادة تعيين الشريط
+    if(progressBar) progressBar.style.width = '0%';
+    if(progressContainer) progressContainer.style.display = 'none';
+    if(attachmentsContainer) attachmentsContainer.innerHTML = '';
+
+    let embedCode = '';
+    if (video.url.includes('youtube') || video.url.includes('youtu.be')) {
+        embedCode = `<iframe src="https://www.youtube.com/embed/${video.url.split('/').pop().split('v=')[1] || video.url.split('/').pop()}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    } else {
+        embedCode = `<video id="active-academy-video" controls autoplay style="width:100%; height:100%;"><source src="${video.url}" type="video/mp4">المتصفح لا يدعم الفيديو.</video>`;
+        if(progressContainer) progressContainer.style.display = 'block';
+    }
+
+    container.innerHTML = embedCode;
+    modal.style.display = 'flex';
+
+    // تفعيل شريط التقدم للفيديوهات المباشرة
+    const videoPlayer = document.getElementById('active-academy-video');
+    if(videoPlayer && progressBar) {
+        videoPlayer.addEventListener('timeupdate', () => {
+            const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+            progressBar.style.width = `${percent}%`;
+        });
+    }
+
+    // عرض المرفقات
+    if(attachmentsContainer && video.attachments && video.attachments.length > 0) {
+        attachmentsContainer.innerHTML = video.attachments.map(a => 
+            `<a href="${a.url}" target="_blank" class="attachment-btn"><i class="fas fa-download"></i> ${a.name}</a>`
+        ).join('');
+    }
+
+    // --- إعداد التفاعلات (لايك وتعليقات) ---
+    setupVideoInteractions(video);
+}
+
+function setupVideoInteractions(video) {
+    // 1. إعداد زر اللايك
+    const likeBtn = document.getElementById('video-like-btn');
+    const likeCount = document.getElementById('video-like-count');
+    
+    // التحقق مما إذا كان المستخدم قد أعجب بالفيديو سابقاً
+    const userLikes = JSON.parse(localStorage.getItem('userLikes')) || [];
+    const isLiked = userLikes.includes(video.id);
+    
+    if(isLiked) {
+        likeBtn.classList.add('active');
+        likeBtn.innerHTML = `<i class="fas fa-thumbs-up"></i> <span id="video-like-count">${video.likes || 0}</span> أعجبني`;
+    } else {
+        likeBtn.classList.remove('active');
+        likeBtn.innerHTML = `<i class="far fa-thumbs-up"></i> <span id="video-like-count">${video.likes || 0}</span> أعجبني`;
+    }
+
+    // 2. عرض التعليقات
+    renderCommentsList(video.comments || []);
+}
+
+function toggleVideoLike() {
+    if(!currentAcademyVideoId) return;
+    
+    const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const videoIndex = videos.findIndex(v => v.id === currentAcademyVideoId);
+    if(videoIndex === -1) return;
+    
+    let userLikes = JSON.parse(localStorage.getItem('userLikes')) || [];
+    const likeBtn = document.getElementById('video-like-btn');
+    
+    if(userLikes.includes(currentAcademyVideoId)) {
+        // إزالة اللايك
+        videos[videoIndex].likes = Math.max(0, (videos[videoIndex].likes || 0) - 1);
+        userLikes = userLikes.filter(id => id !== currentAcademyVideoId);
+        likeBtn.classList.remove('active');
+        likeBtn.innerHTML = `<i class="far fa-thumbs-up"></i> <span id="video-like-count">${videos[videoIndex].likes}</span> أعجبني`;
+    } else {
+        // إضافة لايك
+        videos[videoIndex].likes = (videos[videoIndex].likes || 0) + 1;
+        userLikes.push(currentAcademyVideoId);
+        likeBtn.classList.add('active');
+        likeBtn.innerHTML = `<i class="fas fa-thumbs-up"></i> <span id="video-like-count">${videos[videoIndex].likes}</span> أعجبني`;
+    }
+    
+    localStorage.setItem('academyVideos', JSON.stringify(videos));
+    localStorage.setItem('userLikes', JSON.stringify(userLikes));
+}
+
+function submitComment() {
+    if(!currentAcademyVideoId) return;
+    const input = document.getElementById('comment-input');
+    const text = input.value.trim();
+    if(!text) return;
+    
+    const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const videoIndex = videos.findIndex(v => v.id === currentAcademyVideoId);
+    if(videoIndex === -1) return;
+    
+    const newComment = {
+        user: 'زائر', // يمكن تغييره لاسم المستخدم المسجل لاحقاً
+        text: text,
+        date: new Date().toLocaleDateString('ar-EG')
+    };
+    
+    if(!videos[videoIndex].comments) videos[videoIndex].comments = [];
+    videos[videoIndex].comments.unshift(newComment); // إضافة في البداية
+    
+    localStorage.setItem('academyVideos', JSON.stringify(videos));
+    renderCommentsList(videos[videoIndex].comments);
+    input.value = ''; // مسح الحقل
+}
+
+function renderCommentsList(comments) {
+    const list = document.getElementById('comments-list');
+    if(!list) return;
+    
+    if(!comments || comments.length === 0) {
+        list.innerHTML = '<p style="color:#777; font-size:0.9rem; text-align:center; padding:10px;">كن أول من يعلق!</p>';
+        return;
+    }
+    
+    list.innerHTML = comments.map(c => `
+        <div class="comment-item">
+            <div class="comment-header">
+                <span class="comment-user"><i class="fas fa-user-circle"></i> ${c.user}</span>
+                <span>${c.date}</span>
+            </div>
+            <div class="comment-text" style="color:#ddd;">${c.text}</div>
+        </div>
+    `).join('');
+}
+
+function closeVideoModal() {
+    document.getElementById('video-player-modal').style.display = 'none';
+    document.getElementById('video-frame-container').innerHTML = '';
+}

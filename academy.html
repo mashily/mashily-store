@@ -3,286 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أكاديمية مشالى | المحتوى الحصري</title>
+    <meta name="description" content="أكاديمية مشالى التعليمية - منصتك الأولى لتعلم صيانة الإلكترونيات، البرمجة، وأحدث التقنيات. دروس حصرية ومجانية.">
+    <meta name="keywords" content="صيانة, إلكترونيات, برمجة, تعليم, دورات, مشالى, أكاديمية">
+    <meta name="author" content="Mashily Store">
+    <title>أكاديمية مشالى | تعلم واحترف</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .lock-overlay { position:absolute; top:0; left:0; width:100%; height:240px; background:rgba(0,0,0,0.85); display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; border-radius:15px 15px 0 0; cursor:pointer; z-index: 10; }
-        .thumb-img { width:100%; height:240px; object-fit:cover; border-radius:15px 15px 0 0; }
-        .modal { display:none; position:fixed; z-index:1000; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; }
-        .modal-content { background:white; padding:25px; border-radius:15px; width:90%; max-width:400px; text-align:center; }
-        .interaction-btn { background:none; border:none; cursor:pointer; font-size:0.9rem; color:#555; padding:5px 10px; transition:0.3s; display:flex; align-items:center; gap:5px; }
-        .interaction-btn:hover { color:var(--primary); background:#f0f0f0; border-radius:15px; }
-        .comment-box { text-align:right; max-height:300px; overflow-y:auto; margin-top:10px; border-top:1px solid #eee; padding-top:10px; }
-        .single-comment { background:#f9f9f9; padding:8px; border-radius:8px; margin-bottom:8px; font-size:0.85rem; }
-        /* تنسيق الشبكة لعرض 3 فيديوهات */
-        #v-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; gap: 20px; }
-        @media (min-width: 900px) { #v-grid { grid-template-columns: repeat(3, 1fr) !important; } }
-        
-        /* تنسيق أزرار الأقسام */
-        .cat-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 10px 15px; scrollbar-width: none; margin-bottom: 10px; }
-        .cat-scroll::-webkit-scrollbar { display: none; }
-        .cat-btn {
-            background: white; border: 1px solid #ddd; padding: 8px 20px; border-radius: 20px;
-            white-space: nowrap; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: 0.3s; color: #555;
-        }
-        .cat-btn.active {
-            background: #e67e22; color: white; border-color: #e67e22; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3);
-        }
-        .cat-btn:hover:not(.active) {
-            background: #f0f0f0;
-        }
-    </style>
 </head>
-<body style="background:#f8f9fa;">
-    <header style="background:#fff; border-bottom:2px solid #e67e22; padding:15px 20px; position:sticky; top:0; z-index:100; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-        <div style="display:flex; align-items:center; justify-content: center; position: relative;">
-            <a href="index.html" style="text-decoration: none; background: #fff; padding: 5px 15px; border-radius: 50px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #eee; transition: transform 0.2s; display: flex; align-items: center; gap: 5px; position: absolute; right: 0;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                <h2 style="color:#e67e22; margin:0; font-size: 1rem; font-weight: 900; display: flex; align-items: center; gap: 5px;">
-                    <i class="fas fa-store"></i> متجر مشالي
-                </h2>
+<body>
+    <!-- الهيدر -->
+    <header>
+        <div class="header-top" style="padding: 10px 20px;">
+            <a href="index.html" class="logo" style="font-size: 1.5rem;">
+                ⚡ متجر مشالى
             </a>
-            <h2 style="color:#e67e22; margin:0; font-size: 1.4rem; font-weight: 900; display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-graduation-cap"></i> أكاديمية مشالى
-            </h2>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <a href="index.html" style="text-decoration: none; color: var(--text); font-weight: bold; font-size: 0.9rem;">
+                    <i class="fas fa-store"></i> المتجر
+                </a>
+                <button onclick="toggleThemeMenu(event)" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:var(--primary);">
+                    <i id="theme-icon" class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+        <!-- قائمة الثيمات (مخفية) -->
+        <div id="theme-menu" style="position:absolute; top:50px; left:20px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px; display:none; z-index:2000; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <button onclick="setTheme('light')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-sun"></i> فاتح</button>
+            <button onclick="setTheme('neon')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-bolt"></i> نيون</button>
+            <button onclick="setTheme('gold')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-crown"></i> ذهبي</button>
         </div>
     </header>
 
-    <div style="padding:15px;">
-        <input type="text" id="v-search" onkeyup="renderAcademy()" placeholder="ابحث عن درس..." style="width:100%; padding:12px; border-radius:25px; border:1px solid #ddd; outline:none; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
-    </div>
-    
-    <!-- شريط الأقسام -->
-    <div id="academy-cats" class="cat-scroll"></div>
-
-    <main class="products-grid" id="v-grid" style="padding:15px;"></main>
-
-    <div id="pass-modal" class="modal">
-        <div class="modal-content">
-            <h3 id="modal-title">🔐 الدرس محمي</h3>
-            <p style="font-size:0.8rem; color:#666; margin-bottom:15px;">أدخل كود التفعيل لمشاهدة هذا الشرح</p>
-            <input type="password" id="unlock-pass" placeholder="أدخل الكود هنا..." style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:8px; text-align:center;">
-            <button onclick="verifyPass()" style="width:100%; padding:12px; background:#27ae60; color:white; border:none; border-radius:8px; font-weight:bold; margin-bottom:10px;">تفعيل الآن</button>
-            <a id="wa-link" href="#" target="_blank" style="text-decoration:none; color:#c0392b; font-size:0.8rem; font-weight:bold;">
-                <i class="fab fa-whatsapp"></i> اطلب الكود من مشالي
-            </a>
-            <button onclick="closeModal()" style="display:block; margin:15px auto 0; background:none; border:none; color:#999;">إغلاق</button>
+    <!-- القسم الترحيبي (Hero Section) -->
+    <div class="academy-hero">
+        <div class="hero-content">
+            <div class="hero-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h1>أكاديمية مشالى التعليمية</h1>
+            <p>منصتك الأولى لتعلم صيانة الإلكترونيات، البرمجة، وأحدث التقنيات. محتوى حصري ومميز بانتظارك.</p>
+            <div class="hero-stats">
+                <span><i class="fas fa-video"></i> +50 درس</span>
+                <span><i class="fas fa-users"></i> +1000 طالب</span>
+                <span><i class="fas fa-certificate"></i> شهادات معتمدة</span>
+            </div>
         </div>
     </div>
 
-    <script>
-        let currentVidId = null;
-        let currentCat = 'الكل';
-        const unlockedVids = JSON.parse(localStorage.getItem('unlockedVids')) || [];
+    <!-- أدوات البحث والفلترة -->
+    <div class="academy-controls">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="academy-search" placeholder="ابحث عن درس معين..." onkeyup="searchAcademy()">
+        </div>
+        
+        <!-- قائمة الترتيب -->
+        <div class="academy-sort-container">
+            <select id="academy-sort" onchange="sortAcademyVideos()">
+                <option value="newest">📅 الأحدث أولاً</option>
+                <option value="oldest">📅 الأقدم أولاً</option>
+                <option value="most_viewed">🔥 الأكثر مشاهدة</option>
+                <option value="most_liked">👍 الأكثر إعجاباً</option>
+            </select>
+        </div>
 
-        function renderAcademyCats() {
-            const cats = JSON.parse(localStorage.getItem('academyCategories')) || [{name:'عام'}];
-            const allCats = [{name: 'الكل'}, ...cats];
-            
-            document.getElementById('academy-cats').innerHTML = allCats.map(c => `
-                <button class="cat-btn ${currentCat === c.name ? 'active' : ''}" onclick="filterCat('${c.name}')">
-                    ${c.name}
-                </button>
-            `).join('');
-        }
-
-        function filterCat(catName) {
-            currentCat = catName;
-            renderAcademyCats();
-            renderAcademy();
-        }
-
-        function renderAcademy() {
-            const grid = document.getElementById('v-grid');
-            const vids = JSON.parse(localStorage.getItem('academyVideos')) || [];
-            const term = document.getElementById('v-search').value.toLowerCase();
-            
-            let filtered = vids.filter(v => {
-                const matchesSearch = v.title.toLowerCase().includes(term);
-                const matchesCat = currentCat === 'الكل' || (v.category || 'عام') === currentCat;
-                return matchesSearch && matchesCat;
-            });
-
-            grid.innerHTML = filtered.map(v => {
-                // تهيئة المشاهدات
-                if(!v.views) v.views = Math.floor(Math.random() * 500) + 50;
-
-                const isLocked = v.type === 'locked' && !unlockedVids.includes(v.id);
-                const vId = v.url.split('v=')[1] || v.url.split('/').pop();
-                
-                return `
-                <div class="product-card" style="padding:0; position:relative; overflow:hidden; background:var(--card-bg); border-radius:15px; box-shadow:0 4px 10px rgba(0,0,0,0.05); border:1px solid var(--border);">
-                    ${isLocked ? `
-                        <div class="lock-overlay" onclick="openPassModal(${v.id})" style="height:240px;">
-                            <i class="fas fa-lock fa-3x" style="margin-bottom:10px;"></i>
-                            <span>محتوى حصري - اطلب الكود</span>
-                        </div>
-                        <img src="${v.image || 'https://via.placeholder.com/400x225?text=Mashily+Academy'}" class="thumb-img" style="height:240px;">
-                    ` : `
-                        <iframe width="100%" height="240" src="https://www.youtube.com/embed/${vId}" frameborder="0" allowfullscreen></iframe>
-                    `}
-                    
-                    <div style="padding: 10px 15px;">
-                        <h4 style="font-size:1.1rem; margin:0 0 10px 0; color:var(--text); line-height:1.4;">${v.title}</h4>
-                        
-                        <div style="display:flex; flex-direction:column; gap:8px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="background:${v.type==='locked'?'#fff0f0':'#f0fff4'}; color:${v.type==='locked'?'#e74c3c':'#27ae60'}; padding:3px 8px; border-radius:5px; font-size:0.7rem; font-weight:bold;">
-                                    ${v.type==='locked'?'🔒 مغلق':'🔓 مجاني'}
-                                </span>
-                                <span id="views-${v.id}" style="font-size:0.8rem; color:#777;"><i class="far fa-eye"></i> ${v.views}</span>
-                                ${!isLocked ? `<a href="${v.url}" target="_blank" style="color:#e67e22; text-decoration:none; font-size:0.8rem;"><i class="fab fa-youtube"></i> يوتيوب</a>` : ''}
-                            </div>
-
-                            ${!isLocked ? `
-                                <a href="https://ssyoutube.com/en1/youtube-video-downloader?url=${v.url}" 
-                                   target="_blank" 
-                                   style="text-decoration:none; background:#27ae60; color:white; padding:8px; border-radius:8px; font-size:0.8rem; text-align:center; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px;">
-                                    <i class="fas fa-download"></i> تحميل الفيديو
-                                </a>
-                            ` : `
-                                <button disabled style="background:#ccc; color:#666; padding:8px; border-radius:8px; border:none; font-size:0.8rem; cursor:not-allowed;">
-                                    <i class="fas fa-lock"></i> التحميل متاح بعد التفعيل
-                                </button>
-                            `}
-                            
-                            <div style="display:flex; justify-content:space-between; border-top:1px solid #eee; padding-top:8px; margin-top:5px;">
-                                <div style="display:flex;">
-                                    <button class="interaction-btn" onclick="interact(${v.id}, 'like')"><i class="far fa-thumbs-up"></i> ${v.likes || 0}</button>
-                                    <button class="interaction-btn" onclick="interact(${v.id}, 'dislike')"><i class="far fa-thumbs-down"></i> ${v.dislikes || 0}</button>
-                                </div>
-                                <button class="interaction-btn" onclick="openComments(${v.id})"><i class="far fa-comment"></i> تعليقات (${v.comments ? v.comments.length : 0})</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `}).join('');
-            
-            // حفظ المشاهدات
-            localStorage.setItem('academyVideos', JSON.stringify(vids));
-        }
-        function openPassModal(id) {
-            currentVidId = id;
-            const v = (JSON.parse(localStorage.getItem('academyVideos')) || []).find(x => x.id == id);
-            document.getElementById('modal-title').innerText = "🔐 تفعيل: " + v.title;
-            document.getElementById('wa-link').href = `https://wa.me/201551831308?text=السلام عليكم يا مشالي، عاوز كود تفعيل درس: ${v.title}`;
-            document.getElementById('pass-modal').style.display = 'flex';
-        }
-
-        // --- نظام التفاعل والتعليقات ---
-        let commentVidId = null;
-
-        function interact(id, type) {
-            const vids = JSON.parse(localStorage.getItem('academyVideos')) || [];
-            const idx = vids.findIndex(x => x.id == id);
-            if(idx === -1) return;
-
-            if(!vids[idx].likes) vids[idx].likes = 0;
-            if(!vids[idx].dislikes) vids[idx].dislikes = 0;
-
-            if(type === 'like') vids[idx].likes++;
-            else vids[idx].dislikes++;
-
-            localStorage.setItem('academyVideos', JSON.stringify(vids));
-            renderAcademy(); // تحديث الواجهة
-        }
-
-        function openComments(id) {
-            commentVidId = id;
-            const v = (JSON.parse(localStorage.getItem('academyVideos')) || []).find(x => x.id == id);
-            const commentsList = v.comments || [];
-            
-            let html = `
-                <h3 style="margin-top:0;">💬 التعليقات</h3>
-                <div class="comment-box">
-                    ${commentsList.length === 0 ? '<p style="color:#999;">لا توجد تعليقات بعد، كن الأول!</p>' : 
-                      commentsList.map(c => `<div class="single-comment"><b>${c.user}:</b> ${c.text}</div>`).join('')}
-                </div>
-                <div style="display:flex; gap:5px; margin-top:10px;">
-                    <input id="new-comment-text" placeholder="أضف تعليقك..." style="flex:1; padding:8px; border:1px solid #ddd; border-radius:5px;">
-                    <button onclick="addComment()" style="background:var(--primary); color:white; border:none; padding:5px 10px; border-radius:5px;">نشر</button>
-                </div>
-                <button onclick="document.getElementById('comments-modal').style.display='none'" style="margin-top:10px; background:none; border:none; color:#666;">إغلاق</button>
-            `;
-            
-            document.getElementById('comments-content').innerHTML = html;
-            document.getElementById('comments-modal').style.display = 'flex';
-        }
-
-        function addComment() {
-            const text = document.getElementById('new-comment-text').value;
-            if(!text) return;
-            
-            const vids = JSON.parse(localStorage.getItem('academyVideos')) || [];
-            const idx = vids.findIndex(x => x.id == commentVidId);
-            
-            if(!vids[idx].comments) vids[idx].comments = [];
-            
-            vids[idx].comments.push({
-                user: "زائر", // يمكن تطويرها لاحقاً لتسجيل الاسم
-                text: text,
-                date: new Date().toLocaleDateString()
-            });
-            
-            localStorage.setItem('academyVideos', JSON.stringify(vids));
-            openComments(commentVidId); // تحديث القائمة
-            renderAcademy(); // تحديث العداد الخارجي
-        }
-
-        // نفس دالة التشفير الموجودة في لوحة التحكم
-        function simpleHash(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; 
-            }
-            return Math.abs(hash).toString();
-        }
-
-        function verifyPass() {
-            const input = document.getElementById('unlock-pass').value;
-            const v = (JSON.parse(localStorage.getItem('academyVideos')) || []).find(x => x.id == currentVidId);
-            
-            if(simpleHash(input) === v.password) {
-                unlockedVids.push(currentVidId);
-                localStorage.setItem('unlockedVids', JSON.stringify(unlockedVids));
-                alert('تم التفعيل بنجاح! مشاهدة ممتعة ✅');
-                location.reload();
-            } else {
-                alert('الكود غير صحيح! تواصل مع مشالي للحصول عليه.');
-            }
-        }
-
-        function closeModal() { document.getElementById('pass-modal').style.display = 'none'; }
-        window.onload = function() {
-            renderAcademyCats();
-            renderAcademy();
-        };
-
-        // --- عداد المشاهدات التلقائي ---
-        setInterval(() => {
-            const vids = JSON.parse(localStorage.getItem('academyVideos')) || [];
-            if(vids.length === 0) return;
-            
-            const randIdx = Math.floor(Math.random() * vids.length);
-            if(!vids[randIdx].views) vids[randIdx].views = 100;
-            vids[randIdx].views += Math.floor(Math.random() * 5) + 1;
-            
-            localStorage.setItem('academyVideos', JSON.stringify(vids));
-            
-            const el = document.getElementById(`views-${vids[randIdx].id}`);
-            if(el) el.innerHTML = `<i class="far fa-eye"></i> ${vids[randIdx].views}`;
-        }, 3000);
-    </script>
-
-    <!-- نافذة التعليقات -->
-    <div id="comments-modal" class="modal">
-        <div id="comments-content" class="modal-content" style="text-align:right;"></div>
+        <div id="academy-cats" class="cat-nav-scroll" style="justify-content: center;">
+            <!-- سيتم ملء الأقسام هنا بالجافاسكريبت -->
+        </div>
     </div>
 
-    <a href="https://wa.me/201551831308" class="whatsapp-float" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+    <!-- شبكة الفيديوهات -->
+    <main class="video-grid" id="academy-grid">
+        <!-- سيتم عرض الفيديوهات هنا -->
+        <div class="loader" style="grid-column: 1/-1; margin: 50px auto;"></div>
+    </main>
+
+    <!-- مشغل الفيديو المنبثق -->
+    <div id="video-player-modal" class="video-modal-overlay" onclick="if(event.target === this) closeVideoModal()">
+        <div class="video-modal-content">
+            <button class="close-video-btn" onclick="closeVideoModal()">✕</button>
+            <div id="video-frame-container" class="video-frame-container">
+                <!-- سيتم وضع الفيديو هنا -->
+            </div>
+            <div id="video-progress-container" class="video-progress-container">
+                <div id="video-progress-bar" class="video-progress-bar"></div>
+            </div>
+            <div id="video-attachments-container" class="video-attachments"></div>
+            
+            <!-- قسم التفاعلات (لايك وتعليقات) -->
+            <div class="video-interactions">
+                <div class="video-actions">
+                    <button id="video-like-btn" class="action-btn" onclick="toggleVideoLike()">
+                        <i class="far fa-thumbs-up"></i> <span id="video-like-count">0</span> أعجبني
+                    </button>
+                </div>
+                <div class="comments-section">
+                    <h3 style="color:white; font-size:1rem; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;">التعليقات</h3>
+                    <div class="comment-form">
+                        <input type="text" id="comment-input" placeholder="أضف تعليقاً..." onkeypress="if(event.key==='Enter') submitComment()">
+                        <button onclick="submitComment()" class="btn-send"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <div id="comments-list" class="comments-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الفوتر -->
+    <footer style="text-align: center; padding: 20px; color: var(--text-light); margin-top: 50px; border-top: 1px solid var(--border);">
+        <p>© 2024 أكاديمية مشالى - جميع الحقوق محفوظة</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // تشغيل الأكاديمية عند التحميل
+        window.addEventListener('load', initAcademyPage);
+    </script>
 </body>
 </html>

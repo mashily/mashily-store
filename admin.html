@@ -294,6 +294,7 @@
             line-height: 1.5;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             font-size: 0.85rem;
@@ -1030,6 +1031,16 @@
                     <div class="form-group">
                         <label>رابط يوتيوب</label>
                         <input type="url" id="video-url" placeholder="https://youtube.com/...">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>مدة الفيديو (اختياري)</label>
+                        <input type="text" id="video-duration" placeholder="مثال: 10:30">
+                    </div>
+                    <div class="form-group">
+                        <label>رابط المرفقات (اختياري)</label>
+                        <input type="url" id="video-attachment" placeholder="رابط Google Drive أو PDF">
                     </div>
                 </div>
                 <div class="form-row">
@@ -2949,6 +2960,8 @@
             const title = document.getElementById('video-title').value;
             const url = document.getElementById('video-url').value;
             const pass = document.getElementById('video-pass').value;
+            const duration = document.getElementById('video-duration').value;
+            const attachment = document.getElementById('video-attachment').value;
             
             if(!title || !url) return showAlert('يرجى إدخال العنوان والرابط', 'error');
 
@@ -2958,6 +2971,8 @@
                 url: url,
                 category: document.getElementById('video-category').value,
                 type: document.getElementById('video-type').value,
+                duration: duration,
+                attachments: attachment ? [{name: 'تحميل الملفات', url: attachment}] : [],
                 image: document.getElementById('video-img-base64').value,
                 password: pass ? simpleHash(pass) : (id ? (academyVideos.find(v=>v.id==id)||{}).password : ''),
                 likes: id ? (academyVideos.find(v=>v.id==id)||{}).likes : 0,
@@ -3006,6 +3021,8 @@
             document.getElementById('video-title').value = v.title;
             document.getElementById('video-url').value = v.url;
             document.getElementById('video-category').value = v.category;
+            document.getElementById('video-duration').value = v.duration || '';
+            document.getElementById('video-attachment').value = (v.attachments && v.attachments[0]) ? v.attachments[0].url : '';
             document.getElementById('video-type').value = v.type;
             document.getElementById('video-img-base64').value = v.image || '';
             document.getElementById('video-pass').value = ''; // لا نظهر الهاش
@@ -3025,6 +3042,8 @@
             document.getElementById('video-id').value = '';
             document.getElementById('video-title').value = '';
             document.getElementById('video-url').value = '';
+            document.getElementById('video-duration').value = '';
+            document.getElementById('video-attachment').value = '';
             document.getElementById('video-pass').value = '';
             document.getElementById('video-img-base64').value = '';
             toggleVideoPass();
