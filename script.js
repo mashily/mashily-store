@@ -1728,6 +1728,48 @@ window.addEventListener('load', init);
 let currentAcademyVideoId = null;
 let currentAcademyCategory = 'الكل'; // لتتبع القسم الحالي
 
+// --- نظام النقاط والمستويات ---
+const ACADEMY_LEVELS = {
+    'مبتدئ': { points: 0, next: 100 },
+    'متعلم': { points: 100, next: 500 },
+    'خبير': { points: 500, next: 1500 },
+    'محترف': { points: 1500, next: 5000 },
+    'أسطورة': { points: 5000, next: Infinity }
+};
+
+// تحميل إعدادات النقاط من لوحة التحكم أو استخدام الافتراضي
+const savedPoints = JSON.parse(localStorage.getItem('storeAcademySettings')) || {};
+const ACADEMY_POINTS = {
+    WATCH: savedPoints.WATCH || 15,
+    LIKE_VIDEO: savedPoints.LIKE_VIDEO || 5,
+    COMMENT: savedPoints.COMMENT || 10
+};
+
+function getAcademyUser() {
+    let user = JSON.parse(localStorage.getItem('academyUser'));
+    if (!user) {
+        user = { name: 'زائر', points: 0, level: 'مبتدئ', watchedVideos: [] };
+        localStorage.setItem('academyUser', JSON.stringify(user));
+    }
+    return user;
+}
+
+function saveAcademyUser(user) { localStorage.setItem('academyUser', JSON.stringify(user)); }
+
+function changeUsername() {
+    const user = getAcademyUser();
+    const newName = prompt("أدخل اسمك الجديد:", user.name);
+
+    if (newName && newName.trim() !== "" && newName.trim().length <= 20) {
+        user.name = newName.trim();
+        saveAcademyUser(user);
+        updateAcademyProfileUI();
+        showAcademyNotification(`✅ تم تغيير اسمك إلى "${user.name}"`, 'success');
+    } else if (newName !== null) {
+        alert("الاسم غير صالح. يجب ألا يكون فارغاً وألا يتجاوز 20 حرفاً.");
+    }
+}
+
 // دالة التشفير البسيطة (للتحقق من كلمات المرور)
 function simpleHash(str) {
     let hash = 0;
@@ -1771,6 +1813,42 @@ function initAcademyPage() {
         applyAcademyFilters(); // استخدام دالة الفلترة الشاملة بدلاً من العرض المباشر
     }, 800);
 }
+
+function addPoints(pointsToAdd, reason) {
+    const user = getAcademyUser();
+    user.points += pointsToAdd;
+
+    // Check for level up
+    const currentLevelInfo = ACADEMY_LEVELS[user.level];
+    if (user.points >= currentLevelInfo.next) {
+        for (const levelName in ACADEMY_LEVELS) {
+            if (user.points >= ACADEMY_LEVELS[levelName].points) {
+                user.level = levelName;
+            }
+        }
+        showAcademyNotification(`🎉 ترقية! لقد وصلت إلى مستوى ${user.level}`, 'level-up');
+    } else {
+        showAcademyNotification(`+${pointsToAdd} نقطة | ${reason}`, 'points');
+    }
+
+    saveAcademyUser(user);
+    updateAcademyProfileUI();
+}
+
+function showAcademyNotification(message, type) {
+    const notif = document.createElement('div');
+    notif.className = `academy-notification ${type}`;
+    notif.innerHTML = message;
+    document.body.appendChild(notif);
+    setTimeout(() => {
+        notif.remove();
+    }, 4000);
+}
+
+function updateAcademyProfileUI() {
+    // سيتم ملء هذه الدالة لاحقاً
+}
+
 
 function renderVideos(list) {
     const grid = document.getElementById('academy-grid');
@@ -1871,6 +1949,14 @@ function playVideo(id) {
     
     const video = videos[videoIndex];
 
+    // --- نظام النقاط: إضافة نقاط عند المشاهدة لأول مرة ---
+    const user = getAcademyUser();
+    if (!user.watchedVideos.includes(id)) {
+        addPoints(ACADEMY_POINTS.WATCH, 'مشاهدة درس جديد');
+        user.watchedVideos.push(id);
+        saveAcademyUser(user);
+    }
+
     currentAcademyVideoId = id; // حفظ المعرف الحالي
 
     if(video.type === 'locked') {
@@ -1923,6 +2009,27 @@ function playVideo(id) {
     setupVideoInteractions(video);
 }
 
+function updateAcademyProfileUI() {
+    const user = getAcademyUser();
+    const levelInfo = ACADEMY_LEVELS[user.level];
+    
+    document.getElementById('profile-username').innerText = user.name;
+    document.getElementById('profile-level').innerText = user.level;
+
+    if (levelInfo.next !== Infinity) {
+        const pointsInLevel = user.points - levelInfo.points;
+        const pointsForNextLevel = levelInfo.next - levelInfo.points;
+        const progressPercent = (pointsInLevel / pointsForNextLevel) * 100;
+        
+        document.getElementById('profile-points').innerText = `${user.points} / ${levelInfo.next} نقطة`;
+        document.getElementById('profile-progress').style.width = `${Math.min(progressPercent, 100)}%`;
+    } else {
+        // Max level
+        document.getElementById('profile-points').innerText = `${user.points} نقطة`;
+        document.getElementById('profile-progress').style.width = '100%';
+    }
+}
+
 function setupVideoInteractions(video) {
     // 1. إعداد زر اللايك
     const likeBtn = document.getElementById('video-like-btn');
@@ -1940,8 +2047,24 @@ function setupVideoInteractions(video) {
         likeBtn.innerHTML = `<i class="far fa-thumbs-up"></i> <span id="video-like-count">${video.likes || 0}</span> أعجبني`;
     }
 
-    // 2. عرض التعليقات
+    // 2. إعداد زر الديسلايك (Dislike)
+    const dislikeBtn = document.getElementById('video-dislike-btn');
+    const userDislikes = JSON.parse(localStorage.getItem('userDislikes')) || [];
+    const isDisliked = userDislikes.includes(video.id);
+    
+    if(isDisliked) {
+        dislikeBtn.classList.add('active', 'dislike-active');
+        dislikeBtn.innerHTML = `<i class="fas fa-thumbs-down"></i> <span id="video-dislike-count">${video.dislikes || 0}</span> لم يعجبني`;
+    } else {
+        dislikeBtn.classList.remove('active', 'dislike-active');
+        dislikeBtn.innerHTML = `<i class="far fa-thumbs-down"></i> <span id="video-dislike-count">${video.dislikes || 0}</span> لم يعجبني`;
+    }
+
+    // 3. عرض التعليقات
     renderCommentsList(video.comments || []);
+
+    // 4. تحديث واجهة المستخدم لملف النقاط
+    updateAcademyProfileUI();
 }
 
 function toggleVideoLike() {
@@ -1952,7 +2075,21 @@ function toggleVideoLike() {
     if(videoIndex === -1) return;
     
     let userLikes = JSON.parse(localStorage.getItem('userLikes')) || [];
+    let userDislikes = JSON.parse(localStorage.getItem('userDislikes')) || [];
+    const wasLiked = userLikes.includes(currentAcademyVideoId); // Check state before toggle
     const likeBtn = document.getElementById('video-like-btn');
+    const dislikeBtn = document.getElementById('video-dislike-btn');
+    
+    // إذا كان المستخدم قد ضغط dislike سابقاً، نقوم بإزالته أولاً
+    if(userDislikes.includes(currentAcademyVideoId)) {
+        videos[videoIndex].dislikes = Math.max(0, (videos[videoIndex].dislikes || 0) - 1);
+        userDislikes = userDislikes.filter(id => id !== currentAcademyVideoId);
+        localStorage.setItem('userDislikes', JSON.stringify(userDislikes));
+        
+        // تحديث شكل زر الديسلايك
+        dislikeBtn.classList.remove('active', 'dislike-active');
+        dislikeBtn.innerHTML = `<i class="far fa-thumbs-down"></i> <span id="video-dislike-count">${videos[videoIndex].dislikes || 0}</span> لم يعجبني`;
+    }
     
     if(userLikes.includes(currentAcademyVideoId)) {
         // إزالة اللايك
@@ -1970,6 +2107,73 @@ function toggleVideoLike() {
     
     localStorage.setItem('academyVideos', JSON.stringify(videos));
     localStorage.setItem('userLikes', JSON.stringify(userLikes));
+
+    // --- نظام النقاط: إضافة نقاط عند الإعجاب ---
+    if (!wasLiked && userLikes.includes(currentAcademyVideoId)) {
+        addPoints(ACADEMY_POINTS.LIKE_VIDEO, 'الإعجاب بدرس');
+    }
+}
+
+function toggleVideoDislike() {
+    if(!currentAcademyVideoId) return;
+    
+    const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const videoIndex = videos.findIndex(v => v.id === currentAcademyVideoId);
+    if(videoIndex === -1) return;
+    
+    let userLikes = JSON.parse(localStorage.getItem('userLikes')) || [];
+    let userDislikes = JSON.parse(localStorage.getItem('userDislikes')) || [];
+    const likeBtn = document.getElementById('video-like-btn');
+    const dislikeBtn = document.getElementById('video-dislike-btn');
+    
+    // إذا كان المستخدم قد ضغط like سابقاً، نقوم بإزالته أولاً
+    if(userLikes.includes(currentAcademyVideoId)) {
+        videos[videoIndex].likes = Math.max(0, (videos[videoIndex].likes || 0) - 1);
+        userLikes = userLikes.filter(id => id !== currentAcademyVideoId);
+        localStorage.setItem('userLikes', JSON.stringify(userLikes));
+        
+        // تحديث شكل زر اللايك
+        likeBtn.classList.remove('active');
+        likeBtn.innerHTML = `<i class="far fa-thumbs-up"></i> <span id="video-like-count">${videos[videoIndex].likes || 0}</span> أعجبني`;
+    }
+
+    if(userDislikes.includes(currentAcademyVideoId)) {
+        // إزالة الديسلايك
+        videos[videoIndex].dislikes = Math.max(0, (videos[videoIndex].dislikes || 0) - 1);
+        userDislikes = userDislikes.filter(id => id !== currentAcademyVideoId);
+        dislikeBtn.classList.remove('active', 'dislike-active');
+        dislikeBtn.innerHTML = `<i class="far fa-thumbs-down"></i> <span id="video-dislike-count">${videos[videoIndex].dislikes}</span> لم يعجبني`;
+    } else {
+        // إضافة ديسلايك
+        videos[videoIndex].dislikes = (videos[videoIndex].dislikes || 0) + 1;
+        userDislikes.push(currentAcademyVideoId);
+        dislikeBtn.classList.add('active', 'dislike-active');
+        dislikeBtn.innerHTML = `<i class="fas fa-thumbs-down"></i> <span id="video-dislike-count">${videos[videoIndex].dislikes}</span> لم يعجبني`;
+    }
+    
+    localStorage.setItem('academyVideos', JSON.stringify(videos));
+    localStorage.setItem('userDislikes', JSON.stringify(userDislikes));
+}
+
+function shareAcademyVideo() {
+    if(!currentAcademyVideoId) return;
+    const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const video = videos.find(v => v.id === currentAcademyVideoId);
+    if(!video) return;
+    
+    const text = `شاهد هذا الدرس المميز من أكاديمية مشالى: \n\n*${video.title}*\n\n${video.desc || ''}`;
+    
+    // استخدام واجهة المشاركة الحديثة إذا كانت مدعومة
+    if (navigator.share) {
+        navigator.share({
+            title: video.title,
+            text: text,
+            url: window.location.href
+        }).catch(console.error);
+    } else {
+        // أو الفتح عبر واتساب
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
 }
 
 function submitComment() {
@@ -1982,14 +2186,22 @@ function submitComment() {
     const videoIndex = videos.findIndex(v => v.id === currentAcademyVideoId);
     if(videoIndex === -1) return;
     
+    const user = getAcademyUser();
     const newComment = {
-        user: 'زائر', // يمكن تغييره لاسم المستخدم المسجل لاحقاً
+        id: Date.now(), // إضافة معرف فريد للتعليق
+        user: user.name, // استخدام اسم المستخدم الحالي
         text: text,
-        date: new Date().toLocaleDateString('ar-EG')
+        date: new Date().toLocaleDateString('ar-EG'),
+        replies: [], // مصفوفة الردود
+        likes: 0, // لإضافة الإعجابات على التعليقات
+        isNew: true // إشعار للمدير
     };
     
     if(!videos[videoIndex].comments) videos[videoIndex].comments = [];
     videos[videoIndex].comments.unshift(newComment); // إضافة في البداية
+
+    // --- نظام النقاط: إضافة نقاط عند التعليق ---
+    addPoints(ACADEMY_POINTS.COMMENT, 'إضافة تعليق');
     
     localStorage.setItem('academyVideos', JSON.stringify(videos));
     renderCommentsList(videos[videoIndex].comments);
@@ -2005,15 +2217,118 @@ function renderCommentsList(comments) {
         return;
     }
     
-    list.innerHTML = comments.map(c => `
-        <div class="comment-item">
-            <div class="comment-header">
-                <span class="comment-user"><i class="fas fa-user-circle"></i> ${c.user}</span>
-                <span>${c.date}</span>
+    const userCommentLikes = JSON.parse(localStorage.getItem('userCommentLikes')) || [];
+
+    list.innerHTML = comments.map(c => {
+        const isLiked = userCommentLikes.includes(c.id);
+        const likeIcon = isLiked ? 'fas' : 'far';
+        const likeBtnClass = isLiked ? 'active' : '';
+
+        return `
+        <div class="comment-item" id="comment-${c.id}">
+            <div>
+                <div class="comment-header">
+                    <span class="comment-user"><i class="fas fa-user-circle"></i> ${c.user}</span>
+                    <span>${c.date}</span>
+                </div>
+                <div class="comment-text" style="color:#ddd;">${c.text}</div>
+                <div class="comment-actions">
+                    <button class="reply-btn" onclick="showReplyForm(${c.id})"><i class="fas fa-reply"></i> رد</button>
+                    <button class="like-comment-btn ${likeBtnClass}" onclick="toggleCommentLike(${c.id})">
+                        <i class="${likeIcon} fa-thumbs-up"></i> <span>${c.likes || 0}</span>
+                    </button>
+                </div>
             </div>
-            <div class="comment-text" style="color:#ddd;">${c.text}</div>
+            <div class="replies-container" id="replies-for-${c.id}">
+                ${(c.replies || []).map(r => {
+                    const isAdminReply = r.user === 'مشرف';
+                    return `
+                    <div class="comment-item reply-item ${isAdminReply ? 'admin-reply' : ''}">
+                        <div class="comment-header">
+                            <span class="comment-user"><i class="fas ${isAdminReply ? 'fa-user-shield' : 'fa-user-circle'}"></i> ${r.user}</span>
+                            <span>${r.date}</span>
+                        </div>
+                        <div class="comment-text" style="color:#ccc;">${r.text}</div>
+                    </div>
+                `}).join('')}
+            </div>
         </div>
-    `).join('');
+    `}).join('');
+}
+
+function toggleCommentLike(commentId) {
+    if (!currentAcademyVideoId) return;
+
+    const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const videoIndex = videos.findIndex(v => v.id === currentAcademyVideoId);
+    if (videoIndex === -1 || !videos[videoIndex].comments) return;
+
+    // ابحث عن التعليق في القائمة الرئيسية
+    let comment = videos[videoIndex].comments.find(c => c.id === commentId);
+    // ملاحظة: يمكن توسيع هذا البحث ليشمل الردود في المستقبل
+
+    if (!comment) return;
+
+    let userCommentLikes = JSON.parse(localStorage.getItem('userCommentLikes')) || [];
+    const likeIndex = userCommentLikes.indexOf(commentId);
+
+    if (likeIndex > -1) {
+        // إلغاء الإعجاب
+        userCommentLikes.splice(likeIndex, 1);
+        comment.likes = Math.max(0, (comment.likes || 0) - 1);
+    } else {
+        // إضافة إعجاب
+        userCommentLikes.push(commentId);
+        comment.likes = (comment.likes || 0) + 1;
+    }
+
+    localStorage.setItem('academyVideos', JSON.stringify(videos));
+    localStorage.setItem('userCommentLikes', JSON.stringify(userCommentLikes));
+
+    // إعادة عرض قائمة التعليقات لتحديث الواجهة
+    renderCommentsList(videos[videoIndex].comments);
+}
+
+function showReplyForm(commentId) {
+    // إزالة أي نموذج رد موجود مسبقاً
+    const existingForm = document.querySelector('.reply-form-container');
+    if (existingForm) {
+        existingForm.remove();
+    }
+
+    const parentComment = document.getElementById(`comment-${commentId}`);
+    if (!parentComment) return;
+
+    const formContainer = document.createElement('div');
+    formContainer.className = 'reply-form-container';
+    formContainer.innerHTML = `
+        <input type="text" id="reply-input-${commentId}" placeholder="اكتب ردك..." onkeypress="if(event.key==='Enter') submitReply(${commentId})">
+        <button onclick="submitReply(${commentId})">نشر</button>
+        <button class="cancel-reply" onclick="this.parentElement.remove()">إلغاء</button>
+    `;
+
+    parentComment.appendChild(formContainer);
+    document.getElementById(`reply-input-${commentId}`).focus();
+}
+
+function submitReply(commentId) {
+    const replyInput = document.getElementById(`reply-input-${commentId}`);
+    const text = replyInput.value.trim();
+    if (!text) return;
+
+    const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const videoIndex = videos.findIndex(v => v.id === currentAcademyVideoId);
+    if (videoIndex === -1 || !videos[videoIndex].comments) return;
+
+    const parentComment = videos[videoIndex].comments.find(c => c.id === commentId);
+    if (!parentComment) return;
+
+    const newReply = { user: 'مشرف', text: text, date: new Date().toLocaleDateString('ar-EG') };
+    if (!parentComment.replies) parentComment.replies = [];
+    parentComment.replies.push(newReply);
+
+    localStorage.setItem('academyVideos', JSON.stringify(videos));
+    renderCommentsList(videos[videoIndex].comments);
 }
 
 function closeVideoModal() {

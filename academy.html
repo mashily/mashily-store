@@ -90,9 +90,30 @@
             
             <!-- قسم التفاعلات (لايك وتعليقات) -->
             <div class="video-interactions">
+                <!-- شريط تقدم المستخدم -->
+                <div class="user-profile-bar">
+                    <div class="user-info">
+                        <i class="fas fa-user-astronaut"></i>
+                        <span id="profile-username">زائر</span>
+                        <button id="edit-username-btn" onclick="changeUsername()" title="تغيير اسمك"><i class="fas fa-pencil-alt"></i></button>
+                    </div>
+                    <div class="level-info">
+                        <span id="profile-level" class="level-badge">مبتدئ</span>
+                        <div class="progress-container">
+                            <div id="profile-progress" class="progress-bar"></div>
+                        </div>
+                        <span id="profile-points">0 / 100 نقطة</span>
+                    </div>
+                </div>
                 <div class="video-actions">
                     <button id="video-like-btn" class="action-btn" onclick="toggleVideoLike()">
                         <i class="far fa-thumbs-up"></i> <span id="video-like-count">0</span> أعجبني
+                    </button>
+                    <button id="video-dislike-btn" class="action-btn" onclick="toggleVideoDislike()">
+                        <i class="far fa-thumbs-down"></i> <span id="video-dislike-count">0</span> لم يعجبني
+                    </button>
+                    <button id="video-share-btn" class="action-btn" onclick="shareAcademyVideo()">
+                        <i class="fas fa-share"></i> مشاركة
                     </button>
                 </div>
                 <div class="comments-section">

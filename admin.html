@@ -599,6 +599,20 @@
             .invoice-actions { display: none; }
         }
     </style>
+    <style>
+        /* Styles for new features */
+        .notif-badge {
+            background-color: var(--danger); color: white; font-size: 0.7rem; font-weight: bold;
+            padding: 1px 6px; border-radius: 10px; margin-right: auto; margin-left: 5px;
+            display: none; /* Hidden by default */
+        }
+        #comments-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 5000; align-items: center; justify-content: center; }
+        .comments-modal-content { background: var(--surface); color: var(--text); padding: 20px; border-radius: 10px; width: 90%; max-width: 600px; max-height: 80vh; display: flex; flex-direction: column; }
+        #comments-modal-list { overflow-y: auto; margin: 15px 0; flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
+        .admin-comment-item { background: var(--light); padding: 10px; border-radius: 8px; border-right: 4px solid var(--primary); }
+        .admin-comment-item.new { border-right-color: var(--warning); }
+        .admin-reply-box { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+    </style>
 </head>
 <body>
     <div id="auth-screen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
@@ -653,7 +667,7 @@
                 <li class="nav-item"><a class="nav-link active" onclick="switchTab('dashboard')"><i class="fas fa-home"></i> <span>الرئيسية</span></a></li>
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('products')"><i class="fas fa-box"></i> <span>المنتجات</span></a></li>
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('add-product')"><i class="fas fa-plus"></i> <span>إضافة منتج</span></a></li>
-                <li class="nav-item"><a class="nav-link" onclick="switchTab('academy')"><i class="fas fa-graduation-cap"></i> <span>الأكاديمية</span></a></li>
+                <li class="nav-item"><a class="nav-link" onclick="switchTab('academy')"><i class="fas fa-graduation-cap"></i> <span>الأكاديمية</span><span id="academy-notif-badge" class="notif-badge"></span></a></li>
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('coupons')"><i class="fas fa-tags"></i> <span>الكوبونات</span></a></li>
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('orders')"><i class="fas fa-shopping-bag"></i> <span>الطلبات</span></a></li>
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('invoices')"><i class="fas fa-receipt"></i> <span>الفواتير</span></a></li>
@@ -1020,6 +1034,26 @@
         <div id="academy" class="tab-content">
             <h2><i class="fas fa-graduation-cap"></i> إدارة الأكاديمية</h2>
             
+            <!-- إعدادات نظام النقاط -->
+            <div class="form-container" style="margin-bottom: 20px; border: 1px solid #ffd700;">
+                <h3 style="color: #d4af37;"><i class="fas fa-star"></i> إعدادات نظام النقاط والنجوم</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>نقاط المشاهدة</label>
+                        <input type="number" id="points-watch" placeholder="15">
+                    </div>
+                    <div class="form-group">
+                        <label>نقاط الإعجاب</label>
+                        <input type="number" id="points-like" placeholder="5">
+                    </div>
+                    <div class="form-group">
+                        <label>نقاط التعليق</label>
+                        <input type="number" id="points-comment" placeholder="10">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="saveAcademySettings()">حفظ إعدادات النقاط</button>
+            </div>
+
             <div class="form-container">
                 <h3>إضافة / تعديل درس</h3>
                 <input type="hidden" id="video-id">
@@ -1077,7 +1111,7 @@
             <div class="table-container">
                 <h3>قائمة الدروس</h3>
                 <table>
-                    <thead><tr><th>الصورة</th><th>العنوان</th><th>القسم</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+                    <thead><tr><th>الصورة</th><th>العنوان</th><th>القسم</th><th>الحالة</th><th style="width: 220px;">الإجراءات</th></tr></thead>
                     <tbody id="academy-list-body"></tbody>
                 </table>
             </div>
@@ -1814,6 +1848,7 @@
                 loadReviewsTable();
                 loadSettings();
                 loadAllExtraData();
+                checkForNotifications(); // Check for new comments
                 applyPermissions();
             } else {
                 alert('بيانات الدخول غير صحيحة!');
@@ -1830,6 +1865,7 @@
             loadReviewsTable();
             loadSettings();
             loadAllExtraData(); // تحميل البيانات الجديدة
+            checkForNotifications(); // Check for new comments
             
             // التحقق من تسجيل الدخول
             const sessionUser = sessionStorage.getItem('mashily_user');
@@ -3000,18 +3036,22 @@
             // تحديث قائمة الأقسام في الـ Select
             catSelect.innerHTML = academyCats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
 
-            tbody.innerHTML = academyVideos.map(v => `
+            tbody.innerHTML = academyVideos.map(v => {
+                const newCommentsCount = (v.comments || []).filter(c => c.isNew).length;
+                const commentBadge = newCommentsCount > 0 ? `<span class="notif-badge" style="display:inline-block; margin:0 5px;">${newCommentsCount}</span>` : '';
+                return `
                 <tr>
                     <td><img src="${v.image || ''}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;"></td>
                     <td>${v.title}</td>
                     <td>${v.category}</td>
                     <td>${v.type === 'locked' ? '🔒' : '🔓'}</td>
                     <td>
+                        <button class="btn btn-info btn-small" onclick="manageComments(${v.id})"><i class="fas fa-comments"></i> التعليقات ${commentBadge}</button>
                         <button class="btn btn-primary btn-small" onclick="editVideo(${v.id})"><i class="fas fa-edit"></i></button>
                         <button class="btn btn-danger btn-small" onclick="deleteVideo(${v.id})"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         function editVideo(id) {
@@ -3086,7 +3126,12 @@
             document.getElementById('gen-whatsapp').value = settings.whatsapp || '';
             document.getElementById('gen-ticker').value = localStorage.getItem('tickerText') || '';
 
-            // Lists
+            // Academy Points Settings Load
+            const acadSettings = JSON.parse(localStorage.getItem('storeAcademySettings')) || { WATCH: 15, LIKE_VIDEO: 5, COMMENT: 10 };
+            document.getElementById('points-watch').value = acadSettings.WATCH;
+            document.getElementById('points-like').value = acadSettings.LIKE_VIDEO;
+            document.getElementById('points-comment').value = acadSettings.COMMENT;
+
             document.getElementById('store-cat-list').innerHTML = storeCategories.map((c, i) => `
                 <li style="padding:5px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
                     <span><i class="${c.icon}"></i> ${c.name}</span>

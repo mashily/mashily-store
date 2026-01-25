@@ -972,8 +972,12 @@ header {
 .video-modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.9); z-index: 6000;
-    display: none; align-items: center; justify-content: center;
+    display: none;
+    align-items: flex-start; /* تعديل: لضمان ظهور أعلى النافذة دائماً */
+    justify-content: center;
     backdrop-filter: blur(5px);
+    overflow-y: auto; /* السماح بالتمرير إذا كان المحتوى أطول من الشاشة */
+    padding: 5vh 15px; /* إضافة مسافة علوية وسفلية لتجنب الالتصاق بالحواف */
 }
 .video-modal-content {
     width: 90%; max-width: 900px;
@@ -1027,6 +1031,83 @@ header {
     display: flex;
     gap: 15px;
 }
+
+/* --- شريط تقدم المستخدم --- */
+.user-profile-bar {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+}
+#edit-username-btn {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 2px 5px;
+    transition: color 0.3s;
+}
+#edit-username-btn:hover { color: var(--primary); }
+.user-info i {
+    color: var(--primary);
+    font-size: 1.3rem;
+}
+.level-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1;
+    max-width: 400px;
+}
+.level-badge {
+    background: var(--primary);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+.progress-container {
+    flex-grow: 1;
+    height: 8px;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--primary);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 8px var(--primary);
+}
+#profile-points {
+    font-size: 0.8rem;
+    color: #ccc;
+    font-weight: bold;
+    min-width: 100px;
+    text-align: left;
+}
+
+.video-actions {
+    padding: 15px 0;
+    display: flex;
+    gap: 15px;
+}
 .action-btn {
     background: rgba(255,255,255,0.1);
     border: 1px solid rgba(255,255,255,0.2);
@@ -1039,6 +1120,12 @@ header {
 }
 .action-btn:hover { background: rgba(255,255,255,0.2); }
 .action-btn.active { background: var(--primary); border-color: var(--primary); color: white; animation: pulse 0.3s; }
+
+.action-btn.dislike-active {
+    background: #e74c3c; /* لون أحمر للديسلايك */
+    border-color: #e74c3c;
+    color: white;
+}
 
 .comment-form { display: flex; gap: 10px; margin-bottom: 15px; }
 .comment-form input {
@@ -1060,6 +1147,129 @@ header {
 .comments-list::-webkit-scrollbar { width: 5px; }
 .comments-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
 
-.comment-item { background: #1a1a1a; padding: 10px; border-radius: 8px; font-size: 0.9rem; border: 1px solid #333; }
+.comment-item {
+    background: #1a1a1a;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    border: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
 .comment-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.75rem; color: #888; }
 .comment-user { font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 5px; }
+
+/* --- نظام الرد على التعليقات --- */
+.comment-actions {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.reply-btn {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 2px 5px;
+    transition: color 0.3s;
+    font-family: 'Cairo', sans-serif;
+}
+.reply-btn:hover {
+    color: var(--primary);
+}
+.reply-btn i {
+    margin-left: 4px;
+}
+
+.like-comment-btn {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 2px 5px;
+    transition: color 0.3s;
+    font-family: 'Cairo', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.like-comment-btn:hover {
+    color: var(--primary);
+}
+
+.like-comment-btn.active {
+    color: var(--primary);
+}
+
+.replies-container {
+    margin-top: 10px;
+    margin-right: 25px;
+    border-right: 2px solid #333;
+    padding-right: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.reply-item {
+    background: #222; /* لون أغمق قليلاً للردود */
+    border-color: #444;
+}
+
+/* --- تمييز ردود المشرف --- */
+.reply-item.admin-reply {
+    background: #191c29; /* لون أزرق داكن خفيف */
+    border: 1px solid #4361ee80; /* إطار بلون الثيم */
+}
+
+.admin-reply .comment-user {
+    color: #4cc9f0; /* لون مميز لاسم المشرف */
+    font-weight: bold;
+}
+
+.reply-form-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #333;
+}
+.reply-form-container input { flex: 1; background: #333; border: 1px solid #555; color: #fff; padding: 8px; border-radius: 5px; font-size: 0.9rem; }
+.reply-form-container button { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 5px; cursor: pointer; font-family: 'Cairo', sans-serif; }
+.reply-form-container button.cancel-reply { background: #555; }
+
+/* --- إشعارات الأكاديمية --- */
+.academy-notification {
+    position: fixed;
+    bottom: 80px;
+    left: 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    z-index: 9999;
+    font-size: 0.9rem;
+    font-weight: bold;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    animation: slideUpFadeIn 0.5s ease-out, fadeOut 0.5s 3.5s ease-in forwards;
+}
+.academy-notification.level-up {
+    background: linear-gradient(135deg, #f7b733, #fc4a1a);
+}
+.academy-notification.success {
+    background: linear-gradient(135deg, #10b981, #27ae60);
+}
+@keyframes slideUpFadeIn {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
