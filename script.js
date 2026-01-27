@@ -33,26 +33,26 @@ async function init() {
 
     // --- إضافة منتج تجريبي (للتجربة) ---
     // هذا المنتج سيظهر دائماً في البداية لتجربة التصميم الجديد
-    if (!products.some(p => p.id === 9999)) {
-        products.unshift({
-            id: 9999,
-            name: "ساعة ذكية Ultra Pro (منتج تجريبي)",
-            price: 1250,
-            originalPrice: 1800,
-            image: "https://img.freepik.com/free-photo/smart-watch-space-gray-aluminum-case-black-sport-band_1057-27347.jpg",
-            images: [
-                "https://img.freepik.com/free-photo/smart-watch-space-gray-aluminum-case-black-sport-band_1057-27347.jpg",
-                "https://img.freepik.com/free-vector/realistic-fitness-trackers_23-2148530529.jpg",
-                "https://img.freepik.com/free-photo/rendering-smart-home-device_23-2151039302.jpg"
-            ],
-            videos: ["https://www.w3schools.com/html/mov_bbb.mp4"], // فيديو تجريبي
-            category: "الكل",
-            stock: 5,
-            status: "تجربة ✨",
-            desc: "هذا منتج تجريبي لاختبار شكل النافذة الجديد ومعرض الصور. يتميز هذا المنتج بوجود صور متعددة ومواصفات كاملة لتجربة التكبير والتنسيق.",
-            specs: ["شاشة AMOLED عالية الدقة", "بطارية تدوم طويلاً", "مقاومة للماء IP68", "دعم كامل للغة العربية", "حساسات رياضية دقيقة"]
-        });
-    }
+    // if (!products.some(p => p.id === 9999)) {
+    //     products.unshift({
+    //         id: 9999,
+    //         name: "ساعة ذكية Ultra Pro (منتج تجريبي)",
+    //         price: 1250,
+    //         originalPrice: 1800,
+    //         image: "https://img.freepik.com/free-photo/smart-watch-space-gray-aluminum-case-black-sport-band_1057-27347.jpg",
+    //         images: [
+    //             "https://img.freepik.com/free-photo/smart-watch-space-gray-aluminum-case-black-sport-band_1057-27347.jpg",
+    //             "https://img.freepik.com/free-vector/realistic-fitness-trackers_23-2148530529.jpg",
+    //             "https://img.freepik.com/free-photo/rendering-smart-home-device_23-2151039302.jpg"
+    //         ],
+    //         videos: ["https://www.w3schools.com/html/mov_bbb.mp4"], // فيديو تجريبي
+    //         category: "الكل",
+    //         stock: 5,
+    //         status: "تجربة ✨",
+    //         desc: "هذا منتج تجريبي لاختبار شكل النافذة الجديد ومعرض الصور. يتميز هذا المنتج بوجود صور متعددة ومواصفات كاملة لتجربة التكبير والتنسيق.",
+    //         specs: ["شاشة AMOLED عالية الدقة", "بطارية تدوم طويلاً", "مقاومة للماء IP68", "دعم كامل للغة العربية", "حساسات رياضية دقيقة"]
+    //     });
+    // }
 
     // تحميل إعدادات الدفع المخصصة
     const settings = JSON.parse(localStorage.getItem('storeSettings'));
@@ -2334,4 +2334,5 @@ function submitReply(commentId) {
 function closeVideoModal() {
     document.getElementById('video-player-modal').style.display = 'none';
     document.getElementById('video-frame-container').innerHTML = '';
+
 }
