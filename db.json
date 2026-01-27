@@ -31,67 +31,72 @@
       "id": 2,
       "name": "HP Victus 15",
       "price": 42000,
-      "originalPrice": 42040,
       "description": "Core i5-13th / RTX 3050",
       "image": "https://images.pexels.com/photos/812264/pexels-photo-812264.jpeg/photos/812264/pexels-photo-812264.jpeg",
       "images": [
         "https://images.pexels.com/photos/812264/pexels-photo-812264.jpeg/photos/812264/pexels-photo-812264.jpeg"
       ],
-      "category": "لابتوب",
+      "category": "",
       "stock": 3,
       "status": "جديد",
+      "offerEnds": "",
+      "rating": 0,
+      "reviewCount": 0,
+      "originalPrice": 42040,
       "tags": [
-        "جديد"
+        "💯​💥"
       ],
       "specs": [
         "Core i5-13th / RTX 3050"
-      ],
-      "rating": 0,
-      "reviewCount": 0
+      ]
     },
     {
       "id": 3,
       "name": "Lenovo IdeaPad 3",
       "price": 18500,
-      "originalPrice": 18550,
       "description": "Core i3 / 8GB RAM / 256GB SSD",
       "image": "https://images.pexels.com/photos/812264/pexels-photo-812264.jpeg/photos/812264/pexels-photo-812264.jpeg",
       "images": [
         "https://images.pexels.com/photos/812264/pexels-photo-812264.jpeg/photos/812264/pexels-photo-812264.jpeg"
       ],
-      "category": "لابتوب",
+      "category": "",
       "stock": 19,
       "status": "جديد",
+      "offerEnds": "",
+      "rating": 0,
+      "reviewCount": 0,
+      "originalPrice": 18550,
       "tags": [
-        "حصري"
+        "☠️​ خطير جدا ☠️​"
       ],
       "specs": [
         "Core i3 / 8GB RAM / 256GB SSD"
-      ],
-      "rating": 0,
-      "reviewCount": 0
+      ]
     },
     {
       "id": 4,
       "name": "Samsung 24\" IPS",
       "price": 5500,
-      "originalPrice": 5540,
       "description": "شاشة 24 بوصة FHD - 75Hz",
       "image": "https://images.pexels.com/photos/812264/pexels-photo-812264.jpeg/photos/812264/pexels-photo-812264.jpeg",
       "images": [
         "https://images.pexels.com/photos/812264/pexels-photo-812264.jpeg/photos/812264/pexels-photo-812264.jpeg"
       ],
-      "category": "شاشات",
+      "category": "",
       "stock": 16,
       "status": "جديد",
+      "offerEnds": "",
+      "rating": 0,
+      "reviewCount": 0,
+      "originalPrice": 5540,
       "tags": [
-        "عرض خاص"
+        "عرض خاص",
+        "عرض خاص",
+        "​😈​👿​😈​"
       ],
       "specs": [
         "شاشة 24 بوصة FHD - 75Hz"
-      ],
-      "rating": 0,
-      "reviewCount": 0
+      ]
     },
     {
       "id": 5,
