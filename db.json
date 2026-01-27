@@ -4,7 +4,6 @@
       "id": 1,
       "name": "MacBook Air M3",
       "price": 75000,
-      "originalPrice": 75050,
       "description": "رامات 16GB / هارد 512GB SSD",
       "image": "https://images.pexels.com/photos/812264/pexels-photo-812264.jpeg/photos/4468092/pexels-photo-4468092.jpeg",
       "images": [
@@ -12,17 +11,21 @@
         "https://images.pexels.com/photos/812264/pexels-photo-812264.jpeg/photos/3822336/pexels-photo-3822336.png",
         "https://images.pexels.com/photos/812264/pexels-photo-812264.jpeg/photos/812264/pexels-photo-812264.jpeg"
       ],
-      "category": "لابتوب",
+      "category": "",
       "stock": 14,
       "status": "جديد",
+      "offerEnds": "",
+      "rating": 0,
+      "reviewCount": 0,
+      "originalPrice": 75050,
       "tags": [
-        "عرض خاص"
+        "عرض خاص",
+        "عرض خاص",
+        "💥بوووووم💥"
       ],
       "specs": [
         "رامات 16GB / هارد 512GB SSD"
-      ],
-      "rating": 0,
-      "reviewCount": 0
+      ]
     },
     {
       "id": 2,
