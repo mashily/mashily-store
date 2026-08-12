@@ -2,9 +2,9 @@
   "products": [
     {
       "id": 1,
-      "name": "كيبورد",
+      "name": "سماعه",
       "price": 100,
-      "description": "كيبورد ",
+      "description": "سماعه ",
       "image": "https://picsum.photos/300/200?random=246",
       "images": [
         "https://picsum.photos/300/200?random=246",
@@ -15,7 +15,7 @@
       ],
       "category": "",
       "stock": 10,
-      "status": "☠️​ خطير جدا ☠️​",
+      "status": "☠️​ كويسه جدا ☠️​",
       "offerEnds": "",
       "rating": 5,
       "reviewCount": 0,
@@ -24,7 +24,7 @@
         "🔥 الأكثر مبيعاً"
       ],
       "specs": [
-        "كيبووووووووووووووووووووووووووورد خطيرة"
+        "سماعع"
       ]
     },
     {
