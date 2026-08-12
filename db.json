@@ -2,9 +2,9 @@
   "products": [
     {
       "id": 1,
-      "name": "ماوس",
+      "name": "كيبورد",
       "price": 100,
-      "description": "ماوس \nمـــــــــاوس \nمـــــــــــــــاوس ",
+      "description": "كيبورد ",
       "image": "https://picsum.photos/300/200?random=246",
       "images": [
         "https://picsum.photos/300/200?random=246",
@@ -21,12 +21,10 @@
       "reviewCount": 0,
       "originalPrice": 120,
       "tags": [
-        "💥بوووووم💥"
+        "🔥 الأكثر مبيعاً"
       ],
       "specs": [
-        "ماوس",
-        "مـــــاوس",
-        "مــــــــــــاوس"
+        "كيبووووووووووووووووووووووووووورد خطيرة"
       ]
     },
     {
