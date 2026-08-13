@@ -5,13 +5,10 @@
       "name": "سماعه",
       "price": 100,
       "description": "سماعه ",
-      "image": "https://picsum.photos/300/200?random=246",
+      "image": "https://picsum.photos/200/300/?blur",
       "images": [
-        "https://picsum.photos/300/200?random=246",
-        "https://picsum.photos/300/200?random=577",
-        "https://picsum.photos/300/200?random=16",
-        "https://picsum.photos/300/200?random=529",
-        "https://picsum.photos/300/200?random=931"
+        "https://picsum.photos/200/300/?blur",
+        "https://picsum.photos/200/300/?blur"
       ],
       "category": "",
       "stock": 10,
@@ -21,6 +18,7 @@
       "reviewCount": 0,
       "originalPrice": 120,
       "tags": [
+        "🔥 الأكثر مبيعاً",
         "🔥 الأكثر مبيعاً"
       ],
       "specs": [
