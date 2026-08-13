@@ -722,6 +722,31 @@
         "مـــــاوس",
         "مــــــــــــاوس"
       ]
+    },
+    {
+      "id": 26,
+      "name": "استيكر كيبورد عربي وانجليزي اسود 1قطعه ",
+      "price": 15,
+      "description": "حروف عربي وانجليزي اسود ومقاوم للماء مطفي وغير عاكس ",
+      "image": "https://drive.google.com/file/d/1__qQzQPBAPFIyAhc7NWX87nq7-W-15MS/view?usp=drivesdk",
+      "images": [
+        "https://drive.google.com/file/d/1__qQzQPBAPFIyAhc7NWX87nq7-W-15MS/view?usp=drivesdk"
+      ],
+      "category": "accessories",
+      "stock": 10,
+      "status": "حصري",
+      "offerEnds": "",
+      "rating": 4,
+      "reviewCount": 0,
+      "originalPrice": 20,
+      "tags": [],
+      "specs": [
+        "حروف عربي وانجليزي",
+        "اسود",
+        "ومقاوم للماء",
+        "مطفي",
+        "غير عاكس"
+      ]
     }
   ],
   "categories": [],
