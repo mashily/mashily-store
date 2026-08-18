@@ -5,6 +5,49 @@ let currentSort = 'default';
 let appliedCoupon = null;
 let selectedPaymentMethod = 'cash';
 
+function resolveProductImageUrl(src) {
+    if (!src || typeof src !== 'string') return '';
+
+    const trimmed = src.trim();
+    if (!trimmed) return '';
+
+    const driveMatch = trimmed.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]{10,})/i) ||
+        trimmed.match(/(?:google\.com.*[?&]id=)([a-zA-Z0-9_-]+)/i);
+
+    if (driveMatch && driveMatch[1]) {
+        return `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`;
+    }
+
+    const fileMatch = trimmed.match(/https?:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+    if (fileMatch && fileMatch[1]) {
+        return `https://drive.google.com/uc?export=view&id=${fileMatch[1]}`;
+    }
+
+    return trimmed;
+}
+
+function normalizeProductImages(product) {
+    const list = [];
+    const sources = [];
+
+    if (Array.isArray(product?.images) && product.images.length > 0) {
+        product.images.forEach(src => { if (src) sources.push(src); });
+    }
+
+    if (product?.image) {
+        sources.push(product.image);
+    }
+
+    sources.forEach(src => {
+        const resolved = resolveProductImageUrl(src);
+        if (resolved && !list.some(item => item.src === resolved)) {
+            list.push({ type: 'image', src: resolved });
+        }
+    });
+
+    return list;
+}
+
 async function init() {
     // التحقق مما إذا كان المستخدم مديراً (لتجنب مسح التعديلات المحلية عند التحديث)
     const isAdmin = sessionStorage.getItem('mashily_user');
@@ -199,7 +242,13 @@ function createProductCard(p) {
     const isInWishlist = wishlist.some(item => item.id === p.id);
     const oldPrice = p.originalPrice || p.oldPrice;
     const discountPercent = oldPrice ? Math.round(((oldPrice - p.price) / oldPrice) * 100) : 0;
-    
+    const imageUrl = resolveProductImageUrl(p.image || (Array.isArray(p.images) ? p.images[0] : ''));
+
+    const safeDesc = (p.desc || 'منتج أصلي من متجر مشالي').replace(/\s+/g, ' ').trim();
+    const shortDesc = safeDesc.length > 38 ? safeDesc.slice(0, 38) + '…' : safeDesc;
+    const rating = Number(p.rating || 4.8);
+    const stockText = isOut ? 'غير متوفر' : 'متوفر الآن';
+
     return `
     <div class="product-card" onmouseleave="hideAllInfos()">
         <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${p.id}, event)" title="${isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
@@ -207,22 +256,31 @@ function createProductCard(p) {
         </button>
         <div class="img-container" onclick="openProductDetails(${p.id})">
             ${!isOut ? `<div class="pro-badge ${p.status==='عرض خاص'?'offer':''}">${p.status || 'مميز ✨'}</div>` : ''}
-            ${discountPercent > 0 ? `<div style="position:absolute;bottom:10px;left:10px;background:#e74c3c;color:white;padding:4px 8px;border-radius:6px;font-size:0.75rem;font-weight:bold;">-${discountPercent}%</div>` : ''}
-            <img src="${p.image}" alt="${p.name}" style="${isOut ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
+            ${discountPercent > 0 ? `<div class="discount-badge">-${discountPercent}%</div>` : ''}
+            <img src="${imageUrl}" alt="${p.name}" style="${isOut ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
             ${isOut ? '<div class="out-badge">نفدت الكمية ❌</div>' : ''}
-            <div class="product-info-overlay">${p.desc || 'منتج أصلي من متجر مشالي'}</div>
+            <div class="product-info-overlay">${safeDesc}</div>
         </div>
         <div class="product-details">
-            <h4>${p.name}</h4>
-            <div class="price-tag">
-                ${oldPrice ? `<s style="color:#95a5a6; font-size:0.8rem; margin-left:5px;">${oldPrice}</s>` : ''}
-                ${p.price} ج.م
+            <div class="product-card-top">
+                <h4>${p.name}</h4>
+                <div class="product-meta-row">
+                    <span class="meta-pill rating-pill"><i class="fas fa-star"></i> ${rating.toFixed(1)}</span>
+                    <span class="meta-pill stock-pill ${isOut ? 'soldout' : 'in-stock'}">${stockText}</span>
+                </div>
+                <p class="product-card-subtitle">${shortDesc}</p>
             </div>
-            ${hasTimer ? `<div class="countdown-timer" data-ends="${p.offerEnds}">جاري التحميل...</div>` : ''}
-            <button class="qty-btn" style="background:${isOut?'#95a5a6':'var(--primary)'}" 
-                onclick="${isOut ? "alert('عذراً، المنتج غير متوفر حالياً')" : `addToCart(${p.id})`}">
-                ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
-            </button>
+            <div class="product-card-bottom">
+                <div class="price-tag">
+                    ${oldPrice ? `<s class="old-price">${oldPrice}</s>` : ''}
+                    <span>${p.price} ج.م</span>
+                </div>
+                ${hasTimer ? `<div class="countdown-timer" data-ends="${p.offerEnds}">جاري التحميل...</div>` : ''}
+                <button class="qty-btn" style="background:${isOut?'#95a5a6':'var(--primary)'}" 
+                    onclick="${isOut ? "alert('عذراً، المنتج غير متوفر حالياً')" : `addToCart(${p.id})`}">
+                    ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
+                </button>
+            </div>
         </div>
     </div>
     `;
@@ -237,13 +295,8 @@ function openProductDetails(id) {
     if (!product) return;
 
     // إعداد الصور
-    currentProductImages = [];
-    if (product.images && product.images.length > 0) {
-        product.images.forEach(src => currentProductImages.push({type: 'image', src: src}));
-    } else if (product.image) {
-        currentProductImages.push({type: 'image', src: product.image});
-    }
-    
+    currentProductImages = normalizeProductImages(product);
+
     if (product.videos && product.videos.length > 0) {
         product.videos.forEach(src => currentProductImages.push({type: 'video', src: src}));
     }
@@ -388,7 +441,7 @@ function updateGallery() {
         img.style.display = 'block';
         videoContainer.style.display = 'none';
         videoContainer.innerHTML = ''; // إيقاف الفيديو عند الانتقال
-        img.src = item.src;
+        img.src = resolveProductImageUrl(item.src);
         container.style.cursor = 'zoom-in';
     } else {
         img.style.display = 'none';
@@ -409,7 +462,7 @@ function updateGallery() {
         thumbsContainer.innerHTML = currentProductImages.map((item, i) => {
             const activeClass = i === currentGalleryIndex ? 'active' : '';
             if (item.type === 'image') {
-                return `<img src="${item.src}" class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()">`;
+                return `<img src="${resolveProductImageUrl(item.src)}" class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()">`;
             } else {
                 return `<div class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()" style="display:flex; align-items:center; justify-content:center; background:#000; color:#fff; font-size:1.5rem; cursor:pointer; border-radius:8px; width:60px; height:60px;"><i class="fas fa-play"></i></div>`;
             }
@@ -651,7 +704,7 @@ function showWishlist() {
     } else {
         container.innerHTML = wishlist.map((item, index) => `
             <div style="background:var(--card-bg); padding:10px; border-radius:8px; margin-bottom:10px; display:flex; gap:10px; align-items:center; border:1px solid var(--border);">
-                <img src="${item.image}" alt="${item.name}" style="width:60px; height:60px; object-fit:contain; border-radius:6px; background:white; padding:5px;">
+                <img src="${resolveProductImageUrl(item.image)}" alt="${item.name}" style="width:60px; height:60px; object-fit:contain; border-radius:6px; background:white; padding:5px;">
                 <div style="flex:1;">
                     <h5 style="margin:0 0 3px 0; font-size:0.85rem; color:var(--text);">${item.name}</h5>
                     <div style="color:var(--primary); font-weight:bold; font-size:0.9rem; margin-bottom:5px;">${item.price} ج.م</div>
@@ -733,7 +786,7 @@ function updateCartUI() {
     container.innerHTML = cart.map((item, idx) => `
         <div style="display:flex; gap:10px; background:var(--bg); padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border);">
             <!-- الصورة -->
-            <img src="${item.image}" style="width:60px; height:60px; object-fit:contain; background:#fff; border-radius:6px; border:1px solid var(--border);">
+            <img src="${resolveProductImageUrl(item.image)}" style="width:60px; height:60px; object-fit:contain; background:#fff; border-radius:6px; border:1px solid var(--border);">
             
             <!-- البيانات -->
             <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between;">
