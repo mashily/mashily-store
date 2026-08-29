@@ -5,6 +5,212 @@ let currentSort = 'default';
 let appliedCoupon = null;
 let selectedPaymentMethod = 'cash';
 
+// وظائف حالة النظام (معرفة مبكراً للاستخدام في init)
+function showSystemStatus(message, type) {
+    const statusDiv = document.getElementById('system-status');
+    const messageDiv = document.getElementById('status-message');
+    
+    if (statusDiv && messageDiv) {
+        statusDiv.style.display = 'block';
+        messageDiv.textContent = message;
+        
+        // تغيير اللون حسب النوع
+        if (type === 'success') {
+            statusDiv.style.borderLeft = '4px solid #10b981';
+        } else if (type === 'error') {
+            statusDiv.style.borderLeft = '4px solid #ef4444';
+        } else if (type === 'warning') {
+            statusDiv.style.borderLeft = '4px solid #f59e0b';
+        } else {
+            statusDiv.style.borderLeft = '4px solid #3b82f6';
+        }
+    }
+}
+
+function hideSystemStatus() {
+    const statusDiv = document.getElementById('system-status');
+    if (statusDiv) {
+        statusDiv.style.display = 'none';
+    }
+}
+
+// إعدادات Google Sheets
+let GOOGLE_SHEETS_CONFIG = {
+    apiKey: 'AIzaSyBzB0HnN9wqwPQFiutkjwvpdg-3_J_-ETI', // ضع API Key هنا
+    sheetId: '1SWGvJfnrEWcg6La6XIRdDp6JLGkOe6XIzn9NZ5irJws', // ضع Sheet ID هنا
+    ranges: {
+        categories: 'Categories!A2:C', // نطاق الأصناف
+        products: 'Products!A2:M', // نطاق المنتجات
+        videos: 'Videos!A2:H',     // نطاق الفيديوهات
+        settings: 'Settings!A2:G' // نطاق الإعدادات
+    }
+};
+
+// تحديث إعدادات Google Sheets من localStorage
+function updateGoogleSheetsConfig() {
+    const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    if (settings.sheetId) {
+        GOOGLE_SHEETS_CONFIG.sheetId = settings.sheetId;
+    }
+    if (settings.apiKey) {
+        GOOGLE_SHEETS_CONFIG.apiKey = settings.apiKey;
+    }
+    console.log('تم تحديث إعدادات Google Sheets:', GOOGLE_SHEETS_CONFIG);
+}
+
+// دالة قراءة البيانات من Google Sheets
+async function fetchFromGoogleSheets() {
+    try {
+        console.log('جاري تحميل البيانات من Google Sheets...');
+        console.log('Sheet ID:', GOOGLE_SHEETS_CONFIG.sheetId);
+        console.log('API Key:', GOOGLE_SHEETS_CONFIG.apiKey.substring(0, 10) + '...');
+        
+        // قراءة الأصناف
+        const categoriesResponse = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_CONFIG.sheetId}/values/${GOOGLE_SHEETS_CONFIG.ranges.categories}?key=${GOOGLE_SHEETS_CONFIG.apiKey}`
+        );
+        const categoriesData = await categoriesResponse.json();
+        console.log('بيانات الأصناف:', categoriesData);
+        
+        // قراءة المنتجات
+        const productsResponse = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_CONFIG.sheetId}/values/${GOOGLE_SHEETS_CONFIG.ranges.products}?key=${GOOGLE_SHEETS_CONFIG.apiKey}`
+        );
+        const productsData = await productsResponse.json();
+        console.log('بيانات المنتجات:', productsData);
+        
+        // قراءة الفيديوهات
+        const videosResponse = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_CONFIG.sheetId}/values/${GOOGLE_SHEETS_CONFIG.ranges.videos}?key=${GOOGLE_SHEETS_CONFIG.apiKey}`
+        );
+        const videosData = await videosResponse.json();
+        console.log('بيانات الفيديوهات:', videosData);
+        
+        // قراءة الإعدادات
+        const settingsResponse = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_CONFIG.sheetId}/values/${GOOGLE_SHEETS_CONFIG.ranges.settings}?key=${GOOGLE_SHEETS_CONFIG.apiKey}`
+        );
+        const settingsData = await settingsResponse.json();
+        console.log('بيانات الإعدادات:', settingsData);
+        
+        // تحويل البيانات إلى التنسيق المطلوب
+        const categories = convertSheetDataToCategories(categoriesData.values);
+        const products = convertSheetDataToProducts(productsData.values);
+        const videos = convertSheetDataToVideos(videosData.values);
+        const settings = convertSheetDataToSettings(settingsData.values);
+        
+        console.log('البيانات المحولة:', { 
+            categories: categories.length, 
+            products: products.length, 
+            videos: videos.length, 
+            settings: Object.keys(settings).length 
+        });
+        
+        // حفظ البيانات في localStorage
+        localStorage.setItem('storeCategories', JSON.stringify(categories));
+        localStorage.setItem('storeProducts', JSON.stringify(products));
+        localStorage.setItem('academyVideos', JSON.stringify(videos));
+        localStorage.setItem('storeSettings', JSON.stringify(settings));
+        
+        // تحديث الواجهة
+        if (typeof renderProducts === 'function') {
+            window.products = products; // تحديث المتغير العام
+            renderProducts(products);
+        }
+        
+        if (typeof renderCategories === 'function') {
+            renderCategories();
+        }
+        
+        console.log('تم تحميل البيانات من Google Sheets بنجاح');
+        return { categories, products, videos, settings };
+    } catch (error) {
+        console.error('Error fetching from Google Sheets:', error);
+        console.error('تفاصيل الخطأ:', error.message);
+        throw error;
+    }
+}
+
+// تحويل بيانات الشيت إلى تنسيق الأصناف
+function convertSheetDataToCategories(rows) {
+    if (!rows || rows.length === 0) return [];
+    
+    return rows.map((row, index) => ({
+        name: row[0] || 'قسم غير مسمى',
+        icon: row[1] || 'fas fa-tag',
+        description: row[2] || ''
+    }));
+}
+
+// تحويل بيانات الشيت إلى تنسيق المنتجات
+function convertSheetDataToProducts(rows) {
+    if (!rows || rows.length === 0) return [];
+    
+    return rows.map((row, index) => ({
+        id: parseInt(row[0]) || index + 1,
+        name: row[1] || '',
+        price: parseFloat(row[2]) || 0,
+        originalPrice: parseFloat(row[3]) || null,
+        image: row[4] || '',
+        images: row[5] ? row[5].split(',').map(url => url.trim()) : [],
+        category: row[6] || 'الكل',
+        stock: row[7] === 'out' ? 'out' : (parseInt(row[7]) || 10),
+        status: row[8] || 'مميز ✨',
+        desc: row[9] || '',
+        specs: row[10] ? row[10].split(',').map(spec => spec.trim()) : [],
+        offerEnds: row[11] || null,
+        rating: parseFloat(row[12]) || 4.8
+    }));
+}
+
+// تحويل بيانات الشيت إلى تنسيق الفيديوهات
+function convertSheetDataToVideos(rows) {
+    if (!rows || rows.length === 0) return [];
+    
+    return rows.map((row, index) => ({
+        id: parseInt(row[0]) || index + 1,
+        title: row[1] || '',
+        category: row[2] || 'الكل',
+        thumbnail: row[3] || '',
+        videoUrl: row[4] || '',
+        duration: row[5] || '',
+        description: row[6] || '',
+        price: parseFloat(row[7]) || 0
+    }));
+}
+
+// تحويل بيانات الشيت إلى تنسيق الإعدادات
+function convertSheetDataToSettings(rows) {
+    if (!rows || rows.length === 0) return {};
+    
+    const settings = {};
+    rows.forEach(row => {
+        if (row[0]) { // إذا كان المفتاح موجوداً
+            settings[row[0]] = {
+                value: row[1],
+                description: row[2],
+                type: row[3],
+                category: row[4],
+                updatedAt: row[5],
+                notes: row[6]
+            };
+        }
+    });
+    
+    return settings;
+}
+
+// دالة التحديث التلقائي
+function startAutoUpdate(intervalMinutes = 5) {
+    // تحديث فوري عند التحميل
+    fetchFromGoogleSheets();
+    
+    // تحديث دوري
+    setInterval(() => {
+        fetchFromGoogleSheets();
+    }, intervalMinutes * 60 * 1000);
+}
+
 function resolveProductImageUrl(src) {
     if (!src || typeof src !== 'string') return '';
 
@@ -49,18 +255,50 @@ function normalizeProductImages(product) {
 }
 
 async function init() {
+    console.log('جاري تهيئة النظام...');
+    
+    // تحديث إعدادات Google Sheets من localStorage
+    updateGoogleSheetsConfig();
+    
     // التحقق مما إذا كان المستخدم مديراً (لتجنب مسح التعديلات المحلية عند التحديث)
     const isAdmin = sessionStorage.getItem('mashily_user');
 
-    if (!isAdmin) {
-        // محاولة جلب البيانات من السيرفر (GitHub) للزوار فقط
+    // محاولة جلب البيانات من Google Sheets أولاً
+    try {
+        if (GOOGLE_SHEETS_CONFIG.apiKey !== 'YOUR_API_KEY_HERE' && GOOGLE_SHEETS_CONFIG.sheetId !== 'YOUR_SHEET_ID_HERE') {
+            console.log('محاولة الاتصال بـ Google Sheets...');
+            const sheetData = await fetchFromGoogleSheets();
+            if (sheetData && sheetData.products) {
+                products = sheetData.products;
+                console.log('تم تحميل البيانات من Google Sheets بنجاح');
+            } else {
+                console.log('لم يتم تحميل بيانات من Google Sheets، استخدام البيانات المحلية');
+            }
+        } else {
+            console.log('لم يتم تكوين Google Sheets، استخدام البيانات المحلية');
+        }
+    } catch (e) {
+        console.log('فشل في تحميل البيانات من Google Sheets، محاولة من db.json:', e);
+    }
+
+    // إذا لم تنجح Google Sheets، جرب من db.json
+    if (!isAdmin && products.length === 0) {
         try {
+            console.log('محاولة تحميل البيانات من db.json...');
             const response = await fetch('db.json?v=' + new Date().getTime()); // منع التخزين المؤقت
             if (response.ok) {
                 const data = await response.json();
+                console.log('بيانات db.json:', data);
                 // تحديث البيانات المحلية ببيانات السيرفر
-                if(data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
-                if(data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
+                if(data.products) {
+                    localStorage.setItem('storeProducts', JSON.stringify(data.products));
+                    products = data.products;
+                    console.log('تم تحميل', products.length, 'منتج من db.json');
+                }
+                if(data.categories) {
+                    localStorage.setItem('storeCategories', JSON.stringify(data.categories));
+                    console.log('تم تحميل', data.categories.length, 'صنف من db.json');
+                }
                 if(data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
                 if(data.ticker) localStorage.setItem('tickerText', data.ticker);
                 if(data.proof) localStorage.setItem('proofText', data.proof);
@@ -71,8 +309,12 @@ async function init() {
         }
     }
 
-    // تحميل البيانات للمتغيرات
-    products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+    // إذا لم توجد بيانات بعد كل المحاولات، استخدم البيانات المحلية
+    if (products.length === 0) {
+        console.log('استخدام البيانات المحلية من localStorage');
+        products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+        console.log('تم تحميل', products.length, 'منتج من localStorage');
+    }
 
     // --- إضافة منتج تجريبي (للتجربة) ---
     // هذا المنتج سيظهر دائماً في البداية لتجربة التصميم الجديد
@@ -155,10 +397,19 @@ async function init() {
     if(ticker) ticker.innerText = localStorage.getItem('tickerText') || "🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥";
 
     // 3. عرض الأقسام والمنتجات مع تأثير التحميل
+    console.log('جاري عرض الأقسام والمنتجات...');
+    console.log('عدد المنتجات:', products.length);
+    
+    // إظهار حالة النظام
+    showSystemStatus('جاري التحميل...', 'info');
+    
     renderCategories();
     showSkeletons();
     setTimeout(() => {
         renderProducts(products);
+        console.log('تم عرض المنتجات');
+        showSystemStatus('تم التحميل بنجاح', 'success');
+        setTimeout(() => hideSystemStatus(), 3000);
     }, 700);
 
     updateCartUI();
@@ -234,7 +485,7 @@ function toggleDarkMode() {
     setTheme(target);
 }
 
-// دالة مساعدة لإنشاء كارت المنتج (لإعادة الاستخدام)
+// دالة مساعدة لإنشاء كارت المنتج (لإعادة الاستخدام) - محدث للتصميم الجديد
 function createProductCard(p) {
     const isOut = p.stock === 'out';
     const hasTimer = p.offerEnds && new Date(p.offerEnds) > new Date();
@@ -245,42 +496,41 @@ function createProductCard(p) {
     const imageUrl = resolveProductImageUrl(p.image || (Array.isArray(p.images) ? p.images[0] : ''));
 
     const safeDesc = (p.desc || 'منتج أصلي من متجر مشالي').replace(/\s+/g, ' ').trim();
-    const shortDesc = safeDesc.length > 38 ? safeDesc.slice(0, 38) + '…' : safeDesc;
+    const shortDesc = safeDesc.length > 80 ? safeDesc.slice(0, 80) + '…' : safeDesc;
     const rating = Number(p.rating || 4.8);
     const stockText = isOut ? 'غير متوفر' : 'متوفر الآن';
 
     return `
     <div class="product-card" onmouseleave="hideAllInfos()">
-        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${p.id}, event)" title="${isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
-            <i class="fas fa-heart"></i>
+        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${p.id}, event)" title="${isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}" style="position: absolute; top: 10px; right: 10px; z-index: 10; background: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+            <i class="fas fa-heart" style="color: ${isInWishlist ? '#ef4444' : '#9ca3af'};"></i>
         </button>
-        <div class="img-container" onclick="openProductDetails(${p.id})">
-            ${!isOut ? `<div class="pro-badge ${p.status==='عرض خاص'?'offer':''}">${p.status || 'مميز ✨'}</div>` : ''}
-            ${discountPercent > 0 ? `<div class="discount-badge">-${discountPercent}%</div>` : ''}
-            <img src="${imageUrl}" alt="${p.name}" style="${isOut ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
-            ${isOut ? '<div class="out-badge">نفدت الكمية ❌</div>' : ''}
-            <div class="product-info-overlay">${safeDesc}</div>
+        
+        <div class="img-container" onclick="openProductDetails(${p.id})" style="position: relative; width: 100%; height: 200px; background: var(--color-surface); display: flex; align-items: center; justify-content: center; padding: 1rem; overflow: hidden; cursor: pointer;">
+            ${!isOut ? `<div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 5; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)); color: white; font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; font-weight: 700; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); white-space: nowrap;">${p.status || 'مميز ✨'}</div>` : ''}
+            ${discountPercent > 0 ? `<div style="position: absolute; bottom: 10px; right: 10px; z-index: 5; padding: 4px 8px; border-radius: 20px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; font-size: 0.75rem; font-weight: 900; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);">-${discountPercent}%</div>` : ''}
+            <img src="${imageUrl}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; ${isOut ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
+            ${isOut ? '<div style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.8); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; backdrop-filter: blur(4px);">نفدت الكمية ❌</div>' : ''}
         </div>
-        <div class="product-details">
-            <div class="product-card-top">
-                <h4>${p.name}</h4>
-                <div class="product-meta-row">
-                    <span class="meta-pill rating-pill"><i class="fas fa-star"></i> ${rating.toFixed(1)}</span>
-                    <span class="meta-pill stock-pill ${isOut ? 'soldout' : 'in-stock'}">${stockText}</span>
-                </div>
-                <p class="product-card-subtitle">${shortDesc}</p>
+        
+        <div class="product-content">
+            <h4 class="product-title">${p.name}</h4>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                <span style="background: rgba(251, 191, 36, 0.14); color: #b45309; padding: 2px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">
+                    <i class="fas fa-star" style="font-size: 0.6rem;"></i> ${rating.toFixed(1)}
+                </span>
+                <span style="background: ${isOut ? 'rgba(148, 163, 184, 0.14)' : 'rgba(16, 185, 129, 0.12)'}; color: ${isOut ? '#475569' : '#047857'}; padding: 2px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">${stockText}</span>
             </div>
-            <div class="product-card-bottom">
-                <div class="price-tag">
-                    ${oldPrice ? `<s class="old-price">${oldPrice}</s>` : ''}
-                    <span>${p.price} ج.م</span>
-                </div>
-                ${hasTimer ? `<div class="countdown-timer" data-ends="${p.offerEnds}">جاري التحميل...</div>` : ''}
-                <button class="qty-btn" style="background:${isOut?'#95a5a6':'var(--primary)'}" 
-                    onclick="${isOut ? "alert('عذراً، المنتج غير متوفر حالياً')" : `addToCart(${p.id})`}">
-                    ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
-                </button>
+            <p class="product-description">${shortDesc}</p>
+            <div class="product-price">
+                ${oldPrice ? `<s style="color: #94a3b8; font-size: 0.875rem; text-decoration: line-through; font-weight: 500; margin-left: 0.5rem;">${oldPrice} ج.م</s>` : ''}
+                ${p.price} ج.م
             </div>
+            ${hasTimer ? `<div class="countdown-timer" data-ends="${p.offerEnds}" style="font-size: 0.75rem; color: #c0392b; font-weight: 700; background: #fff5f5; padding: 6px 10px; border-radius: 20px; border: 1px dashed #e74c3c; text-align: center; margin: 0.5rem 0; animation: pulseTimer 2s infinite;">جاري التحميل...</div>` : ''}
+            <button class="add-to-cart-btn" style="background: ${isOut ? '#9ca3af' : 'var(--color-primary)'}; cursor: ${isOut ? 'not-allowed' : 'pointer'};" 
+                onclick="${isOut ? "alert('عذراً، المنتج غير متوفر حالياً')" : `addToCart(${p.id})`}">
+                ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
+            </button>
         </div>
     </div>
     `;
@@ -585,7 +835,16 @@ function renderProducts(items) {
     const grid = document.getElementById('products-grid');
     if(!grid) return;
     
-    if(items.length === 0) { grid.innerHTML = "<p style='grid-column:1/-1; text-align:center; padding:50px; opacity:0.5;'>لا توجد منتجات حالياً في هذا القسم</p>"; return; }
+    if(items.length === 0) { 
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--color-text-secondary);">
+                <i class="fas fa-box-open fa-3x" style="margin-bottom:1rem; opacity:0.4;"></i>
+                <p style="font-size:1.125rem; font-weight:500; margin:0;">لا توجد منتجات حالياً في هذا القسم</p>
+                <p style="font-size:0.875rem; margin:0.5rem 0 0 0;">جرب تصفح أقسام أخرى</p>
+            </div>
+        `; 
+        return; 
+    }
     
     grid.innerHTML = items.map(p => createProductCard(p)).join('');
 }
@@ -605,8 +864,30 @@ function hideAllInfos() {
 // --- وظائف الأقسام ---
 function renderCategories() {
     const catContainer = document.getElementById('product-cats');
-    if(!catContainer) return;
+    if(!catContainer) {
+        console.log('لم يتم العثور على عنصر product-cats');
+        return;
+    }
+    
+    console.log('جاري عرض الأصناف...');
+    
     let rawCats = JSON.parse(localStorage.getItem('storeCategories')) || [];
+    console.log('الأصناف من localStorage:', rawCats.length);
+    
+    // إذا لم توجد أصناف، استخدم أصناف افتراضية
+    if (rawCats.length === 0) {
+        console.log('لم توجد أصناف في localStorage، استخدام الأصناف الافتراضية');
+        rawCats = [
+            { name: 'إلكترونيات', icon: 'fas fa-mobile-alt', description: 'الأجهزة الإلكترونية والهواتف' },
+            { name: 'ملابس', icon: 'fas fa-tshirt', description: 'الملابس والأحذية' },
+            { name: 'إكسسوارات', icon: 'fas fa-gem', description: 'الإكسسوارات والمجوهرات' },
+            { name: 'كتب', icon: 'fas fa-book', description: 'الكتب والمجلات' },
+            { name: 'رياضة', icon: 'fas fa-running', description: 'الرياضة واللياقة' },
+            { name: 'منزل', icon: 'fas fa-home', description: 'مستلزمات المنزل' }
+        ];
+        localStorage.setItem('storeCategories', JSON.stringify(rawCats));
+        console.log('تم حفظ الأصناف الافتراضية في localStorage');
+    }
     
     // تحويل البيانات القديمة (نصوص) إلى كائنات لضمان التوافق
     let categoriesFromStorage = (rawCats.length > 0 && typeof rawCats[0] === 'string') 
@@ -615,6 +896,7 @@ function renderCategories() {
 
     // التأكد من وجود قسم "الكل" دائماً في البداية وإزالة أي تكرار له من القائمة الأصلية
     const categories = [{name: 'الكل', icon: 'fas fa-layer-group'}, ...categoriesFromStorage.filter(c => c.name !== 'الكل')];
+    console.log('الأصناف النهائية:', categories.length);
     
     catContainer.innerHTML = categories.map(cat => {
         let btn = `
@@ -633,6 +915,8 @@ function renderCategories() {
         }
         return btn;
     }).join('');
+    
+    console.log('تم عرض الأصناف بنجاح');
 }
 
 function filterByCategory(cat) {
@@ -694,23 +978,39 @@ function updateWishlistBadge() {
 }
 
 function showWishlist() {
+    console.log('جاري فتح المفضلة...');
     const wishlist = JSON.parse(localStorage.getItem('MASHILY_WISHLIST')) || [];
     const container = document.getElementById('wishlist-items');
     const sidebar = document.getElementById('wishlist-sidebar');
     const overlay = document.getElementById('overlay');
     
+    console.log('عدد عناصر المفضلة:', wishlist.length);
+    console.log('عنصر sidebar:', sidebar);
+    console.log('عنصر overlay:', overlay);
+    
+    if (!sidebar) {
+        console.error('لم يتم العثور على wishlist-sidebar');
+        return;
+    }
+    
     if (wishlist.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">لا توجد عناصر مفضلة حالياً</div>';
+        container.innerHTML = `
+            <div style="text-align:center; padding:40px 20px; color:var(--color-text-secondary);">
+                <i class="fas fa-heart fa-3x" style="margin-bottom:1rem; opacity:0.4;"></i>
+                <p style="font-size:1rem; font-weight:500; margin:0;">لا توجد عناصر مفضلة حالياً</p>
+                <p style="font-size:0.875rem; margin:0.5rem 0 0 0;">أضف منتجات للمفضلة للمتابعة</p>
+            </div>
+        `;
     } else {
         container.innerHTML = wishlist.map((item, index) => `
-            <div style="background:var(--card-bg); padding:10px; border-radius:8px; margin-bottom:10px; display:flex; gap:10px; align-items:center; border:1px solid var(--border);">
-                <img src="${resolveProductImageUrl(item.image)}" alt="${item.name}" style="width:60px; height:60px; object-fit:contain; border-radius:6px; background:white; padding:5px;">
+            <div style="background:var(--color-surface); padding:12px; border-radius:var(--radius-md); margin-bottom:12px; display:flex; gap:12px; align-items:center; border:1px solid var(--color-border); box-shadow: var(--shadow-sm);">
+                <img src="${resolveProductImageUrl(item.image)}" alt="${item.name}" style="width:70px; height:70px; object-fit:contain; border-radius:var(--radius-md); background:white; border:1px solid var(--color-border);">
                 <div style="flex:1;">
-                    <h5 style="margin:0 0 3px 0; font-size:0.85rem; color:var(--text);">${item.name}</h5>
-                    <div style="color:var(--primary); font-weight:bold; font-size:0.9rem; margin-bottom:5px;">${item.price} ج.م</div>
-                    <div style="display:flex; gap:5px;">
-                        <button onclick="addToCart(${item.id}); showWishlist();" style="background:var(--primary); color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer; flex:1;">إضافة للسلة</button>
-                        <button onclick="removeFromWishlist(${item.id}); showWishlist();" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer;">حذف</button>
+                    <h5 style="margin:0 0 4px 0; font-size:0.9rem; color:var(--color-text); font-weight:600;">${item.name}</h5>
+                    <div style="color:var(--color-primary); font-weight:bold; font-size:0.95rem; margin-bottom:8px;">${item.price} ج.م</div>
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="addToCart(${item.id}); showWishlist();" style="background:var(--color-primary); color:white; border:none; padding:6px 12px; border-radius:var(--radius-sm); font-size:0.8rem; cursor:pointer; flex:1; font-weight:600; transition: all 0.2s;">إضافة للسلة</button>
+                        <button onclick="removeFromWishlist(${item.id}); showWishlist();" style="background:var(--color-danger); color:white; border:none; padding:6px 12px; border-radius:var(--radius-sm); font-size:0.8rem; cursor:pointer; font-weight:600; transition: all 0.2s;">حذف</button>
                     </div>
                 </div>
             </div>
@@ -719,6 +1019,7 @@ function showWishlist() {
     
     sidebar.classList.add('active');
     overlay.classList.add('active');
+    console.log('تم فتح المفضلة');
 }
 
 function closeWishlist() {
@@ -784,30 +1085,31 @@ function updateCartUI() {
     if(!container) return;
 
     container.innerHTML = cart.map((item, idx) => `
-        <div style="display:flex; gap:10px; background:var(--bg); padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border);">
+        <div style="display:flex; gap:12px; background:var(--color-surface); padding:12px; border-radius:var(--radius-md); margin-bottom:12px; border:1px solid var(--color-border); box-shadow: var(--shadow-sm);">
             <!-- الصورة -->
-            <img src="${resolveProductImageUrl(item.image)}" style="width:60px; height:60px; object-fit:contain; background:#fff; border-radius:6px; border:1px solid var(--border);">
+            <img src="${resolveProductImageUrl(item.image)}" style="width:70px; height:70px; object-fit:contain; background:white; border-radius:var(--radius-md); border:1px solid var(--color-border);">
             
             <!-- البيانات -->
             <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between;">
                 <div>
-                    <b style="font-size:0.85rem; color:var(--text); display:block; line-height:1.2; margin-bottom:2px;">${item.name}</b>
-                    <small style="color:var(--primary); font-weight:bold; font-size:0.9rem;">${item.price} ج.م</small>
+                    <b style="font-size:0.9rem; color:var(--color-text); display:block; line-height:1.3; margin-bottom:4px;">${item.name}</b>
+                    <small style="color:var(--color-primary); font-weight:bold; font-size:0.95rem;">${item.price} ج.م</small>
                 </div>
                 
                 <!-- الكمية والأزرار -->
-                <div style="display:flex; align-items:center; gap:5px; margin-top:5px;">
-                    <button onclick="changeQty(${idx},-1); return false;" style="width:24px; height:24px; background:var(--primary); color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;">−</button>
-                    <span style="min-width:20px; text-align:center; font-weight:bold; color:var(--text);">${item.qty}</span>
-                    <button onclick="changeQty(${idx},1); return false;" style="width:24px; height:24px; background:var(--primary); color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;">+</button>
-                    <button onclick="removeFromCart(${idx}); return false;" style="margin-right:auto; background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold;">حذف</button>
+                <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+                    <button onclick="changeQty(${idx},-1); return false;" style="width:28px; height:28px; background:var(--color-primary); color:white; border:none; border-radius:var(--radius-sm); cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; transition: all 0.2s;">−</button>
+                    <span style="min-width:24px; text-align:center; font-weight:bold; color:var(--color-text); font-size:0.9rem;">${item.qty}</span>
+                    <button onclick="changeQty(${idx},1); return false;" style="width:28px; height:28px; background:var(--color-primary); color:white; border:none; border-radius:var(--radius-sm); cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; transition: all 0.2s;">+</button>
+                    <button onclick="removeFromCart(${idx}); return false;" style="margin-right:auto; background:var(--color-danger); color:white; border:none; padding:6px 12px; border-radius:var(--radius-sm); cursor:pointer; font-size:0.8rem; font-weight:bold; transition: all 0.2s;">حذف</button>
                 </div>
             </div>
         </div>
     `).join('') || `
-        <div style="text-align:center; padding:40px 20px; color:var(--text-light);">
-            <i class="fas fa-shopping-basket fa-3x" style="margin-bottom:10px; opacity:0.5;"></i>
-            <p style="margin:10px 0 0 0; font-size:0.9rem;">السلة فارغة</p>
+        <div style="text-align:center; padding:40px 20px; color:var(--color-text-secondary);">
+            <i class="fas fa-shopping-cart fa-3x" style="margin-bottom:1rem; opacity:0.4;"></i>
+            <p style="margin:0; font-size:1rem; font-weight:500;">السلة فارغة</p>
+            <p style="margin:0.5rem 0 0 0; font-size:0.875rem;">أضف بعض المنتجات للبدء</p>
         </div>
     `;
 }
@@ -830,10 +1132,20 @@ function clearCart() {
 }
 
 function toggleCart(s){ 
+    console.log('toggleCart called with:', s);
     const c = document.getElementById('cart-sidebar');
     const o = document.getElementById('overlay');
-    if(s) { c.classList.add('active'); o.classList.add('active'); }
-    else { c.classList.remove('active'); o.classList.remove('active'); }
+    console.log('cart-sidebar:', c);
+    console.log('overlay:', o);
+    if(s) { 
+        c.classList.add('active'); 
+        o.classList.add('active'); 
+        console.log('Cart opened');
+    } else { 
+        c.classList.remove('active'); 
+        o.classList.remove('active'); 
+        console.log('Cart closed');
+    }
 }
 
 // تبديل عرض معلومات فودافون كاش
@@ -997,7 +1309,7 @@ let adminClicks = 0;
 function triggerAdmin() {
     adminClicks++;
     if(adminClicks === 5) {
-        window.location.href = 'admin.html';
+        window.location.href = 'login.html'; // التوجيه لصفحة تسجيل الدخول بدلاً من admin.html
     }
     setTimeout(() => { adminClicks = 0; }, 1000); // إعادة التصفير إذا توقف النقر
 }
@@ -2148,23 +2460,18 @@ function toggleVideoLike() {
         // إزالة اللايك
         videos[videoIndex].likes = Math.max(0, (videos[videoIndex].likes || 0) - 1);
         userLikes = userLikes.filter(id => id !== currentAcademyVideoId);
-        likeBtn.classList.remove('active');
-        likeBtn.innerHTML = `<i class="far fa-thumbs-up"></i> <span id="video-like-count">${videos[videoIndex].likes}</span> أعجبني`;
-    } else {
-        // إضافة لايك
-        videos[videoIndex].likes = (videos[videoIndex].likes || 0) + 1;
-        userLikes.push(currentAcademyVideoId);
-        likeBtn.classList.add('active');
-        likeBtn.innerHTML = `<i class="fas fa-thumbs-up"></i> <span id="video-like-count">${videos[videoIndex].likes}</span> أعجبني`;
     }
-    
-    localStorage.setItem('academyVideos', JSON.stringify(videos));
-    localStorage.setItem('userLikes', JSON.stringify(userLikes));
+}
 
-    // --- نظام النقاط: إضافة نقاط عند الإعجاب ---
-    if (!wasLiked && userLikes.includes(currentAcademyVideoId)) {
-        addPoints(ACADEMY_POINTS.LIKE_VIDEO, 'الإعجاب بدرس');
-    }
+// بدء التحديث التلقائي عند تحميل الصفحة
+if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/')) {
+    // تأخير بسيط لضمان تحميل الملفات الأخرى
+    setTimeout(() => {
+        // فقط إذا تم تكوين Google Sheets
+        if (GOOGLE_SHEETS_CONFIG.apiKey !== 'YOUR_API_KEY_HERE' && GOOGLE_SHEETS_CONFIG.sheetId !== 'YOUR_SHEET_ID_HERE') {
+            startAutoUpdate(5); // تحديث كل 5 دقائق
+        }
+    }, 1000);
 }
 
 function toggleVideoDislike() {

@@ -2,18 +2,205 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Redirecting...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - لوحة تحكم مشالى</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; background: #f0f2f5; margin: 0; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .login-header {
+            margin-bottom: 30px;
+        }
+        
+        .login-header h1 {
+            color: #667eea;
+            font-size: 2rem;
+            margin: 0 0 10px 0;
+        }
+        
+        .login-header p {
+            color: #64748b;
+            margin: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #334155;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .login-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        
+        .error-message {
+            color: #ef4444;
+            background: #fee2e2;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
     </style>
-    <script>setTimeout(function(){ window.location.href = 'admin.html'; }, 500);</script>
 </head>
 <body>
-    <div style="text-align: center;">
-        <div class="loader" style="margin: 0 auto 20px;"></div>
-        <p>جاري التوجيه إلى لوحة التحكم...</p>
+    <div class="login-container">
+        <div class="login-header">
+            <h1><i class="fas fa-bolt"></i> مشالى</h1>
+            <p>لوحة التحكم</p>
+        </div>
+        
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>اسم المستخدم</label>
+                <input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
+            </div>
+            
+            <div class="form-group">
+                <label>كلمة المرور</label>
+                <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
+            </div>
+            
+            <button type="submit" class="login-btn" id="login-btn">
+                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+            </button>
+            
+            <div class="loader" id="loader"></div>
+            <div class="error-message" id="error-message"></div>
+        </form>
     </div>
+    
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const loader = document.getElementById('loader');
+            const errorMessage = document.getElementById('error-message');
+            
+            // إظهار التحميل
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحقق...';
+            loader.style.display = 'block';
+            errorMessage.style.display = 'none';
+            
+            // محاكاة التحقق (في التطبيق الحقيقي، استخدم API)
+            setTimeout(() => {
+                // للتجربة: أي اسم مستخدم وكلمة مرور سيعملان
+                // في الإنتاج، قم بالتحقق من API
+                
+                if (username && password) {
+                    // تسجيل الدخول الناجح
+                    sessionStorage.setItem('mashily_user', username);
+                    sessionStorage.setItem('mashily_login_time', new Date().toISOString());
+                    
+                    // إخفاء التحميل
+                    loader.style.display = 'none';
+                    loginBtn.innerHTML = '<i class="fas fa-check"></i> تم التسجيل بنجاح';
+                    
+                    // التوجيه إلى لوحة التحكم
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 1000);
+                } else {
+                    // فشل التسجيل
+                    loader.style.display = 'none';
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
+                    errorMessage.textContent = 'يرجى إدخال اسم المستخدم وكلمة المرور';
+                    errorMessage.style.display = 'block';
+                }
+            }, 1500);
+        }
+        
+        // التحقق من تسجيل الدخول عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            if (sessionStorage.getItem('mashily_user')) {
+                // إذا كان مسجلاً بالفعل، توجيهه مباشرة للوحة التحكم
+                window.location.href = 'admin.html';
+            }
+        });
+    </script>
 </body>
 </html>

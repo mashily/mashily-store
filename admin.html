@@ -12,9 +12,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
-            --primary: #4361ee;
-            --primary-dark: #3a0ca3;
-            --secondary: #4cc9f0;
+            --primary: #f59e0b; /* أصفر/ذهبي - مثل الصورة */
+            --primary-dark: #d97706;
+            --secondary: #64748b;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -24,9 +24,10 @@
             --border: #e2e8f0;
             --text: #334155;
             --text-light: #64748b;
-            --sidebar-bg: #0f172a;
-            --sidebar-text: #94a3b8;
-            --sidebar-active: #4361ee;
+            --sidebar-bg: #0a0a0a; /* أسود داكن جداً - مثل الصورة */
+            --sidebar-text: #e2e8f0; /* أبيض فاتح للنصوص */
+            --sidebar-active: #f59e0b; /* أصفر للزر النشط */
+            --sidebar-hover: rgba(245, 158, 11, 0.15);
             --radius: 8px;
             --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
             --font-main: 'Cairo', sans-serif;
@@ -67,7 +68,7 @@
         
         /* Sidebar */
         .sidebar {
-            width: 230px;
+            width: 240px;
             background: var(--sidebar-bg);
             color: var(--sidebar-text);
             display: flex;
@@ -78,18 +79,20 @@
             top: 0;
             z-index: 1000;
             transition: transform 0.3s ease;
-            box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+            box-shadow: -6px 0 20px rgba(0,0,0,0.3);
+            border-left: 1px solid rgba(255,255,255,0.05);
         }
         
         .brand {
-            padding: 20px;
-            font-size: 1.4rem;
-            font-weight: 700;
+            padding: 24px 20px;
+            font-size: 1.5rem;
+            font-weight: 800;
             color: #fff;
             display: flex;
             align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), transparent);
         }
         
         .nav-menu {
@@ -108,32 +111,34 @@
         .nav-link {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 11px 14px;
+            gap: 12px;
+            padding: 12px 16px;
             font-size: 0.9rem;
             color: var(--sidebar-text);
             text-decoration: none;
-            border-radius: 14px;
-            transition: all 0.25s ease;
+            border-radius: 12px;
+            transition: all 0.3s ease;
             cursor: pointer;
-            font-weight: 700;
+            font-weight: 600;
             border: 1px solid transparent;
-            background: rgba(148, 163, 184, 0.04);
+            background: transparent;
+            margin-bottom: 4px;
         }
         
         .nav-link:hover {
-            background: rgba(67, 97, 238, 0.12);
+            background: var(--sidebar-hover);
             color: #fff;
-            border-color: rgba(255,255,255,0.08);
-            transform: translateX(-4px);
+            border-color: rgba(245, 158, 11, 0.2);
+            transform: translateX(-2px);
         }
 
         .nav-link.active {
-            background: linear-gradient(135deg, var(--primary), #7c3aed);
-            color: #fff;
-            box-shadow: 0 12px 20px rgba(67, 97, 238, 0.25);
-            border-color: rgba(255,255,255,0.12);
-            transform: translateX(-4px);
+            background: linear-gradient(135deg, var(--primary), #eab308);
+            color: #0a0a0a; /* نص أسود على خلفية صفراء */
+            box-shadow: 0 8px 16px rgba(245, 158, 11, 0.3);
+            border-color: rgba(245, 158, 11, 0.4);
+            transform: translateX(-2px);
+            font-weight: 700;
         }
         
         .nav-link i {
@@ -144,9 +149,10 @@
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-right: 230px;
-            padding: 22px;
+            margin-right: 240px;
+            padding: 24px;
             transition: margin 0.3s ease;
+            background: #f5f5f5; /* خلفية رمادية فاتحة جداً مثل الصورة */
             width: calc(100% - 230px);
         }
         
@@ -155,13 +161,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,250,252,0.94));
-            padding: 18px 24px;
-            border-radius: 18px;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-            margin-bottom: 25px;
-            border: 1px solid var(--border);
-            backdrop-filter: blur(8px);
+            background: #ffffff;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
         }
 
         .header-left {
@@ -429,43 +434,50 @@
         /* الإحصائيات */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
         }
         
         .stat-card {
-            background: var(--surface);
+            background: #ffffff;
             padding: 20px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
             transition: all 0.3s;
         }
         
         .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            border-color: #d1d5db;
         }
         
         .stat-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #3498db;
+            font-size: 2rem;
+            color: var(--primary);
+            background: rgba(245, 158, 11, 0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .stat-number {
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: 800;
-            color: #2c3e50;
-            margin-bottom: 5px;
+            color: #1e293b;
+            margin-bottom: 2px;
         }
         
         .stat-label {
-            color: #7f8c8d;
+            color: #64748b;
             font-size: 0.9rem;
         }
         
@@ -700,7 +712,7 @@
                 <span>لوحة التحكم</span>
             </div>
             <ul class="nav-menu">
-                <li class="nav-item"><a class="nav-link active" onclick="switchTab('dashboard')"><i class="fas fa-home"></i> <span>الرئيسية</span></a></li>
+                <li class="nav-item"><a class="nav-link active" onclick="switchTab('dashboard')"><i class="fas fa-chart-line"></i> <span>نظرة عامة</span></a></li>
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('products')"><i class="fas fa-box"></i> <span>المنتجات</span></a></li>
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('add-product')"><i class="fas fa-plus"></i> <span>إضافة منتج</span></a></li>
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('academy')"><i class="fas fa-graduation-cap"></i> <span>الأكاديمية</span><span id="academy-notif-badge" class="notif-badge"></span></a></li>
@@ -742,10 +754,34 @@
         <div id="dashboard" class="tab-content active">
             <div class="stats-grid">
                 <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                    <div>
+                        <div class="stat-number" id="total-revenue">0</div>
+                        <div class="stat-label">إيرادات الطلبات</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-boxes"></i></div>
+                    <div>
+                        <div class="stat-number" id="low-stock-count">0</div>
+                        <div class="stat-label">منتجات منخفضة المخزون</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div>
+                        <div class="stat-number" id="pending-orders">0</div>
+                        <div class="stat-label">طلبات بانتظار الإجراء</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
                     <div class="stat-icon"><i class="fas fa-box"></i></div>
                     <div>
                         <div class="stat-number" id="total-products">0</div>
-                        <div class="stat-label">المنتجات</div>
+                        <div class="stat-label">إجمالي المنتجات</div>
                     </div>
                 </div>
                 
@@ -756,28 +792,52 @@
                         <div class="stat-label">إجمالي الطلبات</div>
                     </div>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-tag"></i></div>
-                    <div>
-                        <div class="stat-number" id="offers-count">0</div>
-                        <div class="stat-label">العروض النشطة</div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-top: 24px;">
+                <!-- أحدث الطلبات -->
+                <div style="background: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+                    <h3 style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-clock" style="color: var(--primary);"></i> أحدث الطلبات
+                    </h3>
+                    <div id="recent-orders" style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- سيتم ملؤها بواسطة JavaScript -->
                     </div>
                 </div>
                 
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-star"></i></div>
-                    <div>
-                        <div class="stat-number" id="total-reviews">0</div>
-                        <div class="stat-label">التقييمات</div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
-                    <div>
-                        <div class="stat-number" id="total-revenue">0</div>
-                        <div class="stat-label">الأرباح (المكتملة)</div>
+                <!-- مؤشرات سريعة -->
+                <div style="background: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+                    <h3 style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-chart-pie" style="color: var(--primary);"></i> مؤشرات سريعة
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border-radius: 8px;">
+                            <div style="width: 40px; height: 40px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #10b981;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.875rem; color: #64748b;">نسبة إكمال الطلبات</div>
+                                <div style="font-size: 1rem; font-weight: 700; color: #1e293b;" id="completion-rate">0%</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border-radius: 8px;">
+                            <div style="width: 40px; height: 40px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #f59e0b;">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.875rem; color: #64748b;">متوسط قيمة الطلب</div>
+                                <div style="font-size: 1rem; font-weight: 700; color: #1e293b;" id="avg-order-value">0 ج.م</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border-radius: 8px;">
+                            <div style="width: 40px; height: 40px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #ef4444;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.875rem; color: #64748b;">المنتجات المفقودة</div>
+                                <div style="font-size: 1rem; font-weight: 700; color: #1e293b;" id="out-of-stock-count">0</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -792,14 +852,17 @@
             
             <div class="quick-actions">
                 <h3><i class="fas fa-bolt"></i> إجراءات سريعة</h3>
-                <div style="display: flex; gap: 15px; margin-top: 20px;">
-                    <button class="btn btn-primary" onclick="switchTab('add-product')">
+                <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="switchTab('add-product')" style="background: var(--primary); border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
                         <i class="fas fa-plus"></i> إضافة منتج جديد
                     </button>
-                    <button class="btn btn-secondary" onclick="exportData()">
+                    <button class="btn btn-primary" onclick="syncWithGoogleSheets()" id="sync-btn" style="background: #4285f4; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; color: white;">
+                        <i class="fas fa-sync-alt"></i> تحديث من Google Sheets
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportData()" style="background: #64748b; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; color: white;">
                         <i class="fas fa-download"></i> تصدير البيانات
                     </button>
-                    <button class="btn btn-success" onclick="generateReport()">
+                    <button class="btn btn-success" onclick="generateReport()" style="background: #10b981; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; color: white;">
                         <i class="fas fa-chart-bar"></i> إنشاء تقرير
                     </button>
                 </div>
@@ -1615,6 +1678,31 @@
                     </div>
                     
                     <hr style="margin: 20px 0; border-top: 1px solid #eee;">
+                    <h3>📊 إعدادات Google Sheets</h3>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <div>أدخل بيانات Google Sheets لربط المتجر بالشيت الخاص بك. سيتم تحديث المنتجات والأصناف تلقائياً من الشيت.</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Sheet ID</label>
+                        <input type="text" id="setting-sheet-id" placeholder="1SWGvJfnrEWcg6La6XIRdDp6JLGkOe6XIzn9NZ5irJws">
+                        <small>المعرف الموجود في رابط Google Sheet بين /d/ و /edit</small>
+                    </div>
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <input type="text" id="setting-api-key" placeholder="AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX">
+                        <small>API Key من Google Cloud Console</small>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" class="btn btn-primary" onclick="saveGoogleSheetsConfig()">
+                            <i class="fas fa-save"></i> حفظ إعدادات Google Sheets
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="testGoogleSheetsConnection()">
+                            <i class="fas fa-plug"></i> اختبار الاتصال
+                        </button>
+                    </div>
+                    
+                    <hr style="margin: 20px 0; border-top: 1px solid #eee;">
                     <h3>🔐 تغيير كلمة المرور الحالية</h3>
                     <div class="form-group">
                         <input type="password" id="current-pass-change" placeholder="كلمة المرور الجديدة">
@@ -1851,6 +1939,11 @@
         let currentUser = null;
         // بيانات جديدة
         let academyVideos = [];
+        
+        // استخدام المتغير العام من script.js إذا كان موجوداً
+        if (typeof window.products !== 'undefined') {
+            products = window.products;
+        }
         let academyCats = [];
         let storeCategories = [];
         let storeStatuses = [];
@@ -2849,22 +2942,90 @@
         function updateStats() {
             document.getElementById('total-products').textContent = products.length;
             
-            // حساب عدد العروض
-            const offersCount = products.filter(p => (p.oldPrice || p.originalPrice) && (!p.tags || p.tags.includes('عرض خاص'))).length;
-            document.getElementById('offers-count').textContent = offersCount;
+            // حساب المنتجات منخفضة المخزون
+            const lowStockCount = products.filter(p => typeof p.stock === 'number' && p.stock <= 5).length;
+            document.getElementById('low-stock-count').textContent = lowStockCount;
             
-            // حساب عدد التقييمات
-            let totalReviews = 0;
-            Object.values(reviews).forEach(productReviews => {
-                totalReviews += productReviews.length;
-            });
-            document.getElementById('total-reviews').textContent = totalReviews;
+            // حساب الطلبات بانتظار الإجراء
+            const pendingOrders = orders.filter(o => o.status === 'pending' || o.status === 'processing').length;
+            document.getElementById('pending-orders').textContent = pendingOrders;
 
             // تحديث إحصائيات الطلبات الحقيقية
             document.getElementById('total-orders').textContent = orders.length;
             
             const revenue = orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + o.total, 0);
             document.getElementById('total-revenue').textContent = revenue.toLocaleString() + ' ج.م';
+            
+            // تحديث أحدث الطلبات
+            updateRecentOrders();
+            
+            // تحديث المؤشرات السريعة
+            updateQuickInsights();
+        }
+        
+        // تحديث أحدث الطلبات
+        function updateRecentOrders() {
+            const recentOrdersContainer = document.getElementById('recent-orders');
+            if (!recentOrdersContainer) return;
+            
+            const recentOrders = orders.slice(-5).reverse();
+            
+            if (recentOrders.length === 0) {
+                recentOrdersContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b;">لا توجد طلبات حديثة</div>';
+                return;
+            }
+            
+            recentOrdersContainer.innerHTML = recentOrders.map(order => `
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div style="width: 40px; height: 40px; background: ${getStatusColor(order.status)}; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                        <i class="fas ${getStatusIcon(order.status)}"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 0.875rem; font-weight: 600; color: #1e293b;">${order.customer || 'عميل جديد'}</div>
+                        <div style="font-size: 0.75rem; color: #64748b;">${order.items?.length || 0} منتج • ${order.total?.toLocaleString() || 0} ج.م</div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #64748b;">${new Date(order.date).toLocaleDateString('ar-EG')}</div>
+                </div>
+            `).join('');
+        }
+        
+        function getStatusColor(status) {
+            const colors = {
+                'pending': 'rgba(245, 158, 11, 0.8)',
+                'processing': 'rgba(59, 130, 246, 0.8)',
+                'completed': 'rgba(16, 185, 129, 0.8)',
+                'cancelled': 'rgba(239, 68, 68, 0.8)'
+            };
+            return colors[status] || 'rgba(100, 116, 139, 0.8)';
+        }
+        
+        function getStatusIcon(status) {
+            const icons = {
+                'pending': 'fa-clock',
+                'processing': 'fa-spinner',
+                'completed': 'fa-check',
+                'cancelled': 'fa-times'
+            };
+            return icons[status] || 'fa-question';
+        }
+        
+        // تحديث المؤشرات السريعة
+        function updateQuickInsights() {
+            // نسبة إكمال الطلبات
+            const completionRate = orders.length > 0 
+                ? Math.round((orders.filter(o => o.status === 'completed').length / orders.length) * 100) 
+                : 0;
+            document.getElementById('completion-rate').textContent = completionRate + '%';
+            
+            // متوسط قيمة الطلب
+            const avgOrderValue = orders.length > 0 
+                ? Math.round(orders.reduce((sum, o) => sum + o.total, 0) / orders.length) 
+                : 0;
+            document.getElementById('avg-order-value').textContent = avgOrderValue.toLocaleString() + ' ج.م';
+            
+            // المنتجات المفقودة
+            const outOfStockCount = products.filter(p => p.stock === 'out' || p.stock === 0).length;
+            document.getElementById('out-of-stock-count').textContent = outOfStockCount;
         }
         
         // تصدير البيانات
@@ -3023,6 +3184,64 @@
             document.getElementById('setting-vodafone').value = settings.vodafone || '';
             document.getElementById('setting-instapay').value = settings.instapay || '';
             document.getElementById('setting-qr').value = settings.qr || '';
+            
+            // تحميل إعدادات Google Sheets
+            document.getElementById('setting-sheet-id').value = settings.sheetId || '';
+            document.getElementById('setting-api-key').value = settings.apiKey || '';
+        }
+        
+        // حفظ إعدادات Google Sheets
+        function saveGoogleSheetsConfig() {
+            const sheetId = document.getElementById('setting-sheet-id').value.trim();
+            const apiKey = document.getElementById('setting-api-key').value.trim();
+            
+            if (!sheetId || !apiKey) {
+                showAlert('يرجى إدخال Sheet ID و API Key', 'error');
+                return;
+            }
+            
+            const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+            settings.sheetId = sheetId;
+            settings.apiKey = apiKey;
+            localStorage.setItem('storeSettings', JSON.stringify(settings));
+            
+            // تحديث إعدادات Google Sheets في المتغير العام
+            if (typeof GOOGLE_SHEETS_CONFIG !== 'undefined') {
+                GOOGLE_SHEETS_CONFIG.sheetId = sheetId;
+                GOOGLE_SHEETS_CONFIG.apiKey = apiKey;
+            }
+            
+            showAlert('تم حفظ إعدادات Google Sheets بنجاح!', 'success');
+        }
+        
+        // اختبار الاتصال بـ Google Sheets
+        async function testGoogleSheetsConnection() {
+            const sheetId = document.getElementById('setting-sheet-id').value.trim();
+            const apiKey = document.getElementById('setting-api-key').value.trim();
+            
+            if (!sheetId || !apiKey) {
+                showAlert('يرجى إدخال Sheet ID و API Key أولاً', 'error');
+                return;
+            }
+            
+            try {
+                showAlert('جاري اختبار الاتصال...', 'info');
+                
+                // محاولة قراءة البيانات من الشيت
+                const response = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Products!A1:M1?key=${apiKey}`
+                );
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showAlert('تم الاتصال بـ Google Sheets بنجاح! ✅', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert('فشل الاتصال: ' + (error.error?.message || 'خطأ غير معروف'), 'error');
+                }
+            } catch (error) {
+                showAlert('فشل الاتصال: ' + error.message, 'error');
+            }
         }
 
         function saveSettings(e) {
@@ -3619,9 +3838,9 @@
 
         // تسجيل الخروج
         function logout() {
-            if(confirm('هل تريد الخروج والعودة للمتجر؟')) {
+            if(confirm('هل تريد الخروج؟')) {
                 sessionStorage.removeItem('mashily_user');
-                window.location.href = 'index.html';
+                window.location.href = 'login.html';
             }
         }
 
@@ -3758,6 +3977,118 @@
         function exportData() {
             showAlert('سيتم تصدير البيانات... (ميزة قيد التطوير)', 'info');
             exportProductsExcel();
+        }
+        
+        // دالة المزامنة مع Google Sheets
+        async function syncWithGoogleSheets() {
+            const btn = document.getElementById('sync-btn');
+            const originalText = btn.innerHTML;
+            
+            try {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحديث...';
+                btn.disabled = true;
+                
+                console.log('جاري المزامنة مع Google Sheets...');
+                
+                // استدعاء الدالة من script.js
+                if (typeof fetchFromGoogleSheets === 'function') {
+                    const result = await fetchFromGoogleSheets();
+                    console.log('نتيجة المزامنة:', result);
+                    
+                    // تحديث المنتجات في لوحة التحكم
+                    if (result && result.products) {
+                        products = result.products;
+                        console.log('تم تحديث المنتجات:', products.length);
+                        renderProductsTable();
+                        updateStats();
+                        
+                        btn.innerHTML = '<i class="fas fa-check"></i> تم التحديث بنجاح';
+                        showAlert('تم تحديث البيانات من Google Sheets بنجاح!', 'success');
+                    } else {
+                        // إذا لم توجد بيانات من الشيت، استخدم البيانات المحلية
+                        console.log('لم توجد بيانات من الشيت، استخدام البيانات المحلية');
+                        products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+                        renderProductsTable();
+                        updateStats();
+                        
+                        btn.innerHTML = '<i class="fas fa-check"></i> تم استخدام البيانات المحلية';
+                        showAlert('تم استخدام البيانات المحلية (Google Sheets فارغ)', 'info');
+                    }
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error('دالة fetchFromGoogleSheets غير موجودة');
+                }
+                
+            } catch (error) {
+                console.error('Google Sheets Sync Error:', error);
+                
+                // استخدام البيانات المحلية كحل احتياطي
+                console.log('استخدام البيانات المحلية كحل احتياطي');
+                products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+                renderProductsTable();
+                updateStats();
+                
+                btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> فشل التحديث';
+                showAlert('فشل في الاتصال بـ Google Sheets. تم استخدام البيانات المحلية. تأكد من صحة API Key و Sheet ID.', 'warning');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 3000);
+            }
+        }
+    </script>
+    
+    <!-- ربط ملف script.js للوظائف المشتركة -->
+    <script src="script.js"></script>
+    
+    <script>
+        // تهيئة لوحة التحكم
+        document.addEventListener('DOMContentLoaded', function() {
+            // التحقق من تسجيل الدخول
+            const isLoggedIn = sessionStorage.getItem('mashily_user');
+            if (!isLoggedIn) {
+                // إعادة توجيه لصفحة تسجيل الدخول إذا لم يكن مسجلاً
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // تحميل البيانات الأولية
+            loadInitialData();
+        });
+        
+        // دالة تحميل البيانات الأولية
+        async function loadInitialData() {
+            try {
+                console.log('جاري تحميل البيانات الأولية للوحة التحكم...');
+                
+                // محاولة تحميل البيانات من Google Sheets
+                if (typeof fetchFromGoogleSheets === 'function') {
+                    console.log('دالة fetchFromGoogleSheets موجودة، جاري الاتصال...');
+                    const sheetData = await fetchFromGoogleSheets();
+                    console.log('بيانات الشيت:', sheetData);
+                    
+                    if (sheetData && sheetData.products) {
+                        products = sheetData.products;
+                        console.log('تم تحديث المنتجات من Google Sheets:', products.length);
+                        renderProductsTable();
+                        updateStats();
+                    }
+                } else {
+                    console.log('دالة fetchFromGoogleSheets غير موجودة، استخدام البيانات المحلية');
+                }
+            } catch (error) {
+                console.log('فشل في تحميل البيانات من Google Sheets، استخدام البيانات المحلية:', error);
+                // استخدام البيانات المحلية
+                products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+                console.log('استخدام البيانات المحلية:', products.length);
+                renderProductsTable();
+                updateStats();
+            }
         }
     </script>
 </body>
