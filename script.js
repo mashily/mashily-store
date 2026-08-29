@@ -1103,23 +1103,23 @@ function updateCartUI() {
     if(!container) return;
 
     container.innerHTML = cart.map((item, idx) => `
-        <div style="display:flex; gap:12px; background:var(--color-surface); padding:12px; border-radius:var(--radius-md); margin-bottom:12px; border:1px solid var(--color-border); box-shadow: var(--shadow-sm);">
+        <div style="display:flex; gap:12px; background:var(--color-surface); padding:12px; border-radius:var(--radius-md); margin-bottom:10px; border:1px solid var(--color-border); box-shadow: var(--shadow-sm); flex-shrink: 0;">
             <!-- الصورة -->
-            <img src="${resolveProductImageUrl(item.image)}" style="width:70px; height:70px; object-fit:contain; background:white; border-radius:var(--radius-md); border:1px solid var(--color-border);">
+            <img src="${resolveProductImageUrl(item.image)}" style="width:60px; height:60px; object-fit:contain; background:white; border-radius:var(--radius-md); border:1px solid var(--color-border); flex-shrink: 0;">
             
             <!-- البيانات -->
-            <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+            <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between; min-width: 0;">
                 <div>
-                    <b style="font-size:0.9rem; color:var(--color-text); display:block; line-height:1.3; margin-bottom:4px;">${item.name}</b>
-                    <small style="color:var(--color-primary); font-weight:bold; font-size:0.95rem;">${item.price} ج.م</small>
+                    <b style="font-size:0.85rem; color:var(--color-text); display:block; line-height:1.3; margin-bottom:4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.name}</b>
+                    <small style="color:var(--color-primary); font-weight:bold; font-size:0.9rem;">${item.price} ج.م</small>
                 </div>
                 
                 <!-- الكمية والأزرار -->
-                <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
-                    <button onclick="changeQty(${idx},-1); return false;" style="width:28px; height:28px; background:var(--color-primary); color:white; border:none; border-radius:var(--radius-sm); cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; transition: all 0.2s;">−</button>
-                    <span style="min-width:24px; text-align:center; font-weight:bold; color:var(--color-text); font-size:0.9rem;">${item.qty}</span>
-                    <button onclick="changeQty(${idx},1); return false;" style="width:28px; height:28px; background:var(--color-primary); color:white; border:none; border-radius:var(--radius-sm); cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; transition: all 0.2s;">+</button>
-                    <button onclick="removeFromCart(${idx}); return false;" style="margin-right:auto; background:var(--color-danger); color:white; border:none; padding:6px 12px; border-radius:var(--radius-sm); cursor:pointer; font-size:0.8rem; font-weight:bold; transition: all 0.2s;">حذف</button>
+                <div style="display:flex; align-items:center; gap:6px; margin-top:6px;">
+                    <button onclick="changeQty(${idx},-1); return false;" style="width:24px; height:24px; background:var(--color-primary); color:white; border:none; border-radius:var(--radius-sm); cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; transition: all 0.2s; font-size:0.8rem;">−</button>
+                    <span style="min-width:20px; text-align:center; font-weight:bold; color:var(--color-text); font-size:0.85rem;">${item.qty}</span>
+                    <button onclick="changeQty(${idx},1); return false;" style="width:24px; height:24px; background:var(--color-primary); color:white; border:none; border-radius:var(--radius-sm); cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; transition: all 0.2s; font-size:0.8rem;">+</button>
+                    <button onclick="removeFromCart(${idx}); return false;" style="margin-right:auto; background:var(--color-danger); color:white; border:none; padding:4px 10px; border-radius:var(--radius-sm); cursor:pointer; font-size:0.75rem; font-weight:bold; transition: all 0.2s;">حذف</button>
                 </div>
             </div>
         </div>
@@ -2500,6 +2500,15 @@ function toggleCouponInput() {
     if (container.style.display === 'none' || container.style.display === '') {
         container.style.display = 'flex';
         applied.style.display = 'none';
+    } else {
+        container.style.display = 'none';
+    }
+}
+
+function toggleCouponInputInCart() {
+    const container = document.getElementById('coupon-input-container-in-cart');
+    if (container.style.display === 'none' || container.style.display === '') {
+        container.style.display = 'flex';
     } else {
         container.style.display = 'none';
     }
