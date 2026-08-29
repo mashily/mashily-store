@@ -672,6 +672,7 @@
             </div>
             <ul class="nav-menu">
                 <li class="nav-item"><a class="nav-link active" onclick="switchTab('dashboard')"><i class="fas fa-chart-line"></i> <span>نظرة عامة</span></a></li>
+                <li class="nav-item"><a class="nav-link" onclick="switchTab('categories')"><i class="fas fa-tags"></i> <span>الأصناف</span></a></li>
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('products')"><i class="fas fa-box"></i> <span>المنتجات</span></a></li>
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('add-product')"><i class="fas fa-plus"></i> <span>إضافة منتج</span></a></li>
                 <li class="nav-item"><a class="nav-link" onclick="switchTab('academy')"><i class="fas fa-graduation-cap"></i> <span>الأكاديمية</span><span id="academy-notif-badge" class="notif-badge"></span></a></li>
@@ -1101,6 +1102,38 @@
             <div id="preview-section" style="display: none; margin-top: 30px;">
                 <h3><i class="fas fa-eye"></i> معاينة المنتج</h3>
                 <div id="product-preview"></div>
+            </div>
+        </div>
+        
+        <!-- إدارة الأصناف -->
+        <div id="categories" class="tab-content">
+            <h2><i class="fas fa-tags"></i> إدارة الأصناف</h2>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>الأصناف تُقرأ من Google Sheet</strong><br>
+                    يمكنك تعديل الأصناف في Google Sheet واضغط "تحديث من Google Sheets" لعرض التغييرات.
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="syncWithGoogleSheets()">
+                    <i class="fas fa-sync-alt"></i> تحديث من Google Sheets
+                </button>
+                <button class="btn btn-success" onclick="saveCategoriesToSheet()">
+                    <i class="fas fa-save"></i> حفظ التغييرات في الشيت
+                </button>
+            </div>
+            
+            <div id="categories-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin-top: 20px;">
+                <!-- الأصناف ستظهر هنا -->
+            </div>
+            
+            <div id="no-categories" style="text-align: center; padding: 40px; color: #7f8c8d; display: none;">
+                <i class="fas fa-tags fa-3x" style="margin-bottom: 15px; opacity: 0.3;"></i>
+                <h3>لا توجد أصناف</h3>
+                <p>اضغط "تحديث من Google Sheets" لتحميل الأصناف</p>
             </div>
         </div>
         
@@ -2142,6 +2175,7 @@
             // خريطة العناوين
             const tabTitles = {
                 'dashboard': 'لوحة القيادة',
+                'categories': 'إدارة الأصناف',
                 'products': 'إدارة المنتجات',
                 'add-product': 'إضافة منتج',
                 'academy': 'إدارة الأكاديمية',
@@ -2183,7 +2217,9 @@
             if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('active');
             
             // تحديث البيانات إذا لزم الأمر
-            if (tabId === 'products') {
+            if (tabId === 'categories') {
+                loadCategories();
+            } else if (tabId === 'products') {
                 loadProducts();
             } else if (tabId === 'reviews') {
                 loadReviewsTable();
@@ -2410,6 +2446,105 @@
         function generateId() {
             if (products.length === 0) return 1;
             return Math.max(...products.map(p => p.id)) + 1;
+        }
+        
+        // تحميل الأصناف للعرض
+        function loadCategories() {
+            const container = document.getElementById('categories-list');
+            const noCategories = document.getElementById('no-categories');
+            
+            let categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
+            
+            if (categories.length === 0) {
+                container.style.display = 'none';
+                noCategories.style.display = 'block';
+                return;
+            }
+            
+            container.style.display = 'grid';
+            noCategories.style.display = 'none';
+            
+            container.innerHTML = categories.map((cat, index) => `
+                <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                        <div style="width: 50px; height: 50px; background: rgba(245, 158, 11, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #f59e0b; font-size: 1.5rem;">
+                            <i class="${cat.icon || 'fas fa-tag'}"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0; color: #1e293b; font-size: 1.1rem;">${cat.name}</h4>
+                            <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.85rem;">${cat.description || ''}</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-primary btn-small" onclick="editCategory(${index})">
+                            <i class="fas fa-edit"></i> تعديل
+                        </button>
+                        <button class="btn btn-danger btn-small" onclick="deleteCategory(${index})">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // تعديل صنف
+        function editCategory(index) {
+            let categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
+            const cat = categories[index];
+            
+            const newName = prompt('اسم الصنف:', cat.name);
+            if (newName === null) return;
+            
+            const newIcon = prompt('الأيقونة (Font Awesome):', cat.icon || 'fas fa-tag');
+            if (newIcon === null) return;
+            
+            const newDesc = prompt('الوصف:', cat.description || '');
+            if (newDesc === null) return;
+            
+            categories[index] = {
+                name: newName,
+                icon: newIcon,
+                description: newDesc
+            };
+            
+            localStorage.setItem('storeCategories', JSON.stringify(categories));
+            loadCategories();
+            showAlert('تم تعديل الصنف بنجاح', 'success');
+        }
+        
+        // حذف صنف
+        function deleteCategory(index) {
+            if (!confirm('هل أنت متأكد من حذف هذا الصنف؟')) return;
+            
+            let categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
+            categories.splice(index, 1);
+            localStorage.setItem('storeCategories', JSON.stringify(categories));
+            loadCategories();
+            showAlert('تم حذف الصنف بنجاح', 'success');
+        }
+        
+        // حفظ الأصناف في Google Sheet
+        async function saveCategoriesToSheet() {
+            try {
+                const categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
+                
+                if (categories.length === 0) {
+                    showAlert('لا توجد أصناف للحفظ', 'error');
+                    return;
+                }
+                
+                // تحويل الأصناف إلى تنسيق الشيت
+                const sheetData = [
+                    ['name', 'icon', 'description'], // العناوين
+                    ...categories.map(cat => [cat.name, cat.icon, cat.description])
+                ];
+                
+                showAlert('سيتم حفظ الأصناف في Google Sheet (ميزة قيد التطوير)', 'info');
+                // في الإنتاج، استخدم Google Sheets API لتحديث البيانات
+                
+            } catch (error) {
+                showAlert('فشل في حفظ الأصناف: ' + error.message, 'error');
+            }
         }
         
         // تحميل المنتجات للعرض
@@ -3915,19 +4050,16 @@
                         console.log('تم تحديث المنتجات:', products.length);
                         renderProductsTable();
                         updateStats();
-                        
-                        btn.innerHTML = '<i class="fas fa-check"></i> تم التحديث بنجاح';
-                        showAlert('تم تحديث البيانات من Google Sheets بنجاح!', 'success');
-                    } else {
-                        // إذا لم توجد بيانات من الشيت، استخدم البيانات المحلية
-                        console.log('لم توجد بيانات من الشيت، استخدام البيانات المحلية');
-                        products = JSON.parse(localStorage.getItem('storeProducts')) || [];
-                        renderProductsTable();
-                        updateStats();
-                        
-                        btn.innerHTML = '<i class="fas fa-check"></i> تم استخدام البيانات المحلية';
-                        showAlert('تم استخدام البيانات المحلية (Google Sheets فارغ)', 'info');
                     }
+                    
+                    // تحديث الأصناف في لوحة التحكم
+                    if (result && result.categories) {
+                        console.log('تم تحديث الأصناف:', result.categories.length);
+                        loadCategories();
+                    }
+                    
+                    btn.innerHTML = '<i class="fas fa-check"></i> تم التحديث بنجاح';
+                    showAlert('تم تحديث البيانات من Google Sheets بنجاح!', 'success');
                     
                     setTimeout(() => {
                         btn.innerHTML = originalText;
@@ -3945,6 +4077,7 @@
                 products = JSON.parse(localStorage.getItem('storeProducts')) || [];
                 renderProductsTable();
                 updateStats();
+                loadCategories();
                 
                 btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> فشل التحديث';
                 showAlert('فشل في الاتصال بـ Google Sheets. تم استخدام البيانات المحلية. تأكد من صحة API Key و Sheet ID.', 'warning');
@@ -3992,6 +4125,11 @@
                         renderProductsTable();
                         updateStats();
                     }
+                    
+                    if (sheetData && sheetData.categories) {
+                        console.log('تم تحديث الأصناف من Google Sheets:', sheetData.categories.length);
+                        loadCategories();
+                    }
                 } else {
                     console.log('دالة fetchFromGoogleSheets غير موجودة، استخدام البيانات المحلية');
                 }
@@ -4002,6 +4140,9 @@
                 console.log('استخدام البيانات المحلية:', products.length);
                 renderProductsTable();
                 updateStats();
+                
+                // تحميل الأصناف المحلية
+                loadCategories();
             }
         }
     </script>

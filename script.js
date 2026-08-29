@@ -910,7 +910,7 @@ function renderCategories() {
             btn += `
             <button class="cat-btn cat-btn-offer ${currentCategory === 'offers' ? 'active' : ''}" 
                     onclick="filterByCategory('offers')">
-                <i class="fas fa-fire-alt"></i> عروض مؤقتة
+                <i class="fas fa-fire-alt"></i> 🔥 عروض خاصة
             </button>`;
         }
         return btn;
@@ -1066,7 +1066,25 @@ function updateCartUI() {
 
     if(badge) badge.innerText = cart.reduce((s,i)=>s+i.qty, 0);
     
-    // تحديث منطقة السعر
+    // تحديث منطقة السعر في السلة
+    const subtotalPrice = document.getElementById('subtotal-price');
+    const discountPrice = document.getElementById('discount-price');
+    const totalPrice = document.getElementById('total-price');
+    const discountRow = document.getElementById('discount-row');
+    
+    if(subtotalPrice) subtotalPrice.textContent = total + ' ج.م';
+    if(totalPrice) totalPrice.textContent = Math.floor(finalTotal);
+    
+    if(discountRow && discountPrice) {
+        if(discountAmount > 0) {
+            discountRow.style.display = 'flex';
+            discountPrice.textContent = '-' + Math.floor(discountAmount) + ' ج.م';
+        } else {
+            discountRow.style.display = 'none';
+        }
+    }
+    
+    // تحديث منطقة السعر القديمة
     const totalArea = document.getElementById('cart-total-area');
     if(totalArea) {
         totalArea.innerHTML = `
@@ -2472,6 +2490,51 @@ if (window.location.pathname.includes('index.html') || window.location.pathname 
             startAutoUpdate(5); // تحديث كل 5 دقائق
         }
     }, 1000);
+}
+
+// وظائف الكوبون في الهيدر
+function toggleCouponInput() {
+    const container = document.getElementById('coupon-input-container');
+    const applied = document.getElementById('coupon-applied');
+    
+    if (container.style.display === 'none' || container.style.display === '') {
+        container.style.display = 'flex';
+        applied.style.display = 'none';
+    } else {
+        container.style.display = 'none';
+    }
+}
+
+function applyCouponFromHeader() {
+    const couponCode = document.getElementById('coupon-input').value.trim();
+    if (!couponCode) {
+        alert('يرجى إدخال كود الكوبون');
+        return;
+    }
+    
+    // نسخ الكود إلى حقل الكوبون في السلة
+    const couponInputInCart = document.querySelector('#cart-sidebar #coupon-input');
+    if (couponInputInCart) {
+        couponInputInCart.value = couponCode;
+    }
+    
+    // استدعاء دالة applyCoupon الموجودة في السلة
+    const couponBtn = document.querySelector('#cart-sidebar .apply-coupon-btn');
+    if (couponBtn) {
+        couponBtn.click();
+    }
+    
+    // إخفاء حقل الإدخال
+    document.getElementById('coupon-input-container').style.display = 'none';
+    
+    // عرض رسالة النجاح
+    const applied = document.getElementById('coupon-applied');
+    applied.style.display = 'block';
+    applied.textContent = 'تم تطبيق الكوبون بنجاح!';
+    
+    setTimeout(() => {
+        applied.style.display = 'none';
+    }, 3000);
 }
 
 function toggleVideoDislike() {
