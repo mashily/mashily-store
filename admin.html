@@ -70,10 +70,6 @@
             --primary: #ec4899;
             --primary-dark: #db2777;
         }
-            --text: #f1f5f9;
-            --text-light: #94a3b8;
-            --sidebar-bg: #020617;
-        }
 
         * {
             box-sizing: border-box;
@@ -732,42 +728,16 @@
                     <h2 id="page-title" style="margin:0; font-size:1.2rem; color: var(--text);">لوحة القيادة</h2>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <!-- أيقونة الثيمات -->
-                    <button class="icon-btn" onclick="toggleThemeMenu()" title="تغيير الثيم" style="position: relative;">
-                        <i class="fas fa-palette" id="theme-icon-btn"></i>
-                        
-                        <!-- قائمة الثيمات المنسدلة -->
-                        <div id="theme-menu-admin" style="display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 8px; box-shadow: var(--shadow); z-index: 1001; min-width: 140px; margin-top: 8px;">
-                            <button onclick="setTheme('gold')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s;">
-                                <span style="width: 20px; height: 20px; background: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">⭐</span>
-                                ذهبي
-                            </button>
-                            <button onclick="setTheme('blue')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s;">
-                                <span style="width: 20px; height: 20px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">●</span>
-                                أزرق
-                            </button>
-                            <button onclick="setTheme('green')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s;">
-                                <span style="width: 20px; height: 20px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">🍃</span>
-                                أخضر
-                            </button>
-                            <button onclick="setTheme('red')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s;">
-                                <span style="width: 20px; height: 20px; background: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">❤️</span>
-                                أحمر
-                            </button>
-                            <button onclick="setTheme('purple')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s;">
-                                <span style="width: 20px; height: 20px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">🌙</span>
-                                بنفسجي
-                            </button>
-                            <button onclick="setTheme('pink')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s;">
-                                <span style="width: 20px; height: 20px; background: #ec4899; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">💗</span>
-                                وردي
-                            </button>
-                            <button onclick="setTheme('dark')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s; border-top: 1px solid var(--border); margin-top: 4px;">
-                                <span style="width: 20px; height: 20px; background: #1e293b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">🌙</span>
-                                داكن
-                            </button>
-                        </div>
-                    </button>
+                    <!-- قائمة الثيمات المنسدلة -->
+                    <select onchange="setTheme(this.value)" style="padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); font-size: 0.85rem; cursor: pointer;">
+                        <option value="gold">⭐ ذهبي</option>
+                        <option value="blue">● أزرق</option>
+                        <option value="green">🍃 أخضر</option>
+                        <option value="red">❤️ أحمر</option>
+                        <option value="purple">🌙 بنفسجي</option>
+                        <option value="pink">💗 وردي</option>
+                        <option value="dark">🌙 داكن</option>
+                    </select>
                     <a href="index.html" class="btn btn-primary btn-small" target="_blank">
                         <i class="fas fa-external-link-alt"></i> المتجر
                     </a>
@@ -4008,27 +3978,12 @@
         }
 
         // --- وظائف الثيم والسايدبار ---
-        function toggleThemeMenu() {
-            const menu = document.getElementById('theme-menu-admin');
-            if (menu.style.display === 'none' || menu.style.display === '') {
-                menu.style.display = 'block';
-            } else {
-                menu.style.display = 'none';
-            }
-        }
-        
         function setTheme(themeName) {
             // حفظ الثيم في localStorage
             localStorage.setItem('mashily_theme', themeName);
             
             // تطبيق الثيم على الصفحة الحالية
             document.documentElement.setAttribute('data-theme', themeName);
-            
-            // إخفاء قائمة الثيمات
-            document.getElementById('theme-menu-admin').style.display = 'none';
-            
-            // إشعار
-            showAlert('تم تغيير الثيم إلى: ' + themeName, 'success');
         }
         
         // تحميل الثيم المحفوظ عند بدء التشغيل

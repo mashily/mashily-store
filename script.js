@@ -2546,33 +2546,12 @@ function applyCouponFromHeader() {
 }
 
 // وظائف الثيمات
-function toggleTheme() {
-    const menu = document.getElementById('theme-menu');
-    if (menu.style.display === 'none' || menu.style.display === '') {
-        menu.style.display = 'block';
-    } else {
-        menu.style.display = 'none';
-    }
-}
-
 function setTheme(themeName) {
     // حفظ الثيم في localStorage
     localStorage.setItem('mashily_theme', themeName);
     
     // تطبيق الثيم على الصفحة الحالية
     document.documentElement.setAttribute('data-theme', themeName);
-    
-    // إخفاء قائمة الثيمات
-    const menu = document.getElementById('theme-menu');
-    if (menu) menu.style.display = 'none';
-    
-    // إخفاء قائمة الثيمات في الأدمن
-    const adminMenu = document.getElementById('theme-menu-admin');
-    if (adminMenu) adminMenu.style.display = 'none';
-    
-    // إخفاء قائمة الثيمات في الأكاديمية
-    const academyMenu = document.getElementById('theme-menu');
-    if (academyMenu) academyMenu.style.display = 'none';
 }
 
 // تحميل الثيم المحفوظ عند بدء التشغيل
@@ -2580,18 +2559,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedTheme = localStorage.getItem('mashily_theme');
     if (savedTheme) {
         document.documentElement.setAttribute('data-theme', savedTheme);
-    }
-});
-
-// إغلاق قائمة الثيمات عند النقر خارجها
-document.addEventListener('click', function(event) {
-    const themeMenu = document.getElementById('theme-menu');
-    const themeButton = event.target.closest('button[onclick="toggleTheme()"]');
-    
-    if (themeMenu && themeMenu.style.display === 'block' && !themeButton) {
-        if (!event.target.closest('#theme-menu')) {
-            themeMenu.style.display = 'none';
-        }
+        
+        // تحديث قائمة الثيمات لتظهر الثيم الحالي
+        const themeSelects = document.querySelectorAll('select[onchange*="setTheme"]');
+        themeSelects.forEach(select => {
+            select.value = savedTheme;
+        });
     }
 });
 
