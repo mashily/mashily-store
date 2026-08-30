@@ -428,6 +428,18 @@ async function init() {
 
     // تفعيل تأثير التكبير في نافذة المنتج
     setupZoomEffect();
+    
+    // Event Delegation للمنتجات - للتعامل مع المنتجات المحملة ديناميكياً
+    document.addEventListener('click', function(e) {
+        const productCard = e.target.closest('.product-card');
+        if (productCard) {
+            const productId = productCard.dataset.id;
+            if (productId) {
+                console.log('Product card clicked, ID:', productId);
+                window.openProductDetails(parseInt(productId));
+            }
+        }
+    });
 }
 
 // --- وظائف الثيمات ---
@@ -505,12 +517,12 @@ function createProductCard(p) {
     const stockText = isOut ? 'غير متوفر' : 'متوفر الآن';
 
     return `
-    <div class="product-card" onmouseleave="hideAllInfos()">
-        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${p.id}, event)" title="${isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}" style="position: absolute; top: 6px; right: 6px; z-index: 10; background: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <div class="product-card" data-id="${p.id}" onmouseleave="hideAllInfos()">
+        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="window.toggleWishlist(${p.id}, event)" title="${isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}" style="position: absolute; top: 6px; right: 6px; z-index: 10; background: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <i class="fas fa-heart" style="color: ${isInWishlist ? '#ef4444' : '#9ca3af'}; font-size: 0.7rem;"></i>
         </button>
         
-        <div class="img-container" onclick="openProductDetails(${p.id})" style="position: relative; width: 100%; height: 140px; background: var(--color-surface); display: flex; align-items: center; justify-content: center; padding: 0.5rem; overflow: hidden; cursor: pointer;">
+        <div class="img-container" style="position: relative; width: 100%; height: 140px; background: var(--color-surface); display: flex; align-items: center; justify-content: center; padding: 0.5rem; overflow: hidden; cursor: pointer;">
             ${!isOut ? `<div style="position: absolute; top: 6px; left: 50%; transform: translateX(-50%); z-index: 5; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)); color: white; font-size: 0.6rem; padding: 2px 8px; border-radius: 14px; font-weight: 700; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2); white-space: nowrap;">${p.status || 'مميز ✨'}</div>` : ''}
             ${discountPercent > 0 ? `<div style="position: absolute; bottom: 6px; right: 6px; z-index: 5; padding: 2px 5px; border-radius: 14px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; font-size: 0.6rem; font-weight: 900; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);">-${discountPercent}%</div>` : ''}
             <img src="${imageUrl}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; ${isOut ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
@@ -532,7 +544,7 @@ function createProductCard(p) {
             </div>
             ${hasTimer ? `<div class="countdown-timer" data-ends="${p.offerEnds}" style="font-size: 0.6rem; color: #c0392b; font-weight: 700; background: #fff5f5; padding: 3px 6px; border-radius: 14px; border: 1px dashed #e74c3c; text-align: center; margin: 0.25rem 0; animation: pulseTimer 2s infinite;">جاري التحميل...</div>` : ''}
             <button class="add-to-cart-btn" style="background: ${isOut ? '#9ca3af' : 'var(--color-primary)'}; cursor: ${isOut ? 'not-allowed' : 'pointer'}; padding: 0.4rem 0.6rem; font-size: 0.75rem;" 
-                onclick="${isOut ? "alert('عذراً، المنتج غير متوفر حالياً')" : `addToCart(${p.id})`}">
+                onclick="${isOut ? "alert('عذراً، المنتج غير متوفر حالياً')" : `window.addToCart(${p.id})`}">
                 ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
             </button>
         </div>
@@ -1050,6 +1062,10 @@ document.addEventListener('click', function(event) {
 window.filterByCategory = filterByCategory;
 window.closeCategoryModal = closeCategoryModal;
 window.openCategoryModal = openCategoryModal;
+window.openProductDetails = openProductDetails;
+window.toggleWishlist = toggleWishlist;
+window.addToCart = addToCart;
+window.closeProductModal = closeProductModal;
 
 // --- وظائف المفضلة (Wishlist) ---
 function toggleWishlist(productId, event) {
