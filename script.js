@@ -901,7 +901,7 @@ function renderCategories() {
     catContainer.innerHTML = categories.map(cat => {
         let btn = `
         <button class="cat-btn ${currentCategory === cat.name ? 'active' : ''}" 
-                onclick="filterByCategory('${cat.name}')">
+                onclick="window.filterByCategory('${cat.name}')">
             <i class="${cat.icon}"></i> ${cat.name === 'الكل' ? 'كل الأصناف' : cat.name}
         </button>`;
         
@@ -909,7 +909,7 @@ function renderCategories() {
         if(cat.name === 'الكل') {
             btn += `
             <button class="cat-btn cat-btn-offer ${currentCategory === 'offers' ? 'active' : ''}" 
-                    onclick="filterByCategory('offers')">
+                    onclick="window.filterByCategory('offers')">
                 <i class="fas fa-fire-alt"></i> 🔥 عروض خاصة
             </button>`;
         }
