@@ -2577,7 +2577,13 @@
                         const json = XLSX.utils.sheet_to_json(worksheet);
 
                         console.log('تم قراءة Excel بنجاح:', json.length, 'منتجات');
-                        processImportedData(json);
+                        console.log('نوع البيانات:', typeof json, 'هو array?', Array.isArray(json));
+                        
+                        // التأكد من أن البيانات هي array
+                        const productsArray = Array.isArray(json) ? json : (json.data || Object.values(json));
+                        console.log('Products array بعد التحقق:', productsArray.length);
+                        
+                        processImportedData(productsArray);
                     } catch (err) {
                         console.error('خطأ في قراءة Excel:', err);
                         showAlert('خطأ في قراءة ملف Excel: ' + err.message, 'error');
@@ -2607,8 +2613,18 @@
         }
 
         function processImportedData(items) {
+            // التأكد من أن items هو array
+            const itemsArray = Array.isArray(items) ? items : (items.data || Object.values(items));
+            
+            if (!Array.isArray(itemsArray) || itemsArray.length === 0) {
+                showAlert('البيانات غير صالحة أو فارغة', 'error');
+                return;
+            }
+            
+            console.log('Processing items:', itemsArray.length);
+            
             let count = 0;
-            items.forEach(p => {
+            itemsArray.forEach(p => {
                 // معالجة الحقول التي قد تكون نصوص في الإكسيل
                 let tags = Array.isArray(p.tags) ? p.tags : (p.tags ? String(p.tags).split(',').map(t=>t.trim()) : []);
                 let specs = Array.isArray(p.specs) ? p.specs : (p.specs ? String(p.specs).split('\n').map(s=>s.trim()) : []);

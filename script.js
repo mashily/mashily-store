@@ -429,14 +429,40 @@ async function init() {
     // تفعيل تأثير التكبير في نافذة المنتج
     setupZoomEffect();
     
-    // Event Delegation للمنتجات - للتعامل مع المنتجات المحملة ديناميكياً
+    // Event Delegation للمنتجات - على الحاوية الرئيسية
+    const productsGrid = document.getElementById('products-grid');
+    if (productsGrid) {
+        productsGrid.addEventListener('click', function(e) {
+            const productCard = e.target.closest('.product-card');
+            if (productCard) {
+                e.preventDefault();
+                const productId = productCard.dataset.id;
+                if (productId) {
+                    console.log('Product card clicked from grid, ID:', productId);
+                    if (typeof window.openProductDetails === 'function') {
+                        window.openProductDetails(parseInt(productId));
+                    } else {
+                        console.error('openProductDetails function not found');
+                    }
+                }
+            }
+        });
+    }
+    
+    // Event Delegation عام للمنتجات - للتعامل مع المنتجات المحملة ديناميكياً
     document.addEventListener('click', function(e) {
         const productCard = e.target.closest('.product-card');
         if (productCard) {
+            e.preventDefault();
             const productId = productCard.dataset.id;
             if (productId) {
-                console.log('Product card clicked, ID:', productId);
-                window.openProductDetails(parseInt(productId));
+                console.log('Product card clicked globally, ID:', productId);
+                // استخدام openProductDetails بدلاً من openProductModal
+                if (typeof window.openProductDetails === 'function') {
+                    window.openProductDetails(parseInt(productId));
+                } else {
+                    console.error('openProductDetails function not found');
+                }
             }
         }
     });
