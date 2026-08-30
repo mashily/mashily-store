@@ -2562,17 +2562,29 @@
                 // معالجة ملفات Excel
                 reader.onload = function(e) {
                     try {
+                        console.log('بدء قراءة ملف Excel...');
+                        
+                        // التأكد من تحميل مكتبة XLSX
+                        if (typeof XLSX === 'undefined') {
+                            showAlert('مكتبة XLSX غير محملة. يرجى تحديث الصفحة.', 'error');
+                            return;
+                        }
+                        
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, {type: 'array'});
                         const firstSheetName = workbook.SheetNames[0];
                         const worksheet = workbook.Sheets[firstSheetName];
                         const json = XLSX.utils.sheet_to_json(worksheet);
-                        
+
+                        console.log('تم قراءة Excel بنجاح:', json.length, 'منتجات');
                         processImportedData(json);
                     } catch (err) {
-                        console.error(err);
-                        showAlert('خطأ في قراءة ملف Excel.', 'error');
+                        console.error('خطأ في قراءة Excel:', err);
+                        showAlert('خطأ في قراءة ملف Excel: ' + err.message, 'error');
                     }
+                };
+                reader.onerror = function() {
+                    showAlert('خطأ في قراءة الملف', 'error');
                 };
                 reader.readAsArrayBuffer(file);
             } else {
@@ -3357,15 +3369,64 @@
         function downloadExcelTemplate() {
             const templateData = [
                 {
-                    name: "اسم المنتج مثال", price: 1000, originalPrice: 1200, description: "وصف المنتج...",
-                    images: "https://picsum.photos/300/200?random=1\nhttps://picsum.photos/300/200?random=2", category: "storage", stock: 10,
-                    status: "جديد", tags: "جديد, عرض خاص", specs: "مواصفة 1\nمواصفة 2"
+                    name: "اسم المنتج مثال 1",
+                    price: 1000,
+                    originalPrice: 1200,
+                    description: "وصف المنتج هنا - اكتب تفاصيل المنتج بشكل واضح",
+                    images: "https://picsum.photos/300/200?random=1",
+                    category: "storage",
+                    stock: 10,
+                    status: "جديد",
+                    tags: "جديد, عرض خاص",
+                    specs: "مواصفة 1\nمواصفة 2"
+                },
+                {
+                    name: "اسم المنتج مثال 2",
+                    price: 500,
+                    originalPrice: 600,
+                    description: "وصف المنتج الثاني",
+                    images: "https://picsum.photos/300/200?random=2",
+                    category: "accessories",
+                    stock: 5,
+                    status: "مميز",
+                    tags: "مميز",
+                    specs: "مواصفة 1"
+                },
+                {
+                    name: "اسم المنتج مثال 3",
+                    price: 2000,
+                    originalPrice: 2500,
+                    description: "وصف المنتج الثالث",
+                    images: "https://picsum.photos/300/200?random=3",
+                    category: "electronics",
+                    stock: "out",
+                    status: "",
+                    tags: "",
+                    specs: ""
                 }
             ];
+            
             const ws = XLSX.utils.json_to_sheet(templateData);
+            
+            // تعيين عرض الأعمدة
+            ws['!cols'] = [
+                {wch: 25}, // name
+                {wch: 10}, // price
+                {wch: 10}, // originalPrice
+                {wch: 40}, // description
+                {wch: 50}, // images
+                {wch: 15}, // category
+                {wch: 10}, // stock
+                {wch: 10}, // status
+                {wch: 20}, // tags
+                {wch: 30}  // specs
+            ];
+            
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Template");
+            XLSX.utils.book_append_sheet(wb, ws, "Products");
             XLSX.writeFile(wb, "products_template.xlsx");
+            
+            showAlert('تم تحميل نموذج Excel بنجاح! يرجى ملء البيانات ثم رفع الملف.', 'success');
         }
         
         // استيراد البيانات

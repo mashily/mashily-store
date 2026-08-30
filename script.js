@@ -1039,6 +1039,11 @@ document.addEventListener('click', function(event) {
     }
 });
 
+// جعل الدوال متاحة عالمياً
+window.filterByCategory = filterByCategory;
+window.closeCategoryModal = closeCategoryModal;
+window.openCategoryModal = openCategoryModal;
+
 // --- وظائف المفضلة (Wishlist) ---
 function toggleWishlist(productId, event) {
     event.stopPropagation();
