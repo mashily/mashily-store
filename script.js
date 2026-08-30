@@ -2482,15 +2482,14 @@ function toggleVideoLike() {
 }
 
 // بدء التحديث التلقائي عند تحميل الصفحة
-if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/')) {
-    // تأخير بسيط لضمان تحميل الملفات الأخرى
-    setTimeout(() => {
-        // فقط إذا تم تكوين Google Sheets
-        if (GOOGLE_SHEETS_CONFIG.apiKey !== 'YOUR_API_KEY_HERE' && GOOGLE_SHEETS_CONFIG.sheetId !== 'YOUR_SHEET_ID_HERE') {
-            startAutoUpdate(5); // تحديث كل 5 دقائق
-        }
-    }, 1000);
-}
+// تم إيقاف التحديث التلقائي لاستخدام الإدارة اليدوية
+// if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/')) {
+//     setTimeout(() => {
+//         if (GOOGLE_SHEETS_CONFIG.apiKey !== 'YOUR_API_KEY_HERE' && GOOGLE_SHEETS_CONFIG.sheetId !== 'YOUR_SHEET_ID_HERE') {
+//             startAutoUpdate(5);
+//         }
+//     }, 1000);
+// }
 
 // وظائف الكوبون في الهيدر
 function toggleCouponInput() {
@@ -2545,6 +2544,56 @@ function applyCouponFromHeader() {
         applied.style.display = 'none';
     }, 3000);
 }
+
+// وظائف الثيمات
+function toggleTheme() {
+    const menu = document.getElementById('theme-menu');
+    if (menu.style.display === 'none' || menu.style.display === '') {
+        menu.style.display = 'block';
+    } else {
+        menu.style.display = 'none';
+    }
+}
+
+function setTheme(themeName) {
+    // حفظ الثيم في localStorage
+    localStorage.setItem('mashily_theme', themeName);
+    
+    // تطبيق الثيم على الصفحة الحالية
+    document.documentElement.setAttribute('data-theme', themeName);
+    
+    // إخفاء قائمة الثيمات
+    const menu = document.getElementById('theme-menu');
+    if (menu) menu.style.display = 'none';
+    
+    // إخفاء قائمة الثيمات في الأدمن
+    const adminMenu = document.getElementById('theme-menu-admin');
+    if (adminMenu) adminMenu.style.display = 'none';
+    
+    // إخفاء قائمة الثيمات في الأكاديمية
+    const academyMenu = document.getElementById('theme-menu');
+    if (academyMenu) academyMenu.style.display = 'none';
+}
+
+// تحميل الثيم المحفوظ عند بدء التشغيل
+document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = localStorage.getItem('mashily_theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+});
+
+// إغلاق قائمة الثيمات عند النقر خارجها
+document.addEventListener('click', function(event) {
+    const themeMenu = document.getElementById('theme-menu');
+    const themeButton = event.target.closest('button[onclick="toggleTheme()"]');
+    
+    if (themeMenu && themeMenu.style.display === 'block' && !themeButton) {
+        if (!event.target.closest('#theme-menu')) {
+            themeMenu.style.display = 'none';
+        }
+    }
+});
 
 function toggleVideoDislike() {
     if(!currentAcademyVideoId) return;

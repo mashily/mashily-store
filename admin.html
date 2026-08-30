@@ -39,6 +39,37 @@
             --light: #0f172a;
             --surface: #1e293b;
             --border: #334155;
+        }
+        
+        [data-theme="gold"] {
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+        }
+        
+        [data-theme="blue"] {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+        }
+        
+        [data-theme="green"] {
+            --primary: #10b981;
+            --primary-dark: #059669;
+        }
+        
+        [data-theme="red"] {
+            --primary: #ef4444;
+            --primary-dark: #dc2626;
+        }
+        
+        [data-theme="purple"] {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+        }
+        
+        [data-theme="pink"] {
+            --primary: #ec4899;
+            --primary-dark: #db2777;
+        }
             --text: #f1f5f9;
             --text-light: #94a3b8;
             --sidebar-bg: #020617;
@@ -701,8 +732,41 @@
                     <h2 id="page-title" style="margin:0; font-size:1.2rem; color: var(--text);">لوحة القيادة</h2>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <button class="icon-btn" onclick="toggleTheme()" title="تغيير الثيم">
-                        <i class="fas fa-moon" id="theme-icon-btn"></i>
+                    <!-- أيقونة الثيمات -->
+                    <button class="icon-btn" onclick="toggleThemeMenu()" title="تغيير الثيم" style="position: relative;">
+                        <i class="fas fa-palette" id="theme-icon-btn"></i>
+                        
+                        <!-- قائمة الثيمات المنسدلة -->
+                        <div id="theme-menu-admin" style="display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 8px; box-shadow: var(--shadow); z-index: 1001; min-width: 140px; margin-top: 8px;">
+                            <button onclick="setTheme('gold')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s;">
+                                <span style="width: 20px; height: 20px; background: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">⭐</span>
+                                ذهبي
+                            </button>
+                            <button onclick="setTheme('blue')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s;">
+                                <span style="width: 20px; height: 20px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">●</span>
+                                أزرق
+                            </button>
+                            <button onclick="setTheme('green')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s;">
+                                <span style="width: 20px; height: 20px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">🍃</span>
+                                أخضر
+                            </button>
+                            <button onclick="setTheme('red')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s;">
+                                <span style="width: 20px; height: 20px; background: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">❤️</span>
+                                أحمر
+                            </button>
+                            <button onclick="setTheme('purple')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s;">
+                                <span style="width: 20px; height: 20px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">🌙</span>
+                                بنفسجي
+                            </button>
+                            <button onclick="setTheme('pink')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s;">
+                                <span style="width: 20px; height: 20px; background: #ec4899; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">💗</span>
+                                وردي
+                            </button>
+                            <button onclick="setTheme('dark')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.85rem; transition: background 0.2s; border-top: 1px solid var(--border); margin-top: 4px;">
+                                <span style="width: 20px; height: 20px; background: #1e293b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">🌙</span>
+                                داكن
+                            </button>
+                        </div>
                     </button>
                     <a href="index.html" class="btn btn-primary btn-small" target="_blank">
                         <i class="fas fa-external-link-alt"></i> المتجر
@@ -1112,18 +1176,45 @@
             <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i>
                 <div>
-                    <strong>الأصناف تُقرأ من Google Sheet</strong><br>
-                    يمكنك تعديل الأصناف في Google Sheet واضغط "تحديث من Google Sheets" لعرض التغييرات.
+                    <strong>إدارة الأصناف يدوياً</strong><br>
+                    يمكنك إضافة وتعديل وحذف الأصناف مباشرة من هنا.
                 </div>
             </div>
             
             <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                <button class="btn btn-primary" onclick="syncWithGoogleSheets()">
-                    <i class="fas fa-sync-alt"></i> تحديث من Google Sheets
+                <button class="btn btn-primary" onclick="showAddCategoryForm()">
+                    <i class="fas fa-plus"></i> إضافة صنف جديد
                 </button>
-                <button class="btn btn-success" onclick="saveCategoriesToSheet()">
-                    <i class="fas fa-save"></i> حفظ التغييرات في الشيت
+                <button class="btn btn-success" onclick="loadCategories()">
+                    <i class="fas fa-sync-alt"></i> تحديث القائمة
                 </button>
+            </div>
+            
+            <!-- نموذج إضافة صنف -->
+            <div id="add-category-form" style="display: none; background: #f8fafc; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e5e7eb;">
+                <h3 style="margin-top: 0;"><i class="fas fa-plus-circle"></i> إضافة صنف جديد</h3>
+                <div style="display: grid; gap: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;"><i class="fas fa-tag"></i> اسم الصنف:</label>
+                        <input type="text" id="new-category-name" placeholder="مثال: أجهزة التخزين" style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;"><i class="fas fa-icon"></i> الأيقونة (Font Awesome):</label>
+                        <input type="text" id="new-category-icon" placeholder="مثال: fas fa-hdd" style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;"><i class="fas fa-align-left"></i> الوصف:</label>
+                        <input type="text" id="new-category-desc" placeholder="وصف قصير للصنف" style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px;">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-success" onclick="addNewCategory()">
+                            <i class="fas fa-check"></i> حفظ
+                        </button>
+                        <button class="btn btn-danger" onclick="hideAddCategoryForm()">
+                            <i class="fas fa-times"></i> إلغاء
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <div id="categories-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin-top: 20px;">
@@ -1133,7 +1224,7 @@
             <div id="no-categories" style="text-align: center; padding: 40px; color: #7f8c8d; display: none;">
                 <i class="fas fa-tags fa-3x" style="margin-bottom: 15px; opacity: 0.3;"></i>
                 <h3>لا توجد أصناف</h3>
-                <p>اضغط "تحديث من Google Sheets" لتحميل الأصناف</p>
+                <p>اضغط "إضافة صنف جديد" للبدء</p>
             </div>
         </div>
         
@@ -2487,6 +2578,53 @@
             `).join('');
         }
         
+        // إظهار نموذج إضافة صنف
+        function showAddCategoryForm() {
+            document.getElementById('add-category-form').style.display = 'block';
+        }
+        
+        // إخفاء نموذج إضافة صنف
+        function hideAddCategoryForm() {
+            document.getElementById('add-category-form').style.display = 'none';
+            document.getElementById('new-category-name').value = '';
+            document.getElementById('new-category-icon').value = '';
+            document.getElementById('new-category-desc').value = '';
+        }
+        
+        // إضافة صنف جديد
+        function addNewCategory() {
+            const name = document.getElementById('new-category-name').value.trim();
+            const icon = document.getElementById('new-category-icon').value.trim();
+            const desc = document.getElementById('new-category-desc').value.trim();
+            
+            if (!name) {
+                showAlert('يرجى إدخال اسم الصنف', 'error');
+                return;
+            }
+            
+            let categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
+            
+            // إضافة صنف "الكل" إذا لم يكن موجوداً
+            if (categories.length === 0) {
+                categories.push({
+                    name: 'الكل',
+                    icon: 'fas fa-th-large',
+                    description: 'جميع المنتجات'
+                });
+            }
+            
+            categories.push({
+                name: name,
+                icon: icon || 'fas fa-tag',
+                description: desc
+            });
+            
+            localStorage.setItem('storeCategories', JSON.stringify(categories));
+            hideAddCategoryForm();
+            loadCategories();
+            showAlert('تم إضافة الصنف بنجاح', 'success');
+        }
+        
         // تعديل صنف
         function editCategory(index) {
             let categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
@@ -2521,30 +2659,6 @@
             localStorage.setItem('storeCategories', JSON.stringify(categories));
             loadCategories();
             showAlert('تم حذف الصنف بنجاح', 'success');
-        }
-        
-        // حفظ الأصناف في Google Sheet
-        async function saveCategoriesToSheet() {
-            try {
-                const categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
-                
-                if (categories.length === 0) {
-                    showAlert('لا توجد أصناف للحفظ', 'error');
-                    return;
-                }
-                
-                // تحويل الأصناف إلى تنسيق الشيت
-                const sheetData = [
-                    ['name', 'icon', 'description'], // العناوين
-                    ...categories.map(cat => [cat.name, cat.icon, cat.description])
-                ];
-                
-                showAlert('سيتم حفظ الأصناف في Google Sheet (ميزة قيد التطوير)', 'info');
-                // في الإنتاج، استخدم Google Sheets API لتحديث البيانات
-                
-            } catch (error) {
-                showAlert('فشل في حفظ الأصناف: ' + error.message, 'error');
-            }
         }
         
         // تحميل المنتجات للعرض
@@ -3894,12 +4008,48 @@
         }
 
         // --- وظائف الثيم والسايدبار ---
-        function toggleTheme() {
-            const body = document.body;
-            const isDark = body.getAttribute('data-theme') === 'dark';
-            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            document.getElementById('theme-icon-btn').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+        function toggleThemeMenu() {
+            const menu = document.getElementById('theme-menu-admin');
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'block';
+            } else {
+                menu.style.display = 'none';
+            }
         }
+        
+        function setTheme(themeName) {
+            // حفظ الثيم في localStorage
+            localStorage.setItem('mashily_theme', themeName);
+            
+            // تطبيق الثيم على الصفحة الحالية
+            document.documentElement.setAttribute('data-theme', themeName);
+            
+            // إخفاء قائمة الثيمات
+            document.getElementById('theme-menu-admin').style.display = 'none';
+            
+            // إشعار
+            showAlert('تم تغيير الثيم إلى: ' + themeName, 'success');
+        }
+        
+        // تحميل الثيم المحفوظ عند بدء التشغيل
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('mashily_theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+        });
+        
+        // إغلاق قائمة الثيمات عند النقر خارجها
+        document.addEventListener('click', function(event) {
+            const themeMenu = document.getElementById('theme-menu-admin');
+            const themeButton = event.target.closest('button[onclick="toggleThemeMenu()"]');
+            
+            if (themeMenu && themeMenu.style.display === 'block' && !themeButton) {
+                if (!event.target.closest('#theme-menu-admin')) {
+                    themeMenu.style.display = 'none';
+                }
+            }
+        });
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');

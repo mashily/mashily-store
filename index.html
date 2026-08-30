@@ -58,6 +58,60 @@
             --border: rgba(0,0,0,0.1);
             --ticker-bg: #2c3e50;
         }
+        
+        /* ثيمات الموقع */
+        [data-theme="gold"] {
+            --color-primary: #f59e0b;
+            --color-primary-hover: #d97706;
+            --primary: #f59e0b;
+        }
+        
+        [data-theme="blue"] {
+            --color-primary: #3b82f6;
+            --color-primary-hover: #2563eb;
+            --primary: #3b82f6;
+        }
+        
+        [data-theme="green"] {
+            --color-primary: #10b981;
+            --color-primary-hover: #059669;
+            --primary: #10b981;
+        }
+        
+        [data-theme="red"] {
+            --color-primary: #ef4444;
+            --color-primary-hover: #dc2626;
+            --primary: #ef4444;
+        }
+        
+        [data-theme="purple"] {
+            --color-primary: #8b5cf6;
+            --color-primary-hover: #7c3aed;
+            --primary: #8b5cf6;
+        }
+        
+        [data-theme="pink"] {
+            --color-primary: #ec4899;
+            --color-primary-hover: #db2777;
+            --primary: #ec4899;
+        }
+        
+        [data-theme="dark"] {
+            --color-primary: #f59e0b;
+            --color-primary-hover: #d97706;
+            --color-background: #1e293b;
+            --color-surface: #334155;
+            --color-text: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+            --color-border: #475569;
+            --primary: #f59e0b;
+            --bg: #1e293b;
+            --card: #334155;
+            --text: #f1f5f9;
+            --card-bg: #334155;
+            --border: rgba(255,255,255,0.1);
+            --ticker-bg: #0f172a;
+        }
 
         body {
             font-family: 'Inter', 'Cairo', sans-serif;
@@ -140,10 +194,12 @@
             display: flex;
             align-items: center;
             gap: 1rem;
+            z-index: 1;
         }
 
         .search-box {
             position: relative;
+            z-index: 2;
         }
 
         .search-input {
@@ -612,7 +668,7 @@
                     <input type="text" id="search-input" class="search-input" placeholder="ابحث عن منتج..." onkeyup="searchProducts()">
                 </div>
                 
-                <select class="modern-select" onchange="sortProducts(this.value)" style="padding: 0.625rem 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-background); font-size: 0.875rem; cursor: pointer;">
+                <select class="modern-select" onchange="sortProducts(this.value)" style="padding: 0.625rem 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-background); font-size: 0.875rem; cursor: pointer; z-index: 10; position: relative;">
                     <option value="default">ترتيب افتراضي</option>
                     <option value="price_low">السعر: الأقل أولاً</option>
                     <option value="price_high">السعر: الأعلى أولاً</option>
@@ -621,6 +677,42 @@
                 <button class="icon-button" onclick="showWishlist()" aria-label="المفضلة">
                     <i class="fas fa-heart"></i>
                     <span id="wishlist-badge" class="badge">0</span>
+                </button>
+
+                <button class="icon-button" onclick="toggleTheme()" aria-label="تغيير الثيم" style="position: relative;">
+                    <i class="fas fa-palette"></i>
+                    
+                    <!-- قائمة الثيمات المنسدلة -->
+                    <div id="theme-menu" style="display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 8px; box-shadow: var(--shadow-lg); z-index: 1001; min-width: 140px; margin-top: 8px;">
+                        <button onclick="setTheme('gold')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--color-text); font-size: 0.85rem; transition: background 0.2s;">
+                            <span style="width: 20px; height: 20px; background: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">⭐</span>
+                            ذهبي
+                        </button>
+                        <button onclick="setTheme('blue')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--color-text); font-size: 0.85rem; transition: background 0.2s;">
+                            <span style="width: 20px; height: 20px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">●</span>
+                            أزرق
+                        </button>
+                        <button onclick="setTheme('green')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--color-text); font-size: 0.85rem; transition: background 0.2s;">
+                            <span style="width: 20px; height: 20px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">🍃</span>
+                            أخضر
+                        </button>
+                        <button onclick="setTheme('red')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--color-text); font-size: 0.85rem; transition: background 0.2s;">
+                            <span style="width: 20px; height: 20px; background: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">❤️</span>
+                            أحمر
+                        </button>
+                        <button onclick="setTheme('purple')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--color-text); font-size: 0.85rem; transition: background 0.2s;">
+                            <span style="width: 20px; height: 20px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">🌙</span>
+                            بنفسجي
+                        </button>
+                        <button onclick="setTheme('pink')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--color-text); font-size: 0.85rem; transition: background 0.2s;">
+                            <span style="width: 20px; height: 20px; background: #ec4899; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">💗</span>
+                            وردي
+                        </button>
+                        <button onclick="setTheme('dark')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: none; background: none; cursor: pointer; border-radius: 6px; color: var(--color-text); font-size: 0.85rem; transition: background 0.2s; border-top: 1px solid var(--color-border); margin-top: 4px;">
+                            <span style="width: 20px; height: 20px; background: #1e293b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">🌙</span>
+                            داكن
+                        </button>
+                    </div>
                 </button>
 
                 <button class="icon-button" onclick="toggleCart(true)" aria-label="السلة">
