@@ -443,8 +443,10 @@ function setTheme(themeName, event) {
         event.preventDefault();
     }
     
+    // حفظ الثيم في localStorage
+    localStorage.setItem('mashily_theme', themeName);
+    
     document.documentElement.setAttribute('data-theme', themeName);
-    localStorage.setItem('theme', themeName);
     
     const icons = {
         'light': 'fas fa-sun',
@@ -464,9 +466,11 @@ function setTheme(themeName, event) {
         themeIcon.style.color = colors[themeName] || '#e67e22';
     }
     
-    // إغلاق القائمة
+    // إغلاق القائمة إذا وجدت
     const menu = document.getElementById('theme-menu');
     if(menu) menu.style.display = 'none';
+    
+    console.log('Theme changed to:', themeName);
 }
 
 // إغلاق menu الثيمات عند الضغط بعيد عنه
@@ -835,18 +839,21 @@ function renderProducts(items) {
     const grid = document.getElementById('products-grid');
     if(!grid) return;
     
+    console.log('renderProducts called with', items.length, 'items');
+    
     if(items.length === 0) { 
         grid.innerHTML = `
             <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--color-text-secondary);">
                 <i class="fas fa-box-open fa-3x" style="margin-bottom:1rem; opacity:0.4;"></i>
-                <p style="font-size:1.125rem; font-weight:500; margin:0;">لا توجد منتجات حالياً في هذا القسم</p>
-                <p style="font-size:0.875rem; margin:0.5rem 0 0 0;">جرب تصفح أقسام أخرى</p>
+                <p style="font-size:1.125rem; font-weight:500; margin:0;">عذراً، لا توجد منتجات متوفرة حالياً!</p>
+                <p style="font-size:0.875rem; margin:0.5rem 0 0 0;">يرجى المحاولة لاحقاً أو تحديث الصفحة</p>
             </div>
         `; 
         return; 
     }
     
     grid.innerHTML = items.map(p => createProductCard(p)).join('');
+    console.log('Products rendered successfully');
 }
 
 // فتح/إغلاق بيانات الصنف عند الضغط على الصورة
@@ -1249,9 +1256,18 @@ function clearCart() {
     if(confirm('هل أنت متأكد من حذف جميع المنتجات من السلة؟')) {
         cart = [];
         appliedCoupon = null; // إلغاء الكوبون عند تفريغ السلة
-        document.getElementById('coupon-msg').innerText = '';
-        document.getElementById('coupon-input').value = '';
+        localStorage.setItem('MASHILY_CART', JSON.stringify(cart));
+        localStorage.removeItem('appliedCoupon');
+        
+        // إعادة تعيين واجهة الكوبون
+        const couponMsg = document.getElementById('coupon-msg');
+        if(couponMsg) couponMsg.innerText = '';
+        
+        const couponInput = document.getElementById('coupon-input');
+        if(couponInput) couponInput.value = '';
+        
         updateCartUI();
+        console.log('Cart cleared successfully');
     }
 }
 
@@ -2650,29 +2666,6 @@ function applyCouponFromHeader() {
         applied.style.display = 'none';
     }, 3000);
 }
-
-// وظائف الثيمات
-function setTheme(themeName) {
-    // حفظ الثيم في localStorage
-    localStorage.setItem('mashily_theme', themeName);
-    
-    // تطبيق الثيم على الصفحة الحالية
-    document.documentElement.setAttribute('data-theme', themeName);
-}
-
-// تحميل الثيم المحفوظ عند بدء التشغيل
-document.addEventListener('DOMContentLoaded', function() {
-    const savedTheme = localStorage.getItem('mashily_theme');
-    if (savedTheme) {
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        
-        // تحديث قائمة الثيمات لتظهر الثيم الحالي
-        const themeSelects = document.querySelectorAll('select[onchange*="setTheme"]');
-        themeSelects.forEach(select => {
-            select.value = savedTheme;
-        });
-    }
-});
 
 function toggleVideoDislike() {
     if(!currentAcademyVideoId) return;
