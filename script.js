@@ -502,32 +502,32 @@ function createProductCard(p) {
 
     return `
     <div class="product-card" onmouseleave="hideAllInfos()">
-        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${p.id}, event)" title="${isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}" style="position: absolute; top: 10px; right: 10px; z-index: 10; background: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
-            <i class="fas fa-heart" style="color: ${isInWishlist ? '#ef4444' : '#9ca3af'};"></i>
+        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${p.id}, event)" title="${isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}" style="position: absolute; top: 8px; right: 8px; z-index: 10; background: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.12);">
+            <i class="fas fa-heart" style="color: ${isInWishlist ? '#ef4444' : '#9ca3af'}; font-size: 0.8rem;"></i>
         </button>
         
-        <div class="img-container" onclick="openProductDetails(${p.id})" style="position: relative; width: 100%; height: 200px; background: var(--color-surface); display: flex; align-items: center; justify-content: center; padding: 1rem; overflow: hidden; cursor: pointer;">
-            ${!isOut ? `<div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 5; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)); color: white; font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; font-weight: 700; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); white-space: nowrap;">${p.status || 'مميز ✨'}</div>` : ''}
-            ${discountPercent > 0 ? `<div style="position: absolute; bottom: 10px; right: 10px; z-index: 5; padding: 4px 8px; border-radius: 20px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; font-size: 0.75rem; font-weight: 900; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);">-${discountPercent}%</div>` : ''}
+        <div class="img-container" onclick="openProductDetails(${p.id})" style="position: relative; width: 100%; height: 160px; background: var(--color-surface); display: flex; align-items: center; justify-content: center; padding: 0.75rem; overflow: hidden; cursor: pointer;">
+            ${!isOut ? `<div style="position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 5; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)); color: white; font-size: 0.65rem; padding: 3px 10px; border-radius: 16px; font-weight: 700; box-shadow: 0 3px 8px rgba(79, 70, 229, 0.25); white-space: nowrap;">${p.status || 'مميز ✨'}</div>` : ''}
+            ${discountPercent > 0 ? `<div style="position: absolute; bottom: 8px; right: 8px; z-index: 5; padding: 3px 6px; border-radius: 16px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; font-size: 0.65rem; font-weight: 900; box-shadow: 0 3px 8px rgba(239, 68, 68, 0.25);">-${discountPercent}%</div>` : ''}
             <img src="${imageUrl}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; ${isOut ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
-            ${isOut ? '<div style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.8); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; backdrop-filter: blur(4px);">نفدت الكمية ❌</div>' : ''}
+            ${isOut ? '<div style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.8); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; backdrop-filter: blur(4px);">نفدت الكمية ❌</div>' : ''}
         </div>
         
-        <div class="product-content">
-            <h4 class="product-title">${p.name}</h4>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
-                <span style="background: rgba(251, 191, 36, 0.14); color: #b45309; padding: 2px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">
-                    <i class="fas fa-star" style="font-size: 0.6rem;"></i> ${rating.toFixed(1)}
+        <div class="product-content" style="padding: 0.75rem;">
+            <h4 class="product-title" style="font-size: 0.9rem; margin: 0 0 0.25rem 0; line-height: 1.3;">${p.name}</h4>
+            <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
+                <span style="background: rgba(251, 191, 36, 0.14); color: #b45309; padding: 2px 6px; border-radius: 16px; font-size: 0.65rem; font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">
+                    <i class="fas fa-star" style="font-size: 0.5rem;"></i> ${rating.toFixed(1)}
                 </span>
-                <span style="background: ${isOut ? 'rgba(148, 163, 184, 0.14)' : 'rgba(16, 185, 129, 0.12)'}; color: ${isOut ? '#475569' : '#047857'}; padding: 2px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">${stockText}</span>
+                <span style="background: ${isOut ? 'rgba(148, 163, 184, 0.14)' : 'rgba(16, 185, 129, 0.12)'}; color: ${isOut ? '#475569' : '#047857'}; padding: 2px 6px; border-radius: 16px; font-size: 0.65rem; font-weight: 600;">${stockText}</span>
             </div>
-            <p class="product-description">${shortDesc}</p>
-            <div class="product-price">
-                ${oldPrice ? `<s style="color: #94a3b8; font-size: 0.875rem; text-decoration: line-through; font-weight: 500; margin-left: 0.5rem;">${oldPrice} ج.م</s>` : ''}
+            <p class="product-description" style="font-size: 0.7rem; margin: 0 0 0.35rem 0; line-height: 1.3;">${shortDesc}</p>
+            <div class="product-price" style="font-size: 1rem; margin: 0 0 0.35rem 0;">
+                ${oldPrice ? `<s style="color: #94a3b8; font-size: 0.75rem; text-decoration: line-through; font-weight: 500; margin-left: 0.35rem;">${oldPrice} ج.م</s>` : ''}
                 ${p.price} ج.م
             </div>
-            ${hasTimer ? `<div class="countdown-timer" data-ends="${p.offerEnds}" style="font-size: 0.75rem; color: #c0392b; font-weight: 700; background: #fff5f5; padding: 6px 10px; border-radius: 20px; border: 1px dashed #e74c3c; text-align: center; margin: 0.5rem 0; animation: pulseTimer 2s infinite;">جاري التحميل...</div>` : ''}
-            <button class="add-to-cart-btn" style="background: ${isOut ? '#9ca3af' : 'var(--color-primary)'}; cursor: ${isOut ? 'not-allowed' : 'pointer'};" 
+            ${hasTimer ? `<div class="countdown-timer" data-ends="${p.offerEnds}" style="font-size: 0.65rem; color: #c0392b; font-weight: 700; background: #fff5f5; padding: 4px 8px; border-radius: 16px; border: 1px dashed #e74c3c; text-align: center; margin: 0.35rem 0; animation: pulseTimer 2s infinite;">جاري التحميل...</div>` : ''}
+            <button class="add-to-cart-btn" style="background: ${isOut ? '#9ca3af' : 'var(--color-primary)'}; cursor: ${isOut ? 'not-allowed' : 'pointer'}; padding: 0.5rem 0.75rem; font-size: 0.8rem;" 
                 onclick="${isOut ? "alert('عذراً، المنتج غير متوفر حالياً')" : `addToCart(${p.id})`}">
                 ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
             </button>
@@ -923,24 +923,49 @@ function filterByCategory(cat) {
     currentCategory = cat;
     renderCategories(); // لتحديث اللون النشط
     
+    console.log('=== بدء الفلترة ===');
+    console.log('الصنف المطلوب:', cat);
+    console.log('عدد المنتجات الكلي:', products.length);
+    
+    // عرض عينة من بيانات المنتجات للتحقق
+    if (products.length > 0) {
+        console.log('عينة من المنتجات:');
+        products.slice(0, 3).forEach((p, i) => {
+            console.log(`المنتج ${i}:`, {
+                name: p.name,
+                category: p.category,
+                categories: p.categories
+            });
+        });
+    }
+    
     let filtered;
     if (cat === 'الكل') {
         filtered = products;
+        console.log('عرض جميع المنتجات');
     } else if (cat === 'offers') {
         filtered = products.filter(p => p.offerEnds && new Date(p.offerEnds) > new Date());
+        console.log('عرض العروض:', filtered.length);
     } else {
         // البحث عن المنتجات التي تحتوي على اسم الصنف
         filtered = products.filter(p => {
             // إذا كان المنتج له خاصية category
             if (p.category) {
-                return p.category === cat || p.category.includes(cat);
+                const match = p.category === cat || p.category.includes(cat);
+                if (match) console.log('مطابقة بالتصنيف المباشر:', p.name);
+                return match;
             }
             // إذا كان المنتج له خاصية categories (مصفوفة)
             if (p.categories && Array.isArray(p.categories)) {
-                return p.categories.includes(cat);
+                const match = p.categories.includes(cat);
+                if (match) console.log('مطابقة بمصفوفة التصنيفات:', p.name);
+                return match;
             }
+            // إذا لم يوجد تصنيف، اعرض المنتج (fallback)
+            console.log('المنتج بدون تصنيف:', p.name);
             return false;
         });
+        console.log('نتيجة الفلترة:', filtered.length);
     }
     
     // تطبيق الترتيب
@@ -950,7 +975,7 @@ function filterByCategory(cat) {
         filtered.sort((a, b) => b.price - a.price);
     }
     
-    console.log('تصفية الصنف:', cat, 'عدد المنتجات:', filtered.length);
+    console.log('المنتجات النهائية:', filtered.length);
     renderProducts(filtered);
 }
 
