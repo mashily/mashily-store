@@ -924,9 +924,24 @@ function filterByCategory(cat) {
     renderCategories(); // لتحديث اللون النشط
     
     let filtered;
-    if (cat === 'الكل') filtered = products;
-    else if (cat === 'offers') filtered = products.filter(p => p.offerEnds && new Date(p.offerEnds) > new Date());
-    else filtered = products.filter(p => p.category === cat);
+    if (cat === 'الكل') {
+        filtered = products;
+    } else if (cat === 'offers') {
+        filtered = products.filter(p => p.offerEnds && new Date(p.offerEnds) > new Date());
+    } else {
+        // البحث عن المنتجات التي تحتوي على اسم الصنف
+        filtered = products.filter(p => {
+            // إذا كان المنتج له خاصية category
+            if (p.category) {
+                return p.category === cat || p.category.includes(cat);
+            }
+            // إذا كان المنتج له خاصية categories (مصفوفة)
+            if (p.categories && Array.isArray(p.categories)) {
+                return p.categories.includes(cat);
+            }
+            return false;
+        });
+    }
     
     // تطبيق الترتيب
     if(currentSort === 'price_low') {
@@ -935,6 +950,7 @@ function filterByCategory(cat) {
         filtered.sort((a, b) => b.price - a.price);
     }
     
+    console.log('تصفية الصنف:', cat, 'عدد المنتجات:', filtered.length);
     renderProducts(filtered);
 }
 
