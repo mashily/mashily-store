@@ -961,6 +961,11 @@ function filterByCategory(cat) {
                 if (match) console.log('مطابقة بمصفوفة التصنيفات:', p.name);
                 return match;
             }
+            // مطابقة بالاسم (fallback)
+            if (p.name && p.name.includes(cat)) {
+                console.log('مطابقة بالاسم:', p.name);
+                return true;
+            }
             // إذا لم يوجد تصنيف، اعرض المنتج (fallback)
             console.log('المنتج بدون تصنيف:', p.name);
             return false;
@@ -977,7 +982,62 @@ function filterByCategory(cat) {
     
     console.log('المنتجات النهائية:', filtered.length);
     renderProducts(filtered);
+    
+    // فتح Modal للصنف (إذا لم يكن "الكل" أو "عروض")
+    if (cat !== 'الكل' && cat !== 'offers') {
+        openCategoryModal(cat, filtered);
+    }
 }
+
+// --- وظائف Modal الصنف ---
+function openCategoryModal(categoryName, products) {
+    const modal = document.getElementById('category-modal');
+    const categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
+    const category = categories.find(c => c.name === categoryName) || { name: categoryName, icon: 'fas fa-box', description: '' };
+    
+    // تعبئة البيانات
+    document.getElementById('category-modal-title').textContent = category.name;
+    document.getElementById('category-modal-desc').textContent = category.description || '';
+    document.getElementById('category-modal-icon').innerHTML = `<i class="${category.icon}"></i>`;
+    document.getElementById('category-modal-count').textContent = products.length;
+    
+    // عرض صور المنتجات
+    const productsContainer = document.getElementById('category-modal-products');
+    if (products.length === 0) {
+        productsContainer.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 20px;">لا توجد منتجات في هذا الصنف</div>';
+    } else {
+        productsContainer.innerHTML = products.slice(0, 8).map(p => {
+            const imageUrl = resolveProductImageUrl(p.image || (Array.isArray(p.images) ? p.images[0] : ''));
+            return `
+                <div style="aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--color-surface); cursor: pointer;" onclick="closeCategoryModal();">
+                    <img src="${imageUrl}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+            `;
+        }).join('');
+        
+        if (products.length > 8) {
+            productsContainer.innerHTML += `<div style="grid-column: 1/-1; text-align: center; color: var(--color-primary); font-size: 0.85rem; padding: 10px;">+${products.length - 8} منتج آخر</div>`;
+        }
+    }
+    
+    // عرض Modal
+    modal.style.display = 'flex';
+}
+
+function closeCategoryModal() {
+    const modal = document.getElementById('category-modal');
+    modal.style.display = 'none';
+}
+
+// إغلاق Modal عند النقر خارجها
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('category-modal');
+    if (modal && modal.style.display === 'flex') {
+        if (event.target === modal) {
+            closeCategoryModal();
+        }
+    }
+});
 
 // --- وظائف المفضلة (Wishlist) ---
 function toggleWishlist(productId, event) {
