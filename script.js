@@ -435,6 +435,11 @@ async function init() {
         productsGrid.addEventListener('click', function(e) {
             const productCard = e.target.closest('.product-card');
             if (productCard) {
+                // تجاهل الأزرار داخل الكارت
+                if (e.target.closest('.wishlist-btn') || e.target.closest('.add-to-cart-btn')) {
+                    return;
+                }
+                
                 e.preventDefault();
                 const productId = productCard.dataset.id;
                 if (productId) {
@@ -453,11 +458,15 @@ async function init() {
     document.addEventListener('click', function(e) {
         const productCard = e.target.closest('.product-card');
         if (productCard) {
+            // تجاهل الأزرار داخل الكارت
+            if (e.target.closest('.wishlist-btn') || e.target.closest('.add-to-cart-btn')) {
+                return;
+            }
+
             e.preventDefault();
             const productId = productCard.dataset.id;
             if (productId) {
-                console.log('Product card clicked globally, ID:', productId);
-                // استخدام openProductDetails بدلاً من openProductModal
+                console.log('Product card clicked from document, ID:', productId);
                 if (typeof window.openProductDetails === 'function') {
                     window.openProductDetails(parseInt(productId));
                 } else {
@@ -466,6 +475,9 @@ async function init() {
             }
         }
     });
+    
+    // تحديث الترويسة عند تغيير الصفحة
+    updateHeader();
 }
 
 // --- وظائف الثيمات ---
@@ -581,8 +593,10 @@ function createProductCard(p) {
 // --- وظائف نافذة تفاصيل المنتج (Modal & Gallery) ---
 let currentGalleryIndex = 0;
 let currentProductImages = [];
+let currentProductId = null;
 
 function openProductDetails(id) {
+    currentProductId = id; // حفظ ID المنتج الحالي
     const product = products.find(p => p.id === id);
     if (!product) return;
 
@@ -719,53 +733,114 @@ function openProductDetails(id) {
     document.getElementById('product-details-modal').style.display = 'flex';
 }
 
+// إغلاق Modal المنتج
 function closeProductModal() {
-    document.getElementById('product-details-modal').style.display = 'none';
+    const modal = document.getElementById('product-details-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
+
+// إضافة للسلة من Modal
+function addToCartFromModal() {
+    const product = products.find(p => p.id === currentProductId);
+    if (product) {
+        addToCart(product.id);
+        closeProductModal();
+    }
+}
+
+// عرض المفضلة
+function showWishlist() {
+    closeWishlist(); // إغلاق أولاً إذا كان مفتوحاً
+    // تحميل المفضلة
+    const wishlist = JSON.parse(localStorage.getItem('MASHILY_WISHLIST')) || [];
+    const wishlistItems = document.getElementById('wishlist-items');
+    
+    if (wishlist.length === 0) {
+        wishlistItems.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--color-text-secondary);">لا توجد منتجات في المفضلة</div>';
+    } else {
+        wishlistItems.innerHTML = wishlist.map(item => `
+            <div style="display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid var(--color-border);">
+                <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; font-size: 0.9rem;">${item.name}</div>
+                    <div style="color: var(--color-primary); font-weight: 700;">${item.price} ج.م</div>
+                </div>
+                <button onclick="window.addToCart(${item.id})" style="background: var(--color-primary); color: white; border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer;">
+                    <i class="fas fa-shopping-cart"></i>
+                </button>
+            </div>
+        `).join('');
+    }
+    
+    const sidebar = document.getElementById('wishlist-sidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.add('active');
+    overlay.classList.add('active');
+}
+
+
 
 function updateGallery() {
     const item = currentProductImages[currentGalleryIndex];
-    const img = document.getElementById('modal-img');
-    const videoContainer = document.getElementById('modal-video');
-    const container = document.querySelector('.gallery-container');
-
+    const galleryContainer = document.getElementById('modal-gallery');
+    
+    if (!galleryContainer) {
+        console.error('modal-gallery element not found');
+        return;
+    }
+    
+    // عرض جميع الصور في Gallery
+    galleryContainer.innerHTML = currentProductImages.map((item, index) => {
+        if (item.type === 'image') {
+            return `
+                <div class="gallery-item ${index === currentGalleryIndex ? 'active' : ''}" onclick="window.currentGalleryIndex = ${index}; window.updateGallery()">
+                    <img src="${resolveProductImageUrl(item.src)}" alt="صورة المنتج">
+                </div>
+            `;
+        } else if (item.type === 'video') {
+            return `
+                <div class="gallery-item ${index === currentGalleryIndex ? 'active' : ''}" onclick="window.currentGalleryIndex = ${index}; window.updateGallery()">
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000;">
+                        <i class="fas fa-play" style="color: white; font-size: 2rem;"></i>
+                    </div>
+                </div>
+            `;
+        }
+    }).join('');
+    
+    // عرض الصورة/الفيديو الرئيسي
+    const mainImageContainer = document.createElement('div');
+    mainImageContainer.style.width = '100%';
+    mainImageContainer.style.aspectRatio = '16/9';
+    mainImageContainer.style.background = '#f8fafc';
+    mainImageContainer.style.borderRadius = '8px';
+    mainImageContainer.style.overflow = 'hidden';
+    mainImageContainer.style.position = 'relative';
+    
     if (item.type === 'image') {
-        img.style.display = 'block';
-        videoContainer.style.display = 'none';
-        videoContainer.innerHTML = ''; // إيقاف الفيديو عند الانتقال
-        img.src = resolveProductImageUrl(item.src);
-        container.style.cursor = 'zoom-in';
-    } else {
-        img.style.display = 'none';
-        videoContainer.style.display = 'flex';
-        videoContainer.innerHTML = `<video controls autoplay style="max-width:100%; max-height:100%; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.2);"><source src="${item.src}" type="video/mp4">المتصفح لا يدعم الفيديو.</video>`;
-        container.style.cursor = 'default';
+        mainImageContainer.innerHTML = `<img src="${resolveProductImageUrl(item.src)}" alt="صورة المنتج" style="width: 100%; height: 100%; object-fit: contain;">`;
+    } else if (item.type === 'video') {
+        mainImageContainer.innerHTML = `<video src="${item.src}" controls style="width: 100%; height: 100%;"></video>`;
     }
     
-    // تحديث النقاط
-    const dotsContainer = document.getElementById('modal-dots');
-    dotsContainer.innerHTML = currentProductImages.map((_, i) => 
-        `<div class="dot ${i === currentGalleryIndex ? 'active' : ''}" onclick="currentGalleryIndex=${i}; updateGallery()"></div>`
-    ).join('');
-
-    // تحديث المصغرات (Thumbnails)
-    const thumbsContainer = document.getElementById('modal-thumbnails');
-    if(thumbsContainer) {
-        thumbsContainer.innerHTML = currentProductImages.map((item, i) => {
-            const activeClass = i === currentGalleryIndex ? 'active' : '';
-            if (item.type === 'image') {
-                return `<img src="${resolveProductImageUrl(item.src)}" class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()">`;
-            } else {
-                return `<div class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()" style="display:flex; align-items:center; justify-content:center; background:#000; color:#fff; font-size:1.5rem; cursor:pointer; border-radius:8px; width:60px; height:60px;"><i class="fas fa-play"></i></div>`;
-            }
-        }).join('');
-        
-        // إخفاء المصغرات إذا كانت صورة واحدة فقط
-        thumbsContainer.style.display = currentProductImages.length > 1 ? 'flex' : 'none';
-    }
+    // إضافة زر Fullscreen
+    const fullscreenBtn = document.createElement('button');
+    fullscreenBtn.className = 'fullscreen-btn';
+    fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+    fullscreenBtn.onclick = toggleFullscreen;
+    mainImageContainer.appendChild(fullscreenBtn);
     
-    // إخفاء الأسهم إذا صورة واحدة
-    document.querySelectorAll('.gallery-btn').forEach(btn => btn.style.display = currentProductImages.length > 1 ? 'flex' : 'none');
+    // إضافة main image قبل gallery
+    galleryContainer.parentNode.insertBefore(mainImageContainer, galleryContainer);
+    
+    // إزالة main image القديم إذا وجد
+    const oldMainImage = galleryContainer.parentNode.querySelector('.main-image-preview');
+    if (oldMainImage) {
+        oldMainImage.remove();
+    }
+    mainImageContainer.classList.add('main-image-preview');
 }
 
 function changeGalleryImage(dir) {
@@ -777,100 +852,48 @@ function changeGalleryImage(dir) {
 
 // --- دالة تأثير التكبير (Zoom) ---
 function setupZoomEffect() {
-    const container = document.querySelector('.gallery-container');
-    const img = document.getElementById('modal-img');
-
-    if (!container || !img) return;
-
-    let isClickedZoom = false; // حالة الزوم في وضع ملء الشاشة
-
-    container.addEventListener('mousemove', function(e) {
-        if (img.style.display === 'none') return; // لا تقم بالتكبير إذا كان المعروض فيديو
-
-        const rect = container.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        // حساب النسبة المئوية لمكان الماوس
-        const xPercent = (x / rect.width) * 100;
-        const yPercent = (y / rect.height) * 100;
-        
-        if (document.fullscreenElement) {
-            // في وضع ملء الشاشة: التحريك فقط إذا كان الزوم مفعلاً بالنقر
-            if (isClickedZoom) {
-                img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
-            }
-        } else {
-            // في الوضع العادي: تكبير عند التحويم (Hover)
-            img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
-            img.style.transform = "scale(2)"; 
-        }
-    });
-
-    container.addEventListener('mouseleave', function() {
-        if (!document.fullscreenElement) {
-            img.style.transformOrigin = "center center";
-            img.style.transform = "scale(1)";
-        }
-    });
-
-    // إضافة النقر للتكبير في وضع ملء الشاشة
-    container.addEventListener('click', function(e) {
-        if (img.style.display === 'none') return; // لا تقم بالتكبير إذا كان المعروض فيديو
-        if (e.target.closest('button')) return; // تجاهل الأزرار
-
-        if (document.fullscreenElement) {
-            isClickedZoom = !isClickedZoom;
-            if (isClickedZoom) {
-                img.style.transform = "scale(2.5)"; // تكبير أكبر
-                img.style.cursor = "zoom-out";
-                
-                // تحديث المركز فوراً
-                const rect = container.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const xPercent = (x / rect.width) * 100;
-                const yPercent = (y / rect.height) * 100;
-                img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
-            } else {
-                img.style.transform = "scale(1)";
-                img.style.cursor = "zoom-in";
-                img.style.transformOrigin = "center center";
-            }
-        }
-    });
-
-    // إعادة تعيين عند الخروج من ملء الشاشة
-    document.addEventListener('fullscreenchange', () => {
-        if (!document.fullscreenElement) {
-            isClickedZoom = false;
-            img.style.transform = "scale(1)";
-            img.style.cursor = "zoom-in";
-            img.style.transformOrigin = "center center";
-        }
-    });
+    // Zoom effect can be added later if needed
 }
 
-// --- دالة تكبير الشاشة (Fullscreen) ---
-function toggleFullscreen() {
-    const container = document.querySelector('.gallery-container');
-    if (!document.fullscreenElement) {
-        if (container.requestFullscreen) container.requestFullscreen();
-        else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen(); // Safari
+// --- وظائف المفضلة (Wishlist) ---
+
+function showWishlist() {
+    closeWishlist(); // إغلاق أولاً إذا كان مفتوحاً
+    // تحميل المفضلة
+    const wishlist = JSON.parse(localStorage.getItem('MASHILY_WISHLIST')) || [];
+    const wishlistItems = document.getElementById('wishlist-items');
+    
+    if (wishlist.length === 0) {
+        wishlistItems.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--color-text-secondary);">لا توجد منتجات في المفضلة</div>';
     } else {
-        if (document.exitFullscreen) document.exitFullscreen();
+        wishlistItems.innerHTML = wishlist.map(item => `
+            <div style="display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid var(--color-border);">
+                <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; font-size: 0.9rem;">${item.name}</div>
+                    <div style="color: var(--color-primary); font-weight: 700;">${item.price} ج.م</div>
+                </div>
+                <button onclick="window.addToCart(${item.id})" style="background: var(--color-primary); color: white; border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer;">
+                    <i class="fas fa-shopping-cart"></i>
+                </button>
+            </div>
+        `).join('');
     }
+    
+    const sidebar = document.getElementById('wishlist-sidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.add('active');
+    overlay.classList.add('active');
 }
 
-// تغيير الأيقونة عند الدخول/الخروج من وضع ملء الشاشة
-document.addEventListener('fullscreenchange', () => {
-    const icon = document.querySelector('.fullscreen-btn i');
-    if (document.fullscreenElement) {
-        icon.classList.replace('fa-expand', 'fa-compress');
-    } else {
-        icon.classList.replace('fa-compress', 'fa-expand');
-    }
-});
+function closeWishlist() {
+    const sidebar = document.getElementById('wishlist-sidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+}
+
+// --- وظائف تصفية المنتجات ---
 
 // --- وظائف عرض المنتجات ببياناتها الجديدة ---
 function renderProducts(items) {
@@ -1092,6 +1115,14 @@ window.openProductDetails = openProductDetails;
 window.toggleWishlist = toggleWishlist;
 window.addToCart = addToCart;
 window.closeProductModal = closeProductModal;
+window.showWishlist = showWishlist;
+window.clearCart = clearCart;
+window.toggleCart = toggleCart;
+window.togglePayment = togglePayment;
+window.sendToWhatsApp = sendToWhatsApp;
+window.applyCoupon = applyCoupon;
+window.toggleCouponInputInCart = toggleCouponInputInCart;
+window.addToCartFromModal = addToCartFromModal;
 
 // --- وظائف المفضلة (Wishlist) ---
 function toggleWishlist(productId, event) {
