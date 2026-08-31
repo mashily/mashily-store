@@ -1806,6 +1806,37 @@
                     <p>انقر لاختيار ملف JSON أو اسحبه هنا</p>
                     <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
                 </div>
+
+                <h3 style="margin-top: 30px;"><i class="fas fa-file-excel"></i> إدارة المنتجات من Excel</h3>
+                <p>تصدير المنتجات، تحديث ذكي، أو استبدال كامل</p>
+                <div class="backup-buttons">
+                    <button class="btn btn-success" style="background: #217346;" onclick="exportProductsExcel()">
+                        <i class="fas fa-file-export"></i> تصدير المنتجات
+                    </button>
+                    <button class="btn btn-primary" onclick="document.getElementById('smart-import-input').click()">
+                        <i class="fas fa-sync"></i> تحديث ذكي من Excel
+                    </button>
+                    <button class="btn btn-danger" onclick="document.getElementById('replace-import-input').click()">
+                        <i class="fas fa-exclamation-triangle"></i> استبدال كامل من Excel
+                    </button>
+                    <input type="file" id="smart-import-input" accept=".xlsx,.xls" style="display: none;" onchange="handleSmartImport(event)">
+                    <input type="file" id="replace-import-input" accept=".xlsx,.xls" style="display: none;" onchange="handleReplaceImport(event)">
+                </div>
+                <p style="font-size: 0.85rem; color: #64748b; margin-top: 10px;">
+                    <i class="fas fa-info-circle"></i> التحديث الذكي: يحافظ على البيانات الموجودة ويحدثها<br>
+                    <i class="fas fa-exclamation-triangle"></i> الاستبدال الكامل: يستبدل كل شيء (لحالات الطوارئ)
+                </p>
+
+                <h3 style="margin-top: 30px;"><i class="fas fa-tags"></i> إدارة الأصناف</h3>
+                <p>عرض تقرير الأصناف أو مسح جميع الأصناف</p>
+                <div class="backup-buttons">
+                    <button class="btn btn-info" onclick="showCategoriesReport()">
+                        <i class="fas fa-chart-bar"></i> تقرير الأصناف
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAllCategories()">
+                        <i class="fas fa-trash"></i> مسح جميع الأصناف
+                    </button>
+                </div>
                 
                 <h3 style="margin-top: 30px;"><i class="fas fa-sync-alt"></i> مزامنة مع المتجر</h3>
                 <p>سحب البيانات من متجرك الحالي (script.js)</p>
@@ -3359,7 +3390,7 @@
                 return;
             }
 
-            // تجهيز البيانات للتصدير
+            // تجهيز البيانات للتصدير مع إضافة عمود الأصناف
             const exportData = products.map(p => ({
                 id: p.id,
                 name: p.name,
@@ -3380,6 +3411,255 @@
             
             XLSX.writeFile(wb, "products_backup.xlsx");
             showAlert('تم تصدير المنتجات إلى Excel بنجاح', 'success');
+        }
+
+        // استيراد ذكي من Excel
+        function handleSmartImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!confirm('هل تريد تحديث المنتجات بشكل ذكي؟\n\nسيتم:\n- تحديث المنتجات الموجودة\n- إضافة المنتجات الجديدة\n- حذف المنتجات غير الموجودة في Excel\n- استخراج الأصناف تلقائياً')) {
+                return;
+            }
+
+            processExcelFile(file, 'smart');
+        }
+
+        // استيراد استبدال كامل من Excel
+        function handleReplaceImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!confirm('⚠️ تحذير: سيتم استبدال جميع المنتجات الحالية!\n\nهل أنت متأكد أنك تريد الاستمرار؟\n\nهذا الإجراء سيحذف جميع المنتجات الحالية ويضيف المنتجات من Excel فقط.')) {
+                return;
+            }
+
+            if (!confirm('تأكيد نهائي: هل أنت متأكد تماماً؟\n\nهذا الإجراء لا يمكن التراجع عنه!')) {
+                return;
+            }
+
+            processExcelFile(file, 'replace');
+        }
+
+        // معالجة ملف Excel
+        function processExcelFile(file, mode) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    if (typeof XLSX === 'undefined') {
+                        showAlert('مكتبة XLSX غير محملة. يرجى تحديث الصفحة.', 'error');
+                        return;
+                    }
+
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const json = XLSX.utils.sheet_to_json(worksheet);
+
+                    const productsArray = Array.isArray(json) ? json : (json.data || Object.values(json));
+
+                    // استخراج الأصناف تلقائياً
+                    const categories = extractCategoriesFromProducts(productsArray);
+
+                    if (mode === 'smart') {
+                        smartUpdateProducts(productsArray, categories);
+                    } else if (mode === 'replace') {
+                        replaceAllProducts(productsArray, categories);
+                    }
+                } catch (err) {
+                    console.error('خطأ في قراءة Excel:', err);
+                    showAlert('خطأ في قراءة ملف Excel: ' + err.message, 'error');
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        // استخراج الأصناف من المنتجات
+        function extractCategoriesFromProducts(productsArray) {
+            const categoriesSet = new Set();
+            
+            productsArray.forEach(p => {
+                if (p.category) {
+                    // دعم الأصناف المتعددة مفصولة بفاصلة
+                    const cats = p.category.toString().split(',').map(c => c.trim()).filter(c => c);
+                    cats.forEach(cat => categoriesSet.add(cat));
+                }
+            });
+
+            // تحويل الأصناف إلى كائنات
+            const categories = Array.from(categoriesSet).map(catName => ({
+                name: catName,
+                icon: 'fas fa-tag',
+                description: `صنف ${catName}`
+            }));
+
+            return categories;
+        }
+
+        // التحديث الذكي للمنتجات
+        function smartUpdateProducts(newProducts, categories) {
+            try {
+                // استخراج الأصناف وحفظها
+                if (categories.length > 0) {
+                    localStorage.setItem('storeCategories', JSON.stringify(categories));
+                    console.log('تم استخراج وحفظ', categories.length, 'صنف');
+                }
+
+                // الحصول على المنتجات الحالية
+                const currentProducts = JSON.parse(localStorage.getItem('storeProducts')) || [];
+                const currentIds = new Set(currentProducts.map(p => p.id));
+                const newIds = new Set(newProducts.map(p => p.id));
+
+                // تحديث المنتجات الموجودة
+                let updatedCount = 0;
+                newProducts.forEach(newP => {
+                    if (currentIds.has(newP.id)) {
+                        const index = currentProducts.findIndex(p => p.id === newP.id);
+                        if (index !== -1) {
+                            currentProducts[index] = normalizeProductData(newP);
+                            updatedCount++;
+                        }
+                    }
+                });
+
+                // إضافة المنتجات الجديدة
+                let addedCount = 0;
+                newProducts.forEach(newP => {
+                    if (!currentIds.has(newP.id)) {
+                        currentProducts.push(normalizeProductData(newP));
+                        addedCount++;
+                    }
+                });
+
+                // حذف المنتجات غير الموجودة في Excel
+                let deletedCount = 0;
+                const finalProducts = currentProducts.filter(p => newIds.has(p.id));
+                deletedCount = currentProducts.length - finalProducts.length;
+
+                // حفظ المنتجات
+                localStorage.setItem('storeProducts', JSON.stringify(finalProducts));
+                products = finalProducts;
+
+                showAlert(`تم التحديث الذكي بنجاح!\n✅ تم تحديث: ${updatedCount} منتج\n✅ تم إضافة: ${addedCount} منتج\n✅ تم حذف: ${deletedCount} منتج\n✅ تم استخراج: ${categories.length} صنف`, 'success');
+
+                // تحديث الواجهة
+                if (typeof renderProducts === 'function') {
+                    renderProducts(products);
+                }
+                if (typeof renderCategories === 'function') {
+                    renderCategories();
+                }
+            } catch (err) {
+                console.error('خطأ في التحديث الذكي:', err);
+                showAlert('خطأ في التحديث الذكي: ' + err.message, 'error');
+            }
+        }
+
+        // استبدال كامل للمنتجات
+        function replaceAllProducts(newProducts, categories) {
+            try {
+                // استخراج الأصناف وحفظها
+                if (categories.length > 0) {
+                    localStorage.setItem('storeCategories', JSON.stringify(categories));
+                    console.log('تم استخراج وحفظ', categories.length, 'صنف');
+                }
+
+                // تطبيع البيانات
+                const normalizedProducts = newProducts.map(p => normalizeProductData(p));
+
+                // حفظ المنتجات
+                localStorage.setItem('storeProducts', JSON.stringify(normalizedProducts));
+                products = normalizedProducts;
+
+                showAlert(`تم الاستبدال الكامل بنجاح!\n✅ تم إضافة: ${normalizedProducts.length} منتج\n✅ تم استخراج: ${categories.length} صنف`, 'success');
+
+                // تحديث الواجهة
+                if (typeof renderProducts === 'function') {
+                    renderProducts(products);
+                }
+                if (typeof renderCategories === 'function') {
+                    renderCategories();
+                }
+            } catch (err) {
+                console.error('خطأ في الاستبدال الكامل:', err);
+                showAlert('خطأ في الاستبدال الكامل: ' + err.message, 'error');
+            }
+        }
+
+        // تطبيع بيانات المنتج
+        function normalizeProductData(p) {
+            return {
+                id: parseInt(p.id) || Date.now(),
+                name: p.name || '',
+                price: parseFloat(p.price) || 0,
+                originalPrice: parseFloat(p.originalPrice) || 0,
+                description: p.description || '',
+                category: p.category || '',
+                stock: parseInt(p.stock) || 0,
+                status: p.status || '',
+                rating: parseFloat(p.rating) || 5,
+                offerEnds: p.offerEnds || '',
+                images: p.images ? (Array.isArray(p.images) ? p.images : p.images.toString().split('\n').filter(img => img.trim())) : [],
+                tags: p.tags ? (Array.isArray(p.tags) ? p.tags : p.tags.toString().split(',').map(t => t.trim()).filter(t => t)) : [],
+                specs: p.specs ? (Array.isArray(p.specs) ? p.specs : p.specs.toString().split('\n').map(s => s.trim()).filter(s => s)) : []
+            };
+        }
+
+        // تقرير الأصناف
+        function showCategoriesReport() {
+            const categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
+            const products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+
+            if (categories.length === 0) {
+                showAlert('لا توجد أصناف حالياً', 'info');
+                return;
+            }
+
+            // حساب عدد المنتجات في كل صنف
+            const categoryStats = categories.map(cat => {
+                const productCount = products.filter(p => p.category === cat.name).length;
+                return {
+                    ...cat,
+                    productCount
+                };
+            });
+
+            // إنشاء تقرير
+            let report = '📊 تقرير الأصناف\n\n';
+            report += `عدد الأصناف الكلي: ${categories.length}\n`;
+            report += `عدد المنتجات الكلي: ${products.length}\n\n`;
+            report += 'تفاصيل الأصناف:\n';
+            report += '----------------\n';
+
+            categoryStats.forEach(cat => {
+                report += `${cat.icon} ${cat.name}\n`;
+                report += `   - عدد المنتجات: ${cat.productCount}\n`;
+                report += `   - الوصف: ${cat.description}\n\n`;
+            });
+
+            alert(report);
+        }
+
+        // مسح جميع الأصناف
+        function clearAllCategories() {
+            if (!confirm('⚠️ تحذير: سيتم مسح جميع الأصناف!\n\nهل أنت متأكد أنك تريد الاستمرار؟')) {
+                return;
+            }
+
+            if (!confirm('تأكيد نهائي: هل أنت متأكد تماماً؟\n\nهذا الإجراء لا يمكن التراجع عنه!')) {
+                return;
+            }
+
+            localStorage.removeItem('storeCategories');
+            showAlert('تم مسح جميع الأصناف بنجاح', 'success');
+
+            // تحديث الواجهة
+            if (typeof renderCategories === 'function') {
+                renderCategories();
+            }
         }
 
         function downloadExcelTemplate() {
