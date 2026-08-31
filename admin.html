@@ -1783,36 +1783,38 @@
             
             <div class="import-export">
                 <h3><i class="fas fa-download"></i> تصدير البيانات</h3>
-                <p>تصدير جميع بيانات المنتجات والتقييمات إلى ملف JSON</p>
+                <p>تصدير جميع بيانات المنتجات والتقييمات إلى ملف Excel</p>
                 <div class="backup-buttons">
-                    <button class="btn btn-success" onclick="exportProducts()">
-                        <i class="fas fa-file-export"></i> تصدير المنتجات
-                    </button>
                     <button class="btn btn-success" style="background: #217346;" onclick="exportProductsExcel()">
-                        <i class="fas fa-file-excel"></i> تصدير Excel
+                        <i class="fas fa-file-excel"></i> تصدير المنتجات
                     </button>
-                    <button class="btn btn-primary" onclick="exportReviews()">
-                        <i class="fas fa-star"></i> تصدير التقييمات
+                    <button class="btn btn-success" style="background: #217346;" onclick="exportReviewsExcel()">
+                        <i class="fas fa-file-excel"></i> تصدير التقييمات
                     </button>
-                    <button class="btn btn-secondary" onclick="exportAll()">
-                        <i class="fas fa-database"></i> تصدير كل شيء
+                    <button class="btn btn-success" style="background: #217346;" onclick="exportAllExcel()">
+                        <i class="fas fa-file-excel"></i> تصدير كل شيء
                     </button>
                 </div>
                 
-                <h3 style="margin-top: 30px;"><i class="fas fa-upload"></i> استيراد البيانات</h3>
-                <p>استيراد بيانات من ملف JSON (استبدال البيانات الحالية)</p>
-                <div class="file-input" onclick="document.getElementById('import-file').click()">
-                    <i class="fas fa-cloud-upload-alt fa-2x" style="margin-bottom: 10px;"></i>
-                    <p>انقر لاختيار ملف JSON أو اسحبه هنا</p>
-                    <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
-                </div>
-
-                <h3 style="margin-top: 30px;"><i class="fas fa-file-excel"></i> إدارة المنتجات من Excel</h3>
-                <p>تصدير المنتجات، تحديث ذكي، أو استبدال كامل</p>
+                <h3 style="margin-top: 30px;"><i class="fas fa-file-excel"></i> إدارة البيانات البسيطة</h3>
+                <p>تنزيل ملف Excel، تعديل، ثم رفعه بسهولة</p>
                 <div class="backup-buttons">
-                    <button class="btn btn-success" style="background: #217346;" onclick="exportProductsExcel()">
-                        <i class="fas fa-file-export"></i> تصدير المنتجات
+                    <button class="btn btn-success" style="background: #217346;" onclick="exportAllExcel()">
+                        <i class="fas fa-download"></i> تنزيل ملف Excel
                     </button>
+                    <button class="btn btn-primary" onclick="document.getElementById('simple-upload-input').click()">
+                        <i class="fas fa-upload"></i> رفع ملف Excel
+                    </button>
+                    <input type="file" id="simple-upload-input" accept=".xlsx,.xls" style="display: none;" onchange="handleSimpleUpload(event)">
+                </div>
+                <p style="font-size: 0.85rem; color: #64748b; margin-top: 10px;">
+                    <i class="fas fa-info-circle"></i> بسيط وسريع: تنزيل → تعديل → رفع<br>
+                    <i class="fas fa-lock"></i> محمي بكلمة مرور لوحة التحكم
+                </p>
+
+                <h3 style="margin-top: 30px;"><i class="fas fa-sync"></i> خيارات متقدمة</h3>
+                <p>تحديث ذكي أو استبدال كامل للبيانات</p>
+                <div class="backup-buttons">
                     <button class="btn btn-primary" onclick="document.getElementById('smart-import-input').click()">
                         <i class="fas fa-sync"></i> تحديث ذكي من Excel
                     </button>
@@ -3347,38 +3349,6 @@
             document.getElementById('out-of-stock-count').textContent = outOfStockCount;
         }
         
-        // تصدير البيانات
-        function exportProducts() {
-            const data = {
-                products: products,
-                exportedAt: new Date().toISOString()
-            };
-            
-            downloadJSON(data, 'products-backup.json');
-            showAlert('تم تصدير بيانات المنتجات', 'success');
-        }
-        
-        function exportReviews() {
-            const data = {
-                reviews: reviews,
-                exportedAt: new Date().toISOString()
-            };
-            
-            downloadJSON(data, 'reviews-backup.json');
-            showAlert('تم تصدير بيانات التقييمات', 'success');
-        }
-        
-        function exportAll() {
-            const data = {
-                products: products,
-                reviews: reviews,
-                exportedAt: new Date().toISOString()
-            };
-            
-            downloadJSON(data, 'store-full-backup.json');
-            showAlert('تم تصدير جميع البيانات', 'success');
-        }
-
         function exportProductsExcel() {
             if (typeof XLSX === 'undefined') {
                 showAlert('مكتبة Excel غير محملة. تأكد من الاتصال بالإنترنت.', 'error');
@@ -3413,7 +3383,106 @@
             showAlert('تم تصدير المنتجات إلى Excel بنجاح', 'success');
         }
 
-        // استيراد ذكي من Excel
+        // تصدير التقييمات إلى Excel
+        function exportReviewsExcel() {
+            if (typeof XLSX === 'undefined') {
+                showAlert('مكتبة Excel غير محملة. تأكد من الاتصال بالإنترنت.', 'error');
+                return;
+            }
+            
+            if (reviews.length === 0) {
+                showAlert('لا توجد تقييمات لتصديرها', 'error');
+                return;
+            }
+
+            const exportData = reviews.map(r => ({
+                id: r.id,
+                productId: r.productId,
+                productName: r.productName || '',
+                rating: r.rating,
+                comment: r.comment || '',
+                date: r.date || '',
+                user: r.user || ''
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Reviews");
+            
+            XLSX.writeFile(wb, "reviews_backup.xlsx");
+            showAlert('تم تصدير التقييمات إلى Excel بنجاح', 'success');
+        }
+
+        // تصدير كل شيء إلى Excel
+        function exportAllExcel() {
+            if (typeof XLSX === 'undefined') {
+                showAlert('مكتبة Excel غير محملة. تأكد من الاتصال بالإنترنت.', 'error');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            // ورقة المنتجات
+            if (products.length > 0) {
+                const productsData = products.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    price: p.price,
+                    originalPrice: p.originalPrice || '',
+                    description: p.description,
+                    category: p.category,
+                    stock: p.stock,
+                    status: p.status || '',
+                    images: (p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : [])).join('\n'),
+                    tags: (p.tags || []).join(', '),
+                    specs: (p.specs || []).join('\n')
+                }));
+                const productsWs = XLSX.utils.json_to_sheet(productsData);
+                XLSX.utils.book_append_sheet(wb, productsWs, "Products");
+            }
+
+            // ورقة التقييمات
+            if (reviews.length > 0) {
+                const reviewsData = reviews.map(r => ({
+                    id: r.id,
+                    productId: r.productId,
+                    productName: r.productName || '',
+                    rating: r.rating,
+                    comment: r.comment || '',
+                    date: r.date || '',
+                    user: r.user || ''
+                }));
+                const reviewsWs = XLSX.utils.json_to_sheet(reviewsData);
+                XLSX.utils.book_append_sheet(wb, reviewsWs, "Reviews");
+            }
+
+            // ورقة الأصناف
+            const categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
+            if (categories.length > 0) {
+                const categoriesData = categories.map(c => ({
+                    name: c.name,
+                    icon: c.icon,
+                    description: c.description
+                }));
+                const categoriesWs = XLSX.utils.json_to_sheet(categoriesData);
+                XLSX.utils.book_append_sheet(wb, categoriesWs, "Categories");
+            }
+
+            XLSX.writeFile(wb, "store_full_backup.xlsx");
+            showAlert('تم تصدير كل شيء إلى Excel بنجاح', 'success');
+        }
+
+        // رفع بسيط من Excel
+        function handleSimpleUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!confirm('هل تريد رفع ملف Excel وتحديث البيانات؟\n\nسيتم استخراج الأصناف تلقائياً من الملف.')) {
+                return;
+            }
+
+            processExcelFile(file, 'smart');
+        }
         function handleSmartImport(event) {
             const file = event.target.files[0];
             if (!file) return;
