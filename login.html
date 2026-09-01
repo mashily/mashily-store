@@ -179,9 +179,9 @@
                     loader.style.display = 'none';
                     loginBtn.innerHTML = '<i class="fas fa-check"></i> تم التسجيل بنجاح';
                     
-                    // التوجيه إلى لوحة التحكم
+                    // التوجيه إلى لوحة التحكم الجديدة
                     setTimeout(() => {
-                        window.location.href = 'admin.html';
+                        window.location.href = 'admin-new.html';
                     }, 1000);
                 } else {
                     // فشل التسجيل
@@ -197,8 +197,8 @@
         // التحقق من تسجيل الدخول عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', function() {
             if (sessionStorage.getItem('mashily_user')) {
-                // إذا كان مسجلاً بالفعل، توجيهه مباشرة للوحة التحكم
-                window.location.href = 'admin.html';
+                // إذا كان مسجلاً بالفعل، توجيهه مباشرة للوحة التحكم الجديدة
+                window.location.href = 'admin-new.html';
             }
         });
     </script>
