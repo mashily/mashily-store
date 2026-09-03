@@ -2,1093 +2,291 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-    <title>Mashily Store Central</title>
-    <meta name="description" content="Mashily Store Central — المتجر الإلكتروني الاحترافي">
-    <meta name="robots" content="index, follow">
-    <meta property="og:title" content="Mashily Store Central">
-    <meta property="og:description" content="Mashily Store Central — المتجر الإلكتروني الاحترافي">
-    <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Mashily Store Central">
-    <meta name="twitter:description" content="Mashily Store Central — المتجر الإلكتروني الاحترافي">
-    
-    <!-- Line Inter Font from the new design -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Cairo Font for Arabic support from old design -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Original CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر مشالى | الإلكترونيات</title>
     <link rel="stylesheet" href="style.css">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* تطبيق التصميم الجديد مع الحفاظ على الوظائف القديمة */
-        :root {
-            /* من التصميم الجديد */
-            --color-primary: #4f46e5;
-            --color-primary-hover: #4338ca;
-            --color-secondary: #64748b;
-            --color-success: #22c55e;
-            --color-warning: #f59e0b;
-            --color-danger: #ef4444;
-            --color-background: #ffffff;
-            --color-surface: #f8fafc;
-            --color-text: #0f172a;
-            --color-text-secondary: #64748b;
-            --color-border: #e2e8f0;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --radius-sm: 0.375rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 0.75rem;
-            
-            /* من التصميم القديم للحفاظ على التوافق */
-            --primary: #e67e22;
-            --bg: #FFFFFF;
-            --card: #F5F5F5;
-            --text: #333333;
-            --card-bg: #FFFFFF;
-            --border: rgba(0,0,0,0.1);
-            --ticker-bg: #2c3e50;
-        }
-        
-        /* ثيمات الموقع */
-        [data-theme="gold"] {
-            --color-primary: #f59e0b;
-            --color-primary-hover: #d97706;
-            --primary: #f59e0b;
-        }
-        
-        [data-theme="blue"] {
-            --color-primary: #3b82f6;
-            --color-primary-hover: #2563eb;
-            --primary: #3b82f6;
-        }
-        
-        [data-theme="green"] {
-            --color-primary: #10b981;
-            --color-primary-hover: #059669;
-            --primary: #10b981;
-        }
-        
-        [data-theme="red"] {
-            --color-primary: #ef4444;
-            --color-primary-hover: #dc2626;
-            --primary: #ef4444;
-        }
-        
-        [data-theme="purple"] {
-            --color-primary: #8b5cf6;
-            --color-primary-hover: #7c3aed;
-            --primary: #8b5cf6;
-        }
-        
-        [data-theme="pink"] {
-            --color-primary: #ec4899;
-            --color-primary-hover: #db2777;
-            --primary: #ec4899;
-        }
-        
-        [data-theme="dark"] {
-            --color-primary: #f59e0b;
-            --color-primary-hover: #d97706;
-            --color-background: #1e293b;
-            --color-surface: #334155;
-            --color-text: #f1f5f9;
-            --color-text-secondary: #cbd5e1;
-            --color-border: #475569;
-            --primary: #f59e0b;
-            --bg: #1e293b;
-            --card: #334155;
-            --text: #f1f5f9;
-            --card-bg: #334155;
-            --border: rgba(255,255,255,0.1);
-            --ticker-bg: #0f172a;
-        }
-
-        body {
-            font-family: 'Inter', 'Cairo', sans-serif;
-            background: var(--color-surface);
-            color: var(--color-text);
-            margin: 0;
-            padding: 0;
-            direction: rtl;
-        }
-
-        /* تنسيق الهيدر الجديد */
-        .modern-header {
-            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.92));
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--color-border);
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: var(--shadow-md);
-        }
-
-        .header-container {
-            max-width: 1400px;
-            margin: 0 auto;
+        .payment-options {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 2rem;
+            gap: 8px;
+            justify-content: center;
         }
-
-        .brand-section {
+        .payment-option label {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 1rem;
-        }
-
-        .brand-logo {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--color-primary);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .brand-subtitle {
-            font-size: 0.875rem;
-            color: var(--color-text-secondary);
-            font-weight: 500;
-        }
-
-        .nav-section {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--color-text);
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-md);
-            transition: all 0.2s;
-        }
-
-        .nav-link:hover {
-            background: var(--color-surface);
-            color: var(--color-primary);
-        }
-
-        .nav-link.active {
-            background: var(--color-primary);
-            color: white;
-        }
-
-        .tools-section {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            z-index: 1;
-            flex: 1;
-            justify-content: flex-end;
-        }
-
-        .search-box {
-            position: relative;
-            z-index: 1;
-            flex: 1;
-            max-width: 260px;
-        }
-
-        .search-input {
-            padding: 0.5rem 0.75rem 0.5rem 2.25rem;
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            background: var(--color-background);
-            font-size: 0.8rem;
-            width: 100%;
-            transition: all 0.2s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--color-text-secondary);
-        }
-
-        .icon-button {
-            width: 2rem;
-            height: 2rem;
-            border: none;
-            background: var(--color-surface);
-            border-radius: var(--radius-md);
+            padding: 6px 4px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--color-text);
-            transition: all 0.2s;
-            position: relative;
-            font-size: 0.95rem;
-        }
-
-        .icon-button:hover {
-            background: var(--color-border);
-            color: var(--color-primary);
-        }
-
-        .badge {
-            position: absolute;
-            top: -0.25rem;
-            right: -0.25rem;
-            background: var(--color-danger);
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 700;
-            min-width: 1.25rem;
-            height: 1.25rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 0.25rem;
-        }
-
-        /* تنسيق شبكة المنتجات */
-        .modern-products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 0.5rem;
-            padding: 1rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .product-card {
-            background: var(--color-background);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            overflow: hidden;
             transition: all 0.3s;
-            cursor: pointer;
+            width: 55px;
+            background: var(--bg);
         }
-
-        .product-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        .payment-option input[type="radio"] { display: none; }
+        .payment-option input[type="radio"]:checked + label { border-color: var(--primary); background: #fff; box-shadow: 0 0 10px rgba(230, 126, 34, 0.3); }
+        .payment-option i { font-size: 1.2rem; margin-bottom: 2px; color: var(--primary); }
+        .payment-option span { font-size: 0.6rem; font-weight: bold; color: var(--text); }
+        .payment-action label {
+            border-color: #25d366;
+            background: #f0fff4;
         }
-
-        .product-image {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            background: var(--color-surface);
+        .payment-action label:hover {
+            background: #d4edda;
         }
-
-        .product-content {
-            padding: 1.25rem;
-        }
-
-        .product-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin: 0 0 0.5rem 0;
-            color: var(--color-text);
-        }
-
-        .product-price {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--color-primary);
-            margin: 0.5rem 0;
-        }
-
-        .product-description {
-            font-size: 0.875rem;
-            color: var(--color-text-secondary);
-            margin: 0.5rem 0 1rem 0;
-            line-height: 1.5;
-        }
-
-        .add-to-cart-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--color-primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .add-to-cart-btn:hover {
-            background: var(--color-primary-hover);
-        }
-
-        /* السلة الجانبية - تحسين التصميم */
-        .cart-sidebar {
-            position: fixed;
-            left: -400px;
-            top: 0;
-            width: 400px;
-            height: 100%;
-            background: var(--color-background);
-            z-index: 3500;
-            transition: 0.4s;
-            box-shadow: 2px 0 15px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .cart-sidebar.active {
-            left: 0;
-        }
-
-        .cart-header {
-            padding: 1rem 1.5rem;
-            background: var(--color-primary);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .cart-header h3 {
-            margin: 0;
-            font-size: 1.1rem;
-        }
-
-        .close-cart-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .cart-items {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .cart-footer {
-            padding: 0.6rem 1rem;
-            background: var(--color-surface);
-            border-top: 1px solid var(--color-border);
-            flex-shrink: 0;
-            position: sticky;
-            bottom: 0;
-        }
-
-        /* أزرار الدفع المحسنة */
-        .payment-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.4rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .payment-btn {
-            padding: 0.5rem 0.3rem;
-            border: none;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.65rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.25rem;
-            transition: all 0.2s;
-        }
-
-        .payment-btn.cash {
-            background: var(--color-primary);
-            color: white;
-        }
-
-        .payment-btn.vodafone {
-            background: #e91e63;
-            color: white;
-        }
-
-        .payment-btn.instapay {
-            background: #673ab7;
-            color: white;
-        }
-
-        .payment-btn.whatsapp {
-            background: #25d366;
-            color: white;
-        }
-
-        .payment-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        /* معلومات الدفع */
-        .payment-info {
-            display: none;
-            padding: 0.5rem;
-            border-radius: var(--radius-md);
-            margin-bottom: 0.5rem;
-            font-size: 0.75rem;
-            text-align: center;
-        }
-
-        .payment-info.vodafone {
-            background: #fce4ec;
-            border: 1px solid #e91e63;
-            color: #c2185b;
-        }
-
-        .payment-info.instapay {
-            background: #f3e5f5;
-            border: 1px solid #673ab7;
-            color: #512da8;
-        }
-
-        .payment-info.active {
-            display: block;
-        }
-
-        /* إجمالي السلة */
-        .cart-total {
-            background: var(--color-background);
-            padding: 0.6rem;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--color-border);
-            margin-bottom: 0.5rem;
-        }
-
-        .cart-total-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.3rem;
-            font-size: 0.75rem;
-        }
-
-        .cart-total-row.discount {
-            color: #10b981;
-            font-weight: 600;
-        }
-
-        .cart-total-row.final {
-            border-top: 1px solid var(--color-border);
-            padding-top: 0.4rem;
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-
-        .total-amount {
-            color: var(--color-primary);
-            font-weight: 700;
-        }
-
-        /* زر تفريغ السلة */
-        .clear-cart-btn {
-            width: 100%;
-            padding: 0.5rem;
-            background: var(--color-danger);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: all 0.2s;
-        }
-
-        .clear-cart-btn:hover {
-            background: #dc2626;
-        }
-
-        /* الكوبون */
-        .coupon-section {
-            margin-bottom: 1rem;
-        }
-
-        .coupon-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            background: var(--color-background);
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .apply-coupon-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--color-primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .coupon-message {
-            font-size: 0.75rem;
-            margin-top: 0.25rem;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        /* شريط الأخبار */
-        .news-ticker {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            padding: 0.4rem 0;
-            z-index: 2000;
-            overflow: hidden;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .ticker-content {
-            display: inline-block;
-            white-space: nowrap;
-            animation: ticker 20s linear infinite;
-            font-size: 0.875rem;
-        }
-
-        @keyframes ticker {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        /* زر واتساب العائم */
-        .whatsapp-float {
-            position: fixed;
-            bottom: 4rem;
-            left: 1.5rem;
-            background: #25d366;
-            color: white;
-            width: 3.5rem;
-            height: 3.5rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            text-decoration: none;
-            z-index: 2500;
-            box-shadow: var(--shadow-lg);
-            transition: all 0.3s;
-        }
-
-        .whatsapp-float:hover {
-            transform: scale(1.1);
-        }
-
-        /* Overlay */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 2500;
-        }
-
-        .overlay.active {
-            display: block;
-        }
-
-        /* استجابة للشاشات الصغيرة */
-        @media (max-width: 768px) {
-            .header-container {
-                flex-wrap: wrap;
-                gap: 1rem;
-            }
-
-            .tools-section {
-                flex-wrap: wrap;
-                gap: 0.5rem;
-            }
-
-            .search-box {
-                max-width: 150px;
-                order: 1;
-            }
-
-            .modern-select {
-                min-width: auto !important;
-                font-size: 0.75rem !important;
-                padding: 0.4rem 0.6rem !important;
-            }
-
-            .modern-products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-                padding: 0.75rem;
-                gap: 0.5rem;
-            }
-
-            .cart-sidebar {
-                width: 100%;
-                left: -100%;
-            }
-
-            .payment-buttons {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .search-box {
-                max-width: 100%;
-                order: 1;
-            }
-
-            .tools-section {
-                justify-content: space-between;
-            }
+        .payment-action i {
+            color: #25d366 !important;
         }
     </style>
 </head>
 <body>
-    <!-- Header الجديد -->
-    <header class="modern-header">
-        <div class="header-container">
-            <div class="brand-section">
-                <a href="index.html" class="brand-logo" onclick="triggerAdmin(); return false;">
-                    <i class="fas fa-bolt"></i>
-                    Mashily Store
-                </a>
-                <span class="brand-subtitle" onclick="triggerAdmin(); return false;">للإلكترونيات والفيديوهات التعليمية</span>
-            </div>
+    <header style="background: var(--bg); box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding-bottom: 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; flex-wrap: nowrap;">
+        
+        <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1;">
+            <span style="font-size: 0.7rem; color: var(--text-light); font-weight: bold; margin-bottom: 2px; margin-right: 2px;">متجر</span>
+            <a href="index.html" style="text-decoration: none; color: var(--primary); font-size: 1.8rem; font-weight: 900; display: block; margin-bottom: 4px;">⚡ مشالى</a>
+            <span onclick="triggerAdmin()" style="font-size: 0.7rem; color: var(--primary); font-weight: bold; white-space: nowrap; cursor: default; user-select: none;">للإلكترونيات والفيديوهات التعليمية</span>
+        </div>
 
-            <div class="nav-section">
-                <a href="index.html" class="nav-link active">المتجر</a>
-                <a href="academy.html" class="nav-link">
-                    <i class="fas fa-graduation-cap"></i> الأكاديمية
-                </a>
-            </div>
+        <a href="academy.html" style="text-decoration: none; background: var(--card); padding: 5px 15px; border-radius: 50px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid var(--border); transition: transform 0.2s; display: flex; align-items: center; gap: 5px;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <h2 style="color:var(--primary); margin:0; font-size: 1rem; font-weight: 900; display: flex; align-items: center; gap: 5px;">
+                <i class="fas fa-graduation-cap"></i> أكاديمية مشالى
+            </h2>
+        </a>
 
-            <div class="tools-section">
-                <div class="search-box">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="search-input" class="search-input" placeholder="بحث..." onkeyup="searchProducts()">
+        <div style="display: flex; align-items: center; gap: 25px;"> <div style="max-width: 140px;">
+                <select onchange="sortProducts(this.value)" style="width: 100%; padding: 5px; border-radius: 15px; border: 1px solid var(--border); font-size: 0.75rem; outline: none; margin-bottom: 5px; background: var(--card); color: var(--text); cursor: pointer;">
+                    <option value="default">ترتيب افتراضي</option>
+                    <option value="price_low">السعر: الأقل أولاً</option>
+                    <option value="price_high">السعر: الأعلى أولاً</option>
+                </select>
+                <input type="text" id="search-input" onkeyup="searchProducts()" placeholder="ابحث.." 
+                       style="width: 100%; padding: 7px 12px; border-radius: 20px; border: 1px solid var(--border); font-size: 0.8rem; outline: none; background: var(--card); color: var(--text);">
+            </div>
+            
+            <div style="display: flex; gap: 15px; align-items: center; margin-right: 5px;">
+                <div style="position:relative;">
+                    <button onclick="toggleThemeMenu(event)" onmouseover="this.style.background='rgba(0,0,0,0.1)'" onmouseout="this.style.background='none'" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:var(--primary); padding:8px; border-radius:50%; transition:all 0.3s; display:flex; align-items:center; justify-content:center; width:40px; height:40px;">
+                        <i id="theme-icon" class="fas fa-moon" style="transition:all 0.3s;"></i>
+                    </button>
+                    <div id="theme-menu" style="position:absolute; top:45px; right:0; background:var(--card); border:2px solid var(--primary); border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.3); padding:8px; min-width:auto; display:none; z-index:10000;">
+                        <button onclick="setTheme('light', event)" style="width:45px; height:45px; padding:0; margin:3px; background:linear-gradient(135deg, #FFFFFF, #F5F5F5); color:#333; border:2px solid #ddd; border-radius:8px; cursor:pointer; font-size:1.2rem; font-weight:bold; display:flex; align-items:center; gap:0; justify-content:center; transition:all 0.3s;" title="Light Theme">
+                            <i class="fas fa-sun"></i>
+                        </button>
+                        <button onclick="setTheme('neon', event)" style="width:45px; height:45px; padding:0; margin:3px; background:#000; color:#00D4FF; border:2px solid #00D4FF; border-radius:8px; cursor:pointer; font-size:1.2rem; font-weight:bold; display:flex; align-items:center; gap:0; justify-content:center; transition:all 0.3s; box-shadow:0 0 10px rgba(0,212,255,0.3);" title="Neon Tech">
+                            <i class="fas fa-bolt"></i>
+                        </button>
+                        <button onclick="setTheme('gold', event)" style="width:45px; height:45px; padding:0; margin:3px; background:#0F0E0B; color:#FFD700; border:2px solid #FFD700; border-radius:8px; cursor:pointer; font-size:1.2rem; font-weight:bold; display:flex; align-items:center; gap:0; justify-content:center; transition:all 0.3s; box-shadow:0 0 10px rgba(255,215,0,0.3);" title="Premium Gold">
+                            <i class="fas fa-crown"></i>
+                        </button>
+                    </div>
                 </div>
-                
-                <select class="modern-select" onchange="sortProducts(this.value)" style="padding: 0.4rem 0.6rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-background); font-size: 0.75rem; cursor: pointer; z-index: 1000; position: relative; min-width: 90px;">
-                    <option value="default">ترتيب</option>
-                    <option value="price_low">الأقل سعراً</option>
-                    <option value="price_high">الأعلى سعراً</option>
-                </select>
-
-                <select class="modern-select" onchange="setTheme(this.value)" style="padding: 0.4rem 0.6rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-background); font-size: 0.75rem; cursor: pointer; z-index: 1000; position: relative; min-width: 90px;">
-                    <option value="gold">⭐ ذهبي</option>
-                    <option value="blue">● أزرق</option>
-                    <option value="green">🍃 أخضر</option>
-                    <option value="red">❤️ أحمر</option>
-                    <option value="purple">🌙 بنفسجي</option>
-                    <option value="pink">💗 وردي</option>
-                    <option value="dark">🌙 داكن</option>
-                </select>
-
-                <button class="icon-button" onclick="window.showWishlist()" aria-label="المفضلة">
+                <div onclick="showWishlist()" style="position:relative; cursor:pointer; color:var(--primary); font-size:1.1rem; display:flex; align-items:center; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;" onmousedown="event.preventDefault()">
                     <i class="fas fa-heart"></i>
-                    <span id="wishlist-badge" class="badge">0</span>
-                </button>
-
-                <button class="icon-button" onclick="window.toggleCart(true)" aria-label="السلة">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="cart-badge" class="badge">0</span>
-                </button>
-            </div>
-        </div>
-        
-        <!-- قسم الفئات -->
-        <div class="categories-wrapper" style="background: #ffffff; padding: 10px 0; border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-            <div id="product-cats" class="categories-scroll" style="display: flex; gap: 8px; overflow-x: auto; padding: 0 2rem; scrollbar-width: none; -ms-overflow-style: none; max-width: 1400px; margin: 0 auto;"></div>
-        </div>
-        
-        <style>
-            #product-cats::-webkit-scrollbar { display: none; }
-            
-            .cat-btn {
-                background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-                color: var(--color-text);
-                border: 1px solid var(--color-border);
-                padding: 6px 12px;
-                border-radius: 6px;
-                white-space: nowrap;
-                cursor: pointer;
-                font-weight: 600;
-                font-size: 0.75rem;
-                transition: all 0.3s ease;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-                display: flex;
-                align-items: center;
-                gap: 4px;
-            }
-        
-            .cat-btn:hover {
-                transform: translateY(-1px);
-                border-color: var(--color-primary);
-                box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-            }
-        
-            .cat-btn.active {
-                background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
-                color: white;
-                border-color: var(--color-primary);
-                box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-            }
-            
-            .cat-btn-offer {
-                background: linear-gradient(135deg, #ef4444, #dc2626);
-                color: white;
-                border-color: #ef4444;
-            }
-            
-            .cat-btn-offer:hover {
-                background: linear-gradient(135deg, #dc2626, #b91c1c);
-                border-color: #dc2626;
-            }
-            
-            .cat-btn-offer.active {
-                background: linear-gradient(135deg, #dc2626, #b91c1c);
-                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-            }
-                color: white;
-                border-color: transparent;
-                box-shadow: 0 10px 18px rgba(79, 70, 229, 0.22);
-            }
-        
-            .cat-btn.cat-btn-offer {
-                background: linear-gradient(135deg, #ef4444, #f97316);
-                color: white;
-                border: none;
-                animation: pulse-offer-btn 2s infinite;
-            }
-        
-            .cat-btn.cat-btn-offer.active,
-            .cat-btn.cat-btn-offer:hover {
-                background: linear-gradient(135deg, #ff6b57, #ef4444);
-                transform: translateY(-1px) scale(1.02);
-                box-shadow: 0 12px 20px rgba(239, 68, 68, 0.24);
-            }
-        
-            @keyframes pulse-offer-btn {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.04); }
-            }
-        </style>
-    </header>
-
-    <!-- Modal تفاصيل الصنف -->
-    <div id="category-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
-        <div style="background: white; border-radius: 16px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; position: relative; animation: modalSlideIn 0.3s ease;">
-            <button onclick="window.closeCategoryModal()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; z-index: 10;">
-                <i class="fas fa-times"></i>
-            </button>
-            
-            <div style="padding: 25px;">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <div id="category-modal-icon" style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; margin: 0 auto 15px;">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <h2 id="category-modal-title" style="margin: 0; color: var(--color-text); font-size: 1.5rem;"></h2>
-                    <p id="category-modal-desc" style="color: var(--color-text-secondary); margin: 5px 0 0 0; font-size: 0.9rem;"></p>
+                    <span id="wishlist-badge" style="position: absolute; top: -8px; right: -8px; background: #e74c3c; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 50%; display:none;">0</span>
                 </div>
-                
-                <div style="background: var(--color-surface); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span style="color: var(--color-text-secondary); font-size: 0.9rem;">عدد المنتجات:</span>
-                        <span id="category-modal-count" style="font-weight: 700; color: var(--color-primary); font-size: 1.1rem;">0</span>
-                    </div>
+                <div onclick="toggleCart(true)" style="position:relative; cursor:pointer; color:var(--primary); font-size:1.1rem; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;" onmousedown="event.preventDefault()">
+                    <i class="fas fa-shopping-basket"></i>
+                    <span id="cart-badge" style="position: absolute; top: -8px; right: -8px; background: var(--primary); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 50%;">0</span>
                 </div>
-                
-                <div id="category-modal-products" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-bottom: 20px;">
-                    <!-- صور المنتجات ستظهر هنا -->
-                </div>
-                
-                <button onclick="window.closeCategoryModal()" style="width: 100%; padding: 12px; background: var(--color-primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">
-                    <i class="fas fa-check"></i> حسنا
-                </button>
             </div>
         </div>
     </div>
-
+    <div class="categories-wrapper" style="background: var(--bg); padding: 10px 0; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;">
+        <div id="product-cats" style="display: flex; gap: 10px; overflow-x: auto; padding: 5px 15px; scrollbar-width: none; -ms-overflow-style: none;">
+        </div>
+    </div>
     <style>
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .gallery-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .gallery-item {
-            aspect-ratio: 1;
-            border-radius: 8px;
-            overflow: hidden;
+        /* إخفاء شريط التمرير المزعج مع الحفاظ على التمرير */
+        #product-cats::-webkit-scrollbar { display: none; }
+        
+        .cat-btn {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 20px;
+            white-space: nowrap;
             cursor: pointer;
-            background: var(--color-surface);
-            border: 2px solid transparent;
-            transition: border-color 0.2s;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+    
+        .cat-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3);
         }
 
-        .gallery-item:hover {
-            border-color: var(--color-primary);
-        }
-
-        .gallery-item.active {
-            border: 3px solid var(--color-primary);
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .fullscreen-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.5);
+        /* --- زر العروض المميز --- */
+        .cat-btn.cat-btn-offer {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
             color: white;
             border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            z-index: 5;
-            transition: background 0.2s;
+            animation: pulse-offer-btn 2s infinite;
         }
-
-        .fullscreen-btn:hover {
-            background: rgba(0,0,0,0.7);
+        .cat-btn.cat-btn-offer.active, .cat-btn.cat-btn-offer:hover {
+            background: linear-gradient(45deg, #ff6b5a, #e74c3c);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
         }
-
-        .main-image-preview {
-            margin-bottom: 20px;
+        .cat-btn.cat-btn-offer i {
+            animation: fa-beat 1.5s ease-in-out infinite;
         }
-        
-        @media (max-width: 768px) {
-            #category-modal {
-                padding: 10px;
-            }
-            
-            #category-modal > div {
-                max-height: 90vh;
-            }
-            
-            #category-modal-title {
-                font-size: 1.25rem !important;
-            }
-            
-            #category-modal-products {
-                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)) !important;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            #category-modal > div {
-                padding: 20px 15px;
-            }
-            
-            #category-modal-icon {
-                width: 50px !important;
-                height: 50px !important;
-                font-size: 1.25rem !important;
-            }
-            
-            #category-modal-products {
-                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)) !important;
-            }
+        @keyframes pulse-offer-btn {
+            0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); }
         }
     </style>
+</header>
 
-    <!-- شبكة المنتجات -->
-    <main class="modern-products-grid" id="products-grid"></main>
-    
-    <!-- رسالة حالة النظام -->
-    <div id="system-status" style="display: none; position: fixed; bottom: 60px; right: 20px; background: #fff; padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 2000; max-width: 300px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <i class="fas fa-info-circle" style="color: #3b82f6; font-size: 1.2rem;"></i>
-            <div>
-                <div style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">حالة النظام</div>
-                <div id="status-message" style="color: #64748b; font-size: 0.8rem;">جاري التحميل...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal تفاصيل المنتج -->
-    <div id="product-details-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; align-items: center; justify-content: center; padding: 20px;">
-        <div style="background: white; border-radius: 16px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; animation: modalSlideIn 0.3s ease;">
-            <button onclick="window.closeProductModal()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; z-index: 10;">
-                <i class="fas fa-times"></i>
-            </button>
-            
-            <div style="padding: 25px;">
-                <h2 id="modal-title" style="margin: 0 0 15px 0; color: var(--color-text); font-size: 1.5rem;"></h2>
-                <div id="modal-meta" style="margin-bottom: 20px;"></div>
-                
-                <div id="modal-gallery" class="gallery-container" style="margin-bottom: 20px;">
-                    <!-- صور المنتج ستظهر هنا -->
-                </div>
-                
-                <div id="modal-description" style="margin-bottom: 20px; color: var(--color-text-secondary); line-height: 1.6;"></div>
-                
-                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                    <button onclick="window.addToCartFromModal()" class="btn btn-primary" style="flex: 1; padding: 12px; background: var(--color-primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">
-                        <i class="fas fa-shopping-cart"></i> إضافة للسلة
-                    </button>
-                    <button id="modal-share-btn" class="btn btn-secondary" style="flex: 1; padding: 12px; background: #64748b; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">
-                        <i class="fas fa-share"></i> مشاركة
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- السلة الجانبية مع الوظائف القديمة -->
-    <div id="cart-sidebar" class="cart-sidebar">
-        <div class="cart-header">
-            <h3><i class="fas fa-shopping-cart"></i> السلة</h3>
-            <button onclick="window.toggleCart(false)" class="close-cart-btn">✕</button>
-        </div>
-
-        <div id="cart-items" class="cart-items"></div>
-
-        <div class="cart-footer">
-            <!-- أزرار الدفع -->
-            <div class="payment-buttons">
-                <button onclick="window.togglePayment('cash')" class="payment-btn cash">
-                    <i class="fas fa-money-bill"></i>
-                    <span style="font-size: 0.7rem;">نقداً</span>
-                </button>
-                <button onclick="window.togglePayment('vodafone')" class="payment-btn vodafone">
-                    <i class="fas fa-mobile-alt"></i>
-                    فودافون
-                </button>
-                <button onclick="window.togglePayment('instapay')" class="payment-btn instapay">
-                    <i class="fas fa-university"></i>
-                    Instapay
-                </button>
-                <button onclick="window.sendToWhatsApp()" class="payment-btn whatsapp">
-                    <i class="fab fa-whatsapp"></i>
-                    واتس
-                </button>
-            </div>
-
-            <!-- معلومات الدفع -->
-            <div id="vodafone-info" class="payment-info vodafone">
-                <p style="margin: 0 0 0.25rem 0; font-weight: bold; font-size: 0.7rem;">رقم فودافون:</p>
-                <b id="vf-number-display" style="font-size: 0.8rem; display: block; letter-spacing: 1px;">01551831308</b>
-            </div>
-
-            <div id="instapay-info" class="payment-info instapay">
-                <p style="margin: 0 0 0.25rem 0; font-weight: bold; font-size: 0.7rem;">حساب انستاباي:</p>
-                <b id="ip-username-display" style="font-size: 0.8rem; display: block; letter-spacing: 1px;">Mashily@instapay</b>
-                <div id="ip-qr-container" style="display: none; margin: 0.25rem auto; width: fit-content;">
-                    <img id="ip-qr-image" src="" alt="InstaPay QR" style="max-width: 60px; border-radius: 6px;">
-                </div>
-            </div>
-
-            <!-- الكوبون -->
-            <div class="coupon-section" style="margin-bottom: 0.5rem;">
-                <label onclick="window.toggleCouponInputInCart()" style="display: block; font-size: 0.75rem; margin-bottom: 0.25rem; color: var(--color-text); cursor: pointer; font-weight: 700; text-decoration: underline;">كوبون 👈</label>
-                <div id="coupon-input-container-in-cart" style="display: none; gap: 6px; align-items: stretch;">
-                    <input type="text" id="coupon-input" class="coupon-input" placeholder="أدخل كود" style="flex: 2; padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.9rem;">
-                    <button onclick="window.applyCoupon()" class="apply-coupon-btn" style="flex: 0 0 auto; padding: 10px 8px; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 0.6rem; cursor: pointer; min-width: 40px;">تطبيق</button>
-                </div>
-                <div id="coupon-msg" class="coupon-message" style="font-size: 0.7rem;"></div>
-            </div>
-
-            <!-- الإجمالي -->
-            <div class="cart-total">
-                <div class="cart-total-row">
-                    <span>المجموع الفرعي:</span>
-                    <span id="subtotal-price">0 ج.م</span>
-                </div>
-                <div class="cart-total-row discount" id="discount-row" style="display: none;">
-                    <span>الخصم:</span>
-                    <span id="discount-price" style="color: #10b981;">-0 ج.م</span>
-                </div>
-                <div class="cart-total-row final">
-                    <span>الإجمالي:</span>
-                    <span class="total-amount">
-                        <span id="total-price">0</span> ج.م
-                    </span>
-                </div>
-            </div>
-
-            <!-- زر تفريغ السلة -->
-            <button onclick="window.clearCart()" class="clear-cart-btn">
-                <i class="fas fa-trash-alt"></i> تفريغ السلة
-            </button>
-        </div>
-    </div>
-
-    <!-- Overlay -->
-    <div id="overlay" class="overlay" onclick="if(event.target === this) { window.toggleCart(false); window.closeWishlist(); }"></div>
-
-    <!-- Wishlist Sidebar -->
-    <div id="wishlist-sidebar" class="cart-sidebar" style="right: -400px; left: auto;">
-        <div class="cart-header">
-            <h3><i class="fas fa-heart"></i> المفضلة</h3>
-            <button onclick="window.closeWishlist()" class="close-cart-btn">✕</button>
-        </div>
-        <div id="wishlist-items" class="cart-items"></div>
-    </div>
-
-    <!-- شريط الأخبار -->
     <div class="news-ticker">
         <div class="ticker-content" id="ticker-text">🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥</div>
     </div>
 
-    <!-- زر واتساب العائم -->
+    <main class="products-grid" id="products-grid"></main>
+
+    <div id="cart-sidebar" class="cart-sidebar" style="width: 350px; background: var(--card); display:flex; flex-direction:column;">
+        <!-- رأس السلة -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background: var(--primary); color:white; border-radius: 8px 8px 0 0;">
+            <h4 style="margin:0; font-size:1.2rem;">🛒 السلة</h4>
+            <button onclick="toggleCart(false)" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; padding:0; width:30px; height:30px; display:flex; align-items:center; justify-content:center;">✕</button>
+        </div>
+
+        <!-- قائمة المنتجات - تأخذ كل المساحة المتاحة -->
+        <div id="cart-items" style="flex:1; overflow-y:auto; padding:15px; border-bottom: 2px solid var(--primary);"></div>
+
+        <!-- قسم الدفع والإجمالي -->
+        <div class="cart-footer" style="background: var(--card); padding: 12px 15px; overflow-y:auto;">
+            
+            <!-- طريقة الدفع -->
+            <div style="margin-bottom:10px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:4px;">
+                    <button onclick="togglePayment('cash')" style="background:var(--primary); color:white; border:none; padding:6px 4px; border-radius:4px; cursor:pointer; font-size:0.7rem; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:1px;">
+                        <i class="fas fa-money-bill" style="font-size:0.8rem;"></i> نقداً
+                    </button>
+                    <button onclick="togglePayment('vodafone')" style="background:var(--primary); color:white; border:none; padding:6px 4px; border-radius:4px; cursor:pointer; font-size:0.7rem; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:1px;">
+                        <i class="fas fa-mobile-alt" style="font-size:0.8rem;"></i> فودافون
+                    </button>
+                    <button onclick="togglePayment('instapay')" style="background:var(--primary); color:white; border:none; padding:6px 4px; border-radius:4px; cursor:pointer; font-size:0.7rem; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:1px;">
+                        <i class="fas fa-university" style="font-size:0.8rem;"></i> Instapay
+                    </button>
+                    <button onclick="sendToWhatsApp()" style="background:#25d366; color:white; border:none; padding:6px 4px; border-radius:4px; cursor:pointer; font-size:0.7rem; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:1px;">
+                        <i class="fab fa-whatsapp" style="font-size:0.8rem;"></i> واتس
+                    </button>
+                </div>
+            </div>
+
+            <!-- معلومات الدفع -->
+            <div id="vodafone-info" style="display:none; background:#fff5f5; border:1px solid var(--primary); color:#c0392b; padding:8px; border-radius:6px; font-size:0.8rem; text-align:center; margin-bottom:10px;">
+                <p style="margin:0 0 3px 0; font-weight:bold; font-size:0.75rem;">رقم فودافون:</p>
+                <b id="vf-number-display" style="font-size:0.9rem; display:block; letter-spacing:1px;">01551831308</b>
+            </div>
+            <div id="instapay-info" style="display:none; background:#f3e5f5; border:1px solid var(--primary); color:#6a1b9a; padding:8px; border-radius:6px; font-size:0.8rem; text-align:center; margin-bottom:10px;">
+                <p style="margin:0 0 3px 0; font-weight:bold; font-size:0.75rem;">حساب انستاباي:</p>
+                <b id="ip-username-display" style="font-size:0.9rem; display:block; letter-spacing:1px;">Mashily@instapay</b>
+                <div id="ip-qr-container" style="display:none; margin: 8px auto; width: fit-content;">
+                    <img id="ip-qr-image" src="" alt="InstaPay QR" style="max-width: 80px; border-radius: 6px;">
+                </div>
+            </div>
+
+            <!-- كوبون -->
+            <div style="margin-bottom:12px;">
+                <label style="display:block; font-size:0.85rem; margin-bottom:4px; color:var(--text);">كوبون:</label>
+                <div style="display:flex; gap:4px;">
+                    <input type="text" id="coupon-input" placeholder="الكود" style="flex:1; padding:6px; border:1px solid var(--border); border-radius:4px; background:var(--bg); color:var(--text); font-size:0.8rem;">
+                    <button onclick="applyCoupon()" style="background:var(--primary); color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.75rem;">تطبيق</button>
+                </div>
+                <div id="coupon-msg" style="font-size:0.7rem; margin-top:3px; text-align:center; font-weight:bold; color:var(--primary);"></div>
+            </div>
+
+            <!-- الإجمالي -->
+            <div id="cart-total-area" style="background:var(--bg); padding:8px; border-radius:6px; border:1px solid var(--border); margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:2px; font-size:0.75rem;">
+                    <span style="color:var(--text-light);">الفرعي:</span>
+                    <span id="subtotal-price" style="color:var(--text); font-size:0.75rem;">0</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding-top:6px; border-top:1px solid var(--border); font-weight:bold;">
+                    <span style="color:var(--text); font-size:0.9rem;">الإجمالي:</span>
+                    <div style="color:var(--primary); font-size:1rem; font-weight:900;">
+                        <span id="total-price">0</span> <small style="font-size:0.6rem; color:var(--text-light);">ج.م</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- زر تفريغ السلة -->
+            <button onclick="clearCart()" style="width:100%; background:#e74c3c; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer; font-weight:bold; font-size:0.85rem; display:flex; align-items:center; justify-content:center; gap:5px;">
+                <i class="fas fa-trash-alt"></i>   تفريغ
+            </button>
+
+</div>
+    </div>
+    <div id="overlay" class="overlay" onclick="if(event.target === this) { toggleCart(false); closeWishlist(); }"></div>
+
+    <!-- Wishlist Sidebar -->
+    <div id="wishlist-sidebar" class="cart-sidebar" style="right: auto; left: -350px; transition: left 0.3s ease;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px;">
+            <h4>❤️ المفضلة</h4>
+            <button onclick="closeWishlist()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; line-height:1;">✕</button>
+        </div>
+        <div id="wishlist-items" style="padding:10px; overflow-y:auto; height:calc(100% - 60px);"></div>
+    </div>
+
+    <!-- نافذة تفاصيل المنتج المنبثقة -->
+    <div id="product-details-modal" onclick="if(event.target === this) closeProductModal()">
+        <div class="details-content" onmouseleave="closeProductModal()">
+            <button onclick="closeProductModal()" class="close-modal-btn">✕</button>
+            
+            <div class="modal-body-grid">
+                <!-- القسم الأيمن: معرض الصور -->
+                <div class="modal-gallery-section">
+                    <div class="gallery-container">
+                        <button class="gallery-btn prev-btn" onclick="changeGalleryImage(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <img id="modal-img" class="gallery-img" src="" alt="Product">
+                        <div id="modal-video" style="display:none; width:100%; height:100%; align-items:center; justify-content:center;"></div>
+                        <button class="gallery-btn next-btn" onclick="changeGalleryImage(1)"><i class="fas fa-chevron-right"></i></button>
+                        <button class="gallery-btn fullscreen-btn" onclick="toggleFullscreen()" title="تكبير الشاشة"><i class="fas fa-expand"></i></button>
+                    </div>
+                    <div id="modal-dots" class="gallery-dots"></div>
+                    <div id="modal-thumbnails" class="gallery-thumbnails"></div>
+                </div>
+
+                <!-- القسم الأيسر: البيانات -->
+                <div class="modal-info-section">
+                    <h2 id="modal-title"></h2>
+                    <div id="modal-meta" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;"></div>
+                    
+                    <div id="modal-price-area"></div>
+                    
+                    <p id="modal-desc"></p>
+                    
+                    <div style="margin-top: 10px;">
+                        <h4 style="margin: 0 0 8px 0; color: var(--text);">📋 المواصفات:</h4>
+                        <div id="modal-specs"></div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: auto; padding-top: 20px;">
+                        <button id="modal-add-btn" class="btn" style="flex: 2; font-size: 1.1rem; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                            <i class="fas fa-cart-plus"></i> إضافة للسلة
+                        </button>
+                        <button id="modal-wishlist-btn" class="btn" style="flex: 0.6; background: var(--bg); color: var(--text); border: 1px solid var(--border); font-size: 1.3rem; padding: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button id="modal-share-btn" class="btn" style="flex: 1; background: #25d366; color: white; font-size: 1.1rem; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <i class="fab fa-whatsapp"></i> مشاركة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
     <a href="https://wa.me/201551831308" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
-
-    <!-- Script القديم مع الحفاظ على جميع الوظائف -->
-    <script src="script.js"></script>
 </body>
 </html>

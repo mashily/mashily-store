@@ -9,41 +9,6 @@
     <title>أكاديمية مشالى | تعلم واحترف</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* ثيمات الموقع */
-        [data-theme="gold"] {
-            --primary: #f59e0b;
-        }
-        
-        [data-theme="blue"] {
-            --primary: #3b82f6;
-        }
-        
-        [data-theme="green"] {
-            --primary: #10b981;
-        }
-        
-        [data-theme="red"] {
-            --primary: #ef4444;
-        }
-        
-        [data-theme="purple"] {
-            --primary: #8b5cf6;
-        }
-        
-        [data-theme="pink"] {
-            --primary: #ec4899;
-        }
-        
-        [data-theme="dark"] {
-            --primary: #f59e0b;
-            --light: #1e293b;
-            --surface: #334155;
-            --border: #475569;
-            --text: #f1f5f9;
-            --card: #334155;
-        }
-    </style>
 </head>
 <body>
     <!-- الهيدر -->
@@ -56,17 +21,16 @@
                 <a href="index.html" style="text-decoration: none; color: var(--text); font-weight: bold; font-size: 0.9rem;">
                     <i class="fas fa-store"></i> المتجر
                 </a>
-                <!-- قائمة الثيمات المنسدلة -->
-                <select onchange="setTheme(this.value)" style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--card); font-size: 0.85rem; cursor: pointer;">
-                    <option value="gold">⭐ ذهبي</option>
-                    <option value="blue">● أزرق</option>
-                    <option value="green">🍃 أخضر</option>
-                    <option value="red">❤️ أحمر</option>
-                    <option value="purple">🌙 بنفسجي</option>
-                    <option value="pink">💗 وردي</option>
-                    <option value="dark">🌙 داكن</option>
-                </select>
+                <button onclick="toggleThemeMenu(event)" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:var(--primary);">
+                    <i id="theme-icon" class="fas fa-moon"></i>
+                </button>
             </div>
+        </div>
+        <!-- قائمة الثيمات (مخفية) -->
+        <div id="theme-menu" style="position:absolute; top:50px; left:20px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px; display:none; z-index:2000; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <button onclick="setTheme('light')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-sun"></i> فاتح</button>
+            <button onclick="setTheme('neon')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-bolt"></i> نيون</button>
+            <button onclick="setTheme('gold')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-crown"></i> ذهبي</button>
         </div>
     </header>
 
@@ -173,20 +137,6 @@
     <script>
         // تشغيل الأكاديمية عند التحميل
         window.addEventListener('load', initAcademyPage);
-        
-        // تحميل الثيم المحفوظ
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('mashily_theme');
-            if (savedTheme) {
-                document.documentElement.setAttribute('data-theme', savedTheme);
-            }
-        });
-        
-        // وظيفة تغيير الثيم
-        function setTheme(themeName) {
-            localStorage.setItem('mashily_theme', themeName);
-            document.documentElement.setAttribute('data-theme', themeName);
-        }
     </script>
 </body>
 </html>
