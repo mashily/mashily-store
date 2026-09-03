@@ -1,5 +1,58 @@
 {
-  "products": [],
+  "products": [
+    {
+      "id": 1,
+      "name": "سماعه",
+      "price": 100,
+      "originalPrice": 120,
+      "description": "سماعه ",
+      "image": "https://picsum.photos/200/300/?blur",
+      "images": [
+        "https://picsum.photos/200/300/?blur",
+        "https://picsum.photos/200/300/?blur"
+      ],
+      "category": "general",
+      "stock": 10,
+      "status": "☠️​ كويسه جدا ☠️​",
+      "tags": [
+        "🔥 الأكثر مبيعاً",
+        "🔥 الأكثر مبيعاً"
+      ],
+      "specs": [
+        "سماعع"
+      ],
+      "rating": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": 2,
+      "name": "ماوس (نسخة)",
+      "price": 100,
+      "originalPrice": 120,
+      "description": "ماوس \nمـــــــــاوس \nمـــــــــــــــاوس ",
+      "image": "https://picsum.photos/300/200?random=246",
+      "images": [
+        "https://picsum.photos/300/200?random=246",
+        "https://picsum.photos/300/200?random=577",
+        "https://picsum.photos/300/200?random=16",
+        "https://picsum.photos/300/200?random=529",
+        "https://picsum.photos/300/200?random=931"
+      ],
+      "category": "general",
+      "stock": 10,
+      "status": "☠️​ خطير جدا ☠️​",
+      "tags": [
+        "💥بوووووم💥"
+      ],
+      "specs": [
+        "ماوس",
+        "مـــــاوس",
+        "مــــــــــــاوس"
+      ],
+      "rating": 0,
+      "reviewCount": 0
+    }
+  ],
   "categories": [],
   "academyCats": [
     {
