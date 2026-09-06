@@ -157,12 +157,7 @@ function applyStoreData(data) {
    تصدير بيانات المتجر الحالية إلى ملف Excel
    (تستخدم من لوحة التحكم - زر "تصدير إلى Excel")
    ------------------------------------------------------------ */
-function exportStoreToExcel() {
-    if (typeof XLSX === 'undefined') {
-        alert('مكتبة Excel غير محمّلة. تأكد من اتصال الإنترنت.');
-        return;
-    }
-
+function buildStoreWorkbook() {
     const products = JSON.parse(localStorage.getItem('storeProducts')) || [];
     const categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
     const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
@@ -245,7 +240,22 @@ function exportStoreToExcel() {
     ];
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(notifRows), 'Notifications');
 
-    // الحفظ
+    return wb;
+}
+
+function exportStoreToExcel() {
+    if (typeof XLSX === 'undefined') {
+        alert('مكتبة Excel غير محمّلة. تأكد من اتصال الإنترنت.');
+        return;
+    }
+    const wb = buildStoreWorkbook();
     XLSX.writeFile(wb, 'store-data.xlsx');
     alert('✅ تم تصدير ملف Excel بنجاح!\n\nالآن ارفعه على GitHub ليظهر التعديل للزوار.');
+}
+
+// إرجاع محتوى ملف Excel بصيغة Base64 (لرفعه على GitHub)
+function getStoreWorkbookBase64() {
+    if (typeof XLSX === 'undefined') return null;
+    const wb = buildStoreWorkbook();
+    return XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
 }
