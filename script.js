@@ -103,12 +103,18 @@ async function init() {
     
     const themeIcons = {
         'light': 'fas fa-sun',
+        'ocean': 'fas fa-water',
+        'rose': 'fas fa-heart',
+        'mint': 'fas fa-leaf',
         'neon': 'fas fa-bolt',
         'gold': 'fas fa-crown'
     };
     
     const themeColors = {
-        'light': '#e67e22',
+        'light': '#5a8f7b',
+        'ocean': '#2f6f8f',
+        'rose': '#c97b84',
+        'mint': '#5b9a7e',
         'neon': '#00D4FF',
         'gold': '#FFD700'
     };
@@ -116,7 +122,7 @@ async function init() {
     const themeIcon = document.getElementById('theme-icon');
     if(themeIcon) {
         themeIcon.className = themeIcons[savedTheme] || 'fas fa-sun';
-        themeIcon.style.color = themeColors[savedTheme] || '#e67e22';
+        themeIcon.style.color = themeColors[savedTheme] || '#5a8f7b';
     }
 
     // 2. تحديث شريط الأخبار السفلي (يعرض كل الرسائل من ملف Excel بالتناوب حسب مدة كل رسالة)
@@ -187,12 +193,18 @@ function setTheme(themeName, event) {
     
     const icons = {
         'light': 'fas fa-sun',
+        'ocean': 'fas fa-water',
+        'rose': 'fas fa-heart',
+        'mint': 'fas fa-leaf',
         'neon': 'fas fa-bolt',
         'gold': 'fas fa-crown'
     };
     
     const colors = {
-        'light': '#e67e22',
+        'light': '#5a8f7b',
+        'ocean': '#2f6f8f',
+        'rose': '#c97b84',
+        'mint': '#5b9a7e',
         'neon': '#00D4FF',
         'gold': '#FFD700'
     };
@@ -200,7 +212,7 @@ function setTheme(themeName, event) {
     const themeIcon = document.getElementById('theme-icon');
     if(themeIcon) {
         themeIcon.className = icons[themeName] || 'fas fa-sun';
-        themeIcon.style.color = colors[themeName] || '#e67e22';
+        themeIcon.style.color = colors[themeName] || '#5a8f7b';
     }
     
     // إغلاق القائمة

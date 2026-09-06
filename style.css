@@ -2,25 +2,58 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
 
 :root {
-    /* Light Theme - الافتراضي */
-    --primary: #e67e22;
-    --bg: #FFFFFF;
-    --card: #F5F5F5;
-    --text: #333333;
-    --card-bg: #FFFFFF;
-    --border: rgba(0,0,0,0.1);
+    /* Light Theme - الافتراضي (هادئ) */
+    --primary: #5a8f7b;
+    --bg: #f7f9f8;
+    --card: #eef2f0;
+    --text: #3d4442;
+    --card-bg: #ffffff;
+    --border: rgba(90,143,123,0.15);
+    --ticker-bg: #3d4442;
+}
+
+/* Light Theme - الافتراضي (هادئ) */
+[data-theme="light"] {
+    --primary: #5a8f7b;
+    --bg: #f7f9f8;
+    --card: #eef2f0;
+    --text: #3d4442;
+    --card-bg: #ffffff;
+    --border: rgba(90,143,123,0.15);
+    --ticker-bg: #3d4442;
+}
+
+/* Ocean Theme - أزرق هادئ */
+[data-theme="ocean"] {
+    --primary: #2f6f8f;
+    --bg: #f4f8fa;
+    --card: #e8f0f4;
+    --text: #2c3e50;
+    --card-bg: #ffffff;
+    --border: rgba(47,111,143,0.2);
     --ticker-bg: #2c3e50;
 }
 
-/* Light Theme - الافتراضي */
-[data-theme="light"] {
-    --primary: #e67e22;
-    --bg: #FFFFFF;
-    --card: #F5F5F5;
-    --text: #333333;
-    --card-bg: #FFFFFF;
-    --border: rgba(0,0,0,0.1);
-    --ticker-bg: #2c3e50;
+/* Rose Theme - وردي هادئ */
+[data-theme="rose"] {
+    --primary: #c97b84;
+    --bg: #fdf7f8;
+    --card: #f7ecee;
+    --text: #4a3b3d;
+    --card-bg: #ffffff;
+    --border: rgba(201,123,132,0.2);
+    --ticker-bg: #4a3b3d;
+}
+
+/* Mint Theme - أخضر ناعم */
+[data-theme="mint"] {
+    --primary: #5b9a7e;
+    --bg: #f6faf8;
+    --card: #e9f2ee;
+    --text: #33423b;
+    --card-bg: #ffffff;
+    --border: rgba(91,154,126,0.2);
+    --ticker-bg: #33423b;
 }
 
 /* Neon Tech Theme */
@@ -85,7 +118,19 @@ header {
 
 /* تأثيرات الثيمات على الأيقونة */
 [data-theme="light"] #theme-icon {
-    color: #e67e22;
+    color: #5a8f7b;
+}
+
+[data-theme="ocean"] #theme-icon {
+    color: #2f6f8f;
+}
+
+[data-theme="rose"] #theme-icon {
+    color: #c97b84;
+}
+
+[data-theme="mint"] #theme-icon {
+    color: #5b9a7e;
 }
 
 [data-theme="neon"] #theme-icon {
@@ -128,9 +173,9 @@ header {
 /* كارت المنتج المطور - ضبط المسافات صفر */
 .products-grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
-    gap: 12px; 
-    padding: 12px; 
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+    gap: 8px; 
+    padding: 8px; 
 }
 .product-card { 
     background: var(--card); 
@@ -195,7 +240,7 @@ header {
 /* توحيد مقاسات الصور */
 .img-container { 
     width: 100%; 
-    height: 140px; 
+    height: 115px; 
     background: #fff; 
     display: flex; 
     align-items: center; 
@@ -236,9 +281,9 @@ header {
 /* كارت المنتج المطور - ضغط المسافات لأقصى درجة */
 .products-grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
-    gap: 10px; 
-    padding: 10px; 
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+    gap: 8px; 
+    padding: 8px; 
 }
 
 .product-card { 
@@ -274,7 +319,7 @@ header {
 /* توحيد مقاسات الصور وضغطها */
 .img-container { 
     width: 100%; 
-    height: 220px; /* تكبير الارتفاع */
+    height: 125px; /* ارتفاع مضغوط لكارت أصغر */
     background: #fff; 
     display: flex; 
     align-items: center; 
@@ -303,7 +348,7 @@ header {
 .product-details h4 { 
     margin: 0px 0 0px 0; /* مسافة صفر تماماً */
     padding: 0;
-    font-size: 0.8rem; /* خط أصغر */
+    font-size: 0.7rem; /* خط أصغر */
     line-height: 1.1;
     min-height: auto; /* ديناميكي */
     display: -webkit-box;
@@ -320,7 +365,7 @@ header {
     font-weight: 900; 
     margin: 0px 0 0px 0; /* مسافة صفر */
     padding: 0;
-    font-size: 0.85rem; 
+    font-size: 0.75rem; 
 }
 
 /* عداد العروض الخاصة */
@@ -342,12 +387,12 @@ header {
     background: var(--primary); 
     color: white; 
     border: none; 
-    padding: 4px 3px; 
+    padding: 3px 2px; 
     width: 100%; 
     border-radius: 5px; 
     cursor: pointer; 
     font-weight: bold;
-    font-size: 0.7rem;
+    font-size: 0.62rem;
     transition: all 0.2s;
     margin: 0px 0 0 0; /* مسافة صفر */
 }

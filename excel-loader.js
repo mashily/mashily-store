@@ -20,7 +20,13 @@ function parseNum(value) {
 function sheetToObjects(sheet) {
     if (!sheet) return [];
     try {
-        return XLSX.utils.sheet_to_json(sheet, { defval: '' });
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+        // تخطي صفوف الملاحظات/التعليمات (تبدأ بـ 💡) حتى لا تُقرأ كبيانات
+        return rows.filter(r => {
+            const firstKey = Object.keys(r)[0];
+            const firstVal = r[firstKey];
+            return !(typeof firstVal === 'string' && firstVal.trim().startsWith('💡'));
+        });
     } catch (e) {
         return [];
     }
