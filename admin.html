@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13Ka07paqdeTu0WR1d45h426IwqESpidRhu398jM5+57ablS4hG3/Gsf3y3k0s00DA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="excel-loader.js"></script>
     <style>
         :root {
             --primary: #4361ee;
@@ -1471,6 +1472,18 @@
                         <i class="fas fa-database"></i> تصدير كل شيء
                     </button>
                 </div>
+
+                <h3 style="margin-top: 30px;"><i class="fas fa-file-excel" style="color:#217346;"></i> تصدير إلى Excel (لرفعه على GitHub)</h3>
+                <div class="alert alert-success">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>طريقة العمل:</strong> اضغط الزر التالي لتحميل ملف <b>store-data.xlsx</b> بكل بيانات المتجر (المنتجات، الأصناف، الفيديوهات، الكوبونات، الإعدادات).<br>
+                        ثم عدّل عليه في Excel وارفعه على GitHub (بنفس الاسم <b>store-data.xlsx</b>) ليظهر التعديل للزوار تلقائياً.
+                    </div>
+                </div>
+                <button class="btn btn-success" style="background:#217346; font-size:1rem; padding:12px 25px;" onclick="exportStoreToExcel()">
+                    <i class="fas fa-file-excel"></i> تصدير ملف Excel كامل
+                </button>
                 
                 <h3 style="margin-top: 30px;"><i class="fas fa-upload"></i> استيراد البيانات</h3>
                 <p>استيراد بيانات من ملف JSON (استبدال البيانات الحالية)</p>

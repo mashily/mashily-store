@@ -1,0 +1,23 @@
+# Node modules
+node_modules/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files (لا ترفع النسخ الاحتياطي القديمة إلى GitHub)
+*-backup.html
+*-backup.js
+admin-old-backup.html
+index-backup.html

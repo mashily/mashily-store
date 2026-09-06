@@ -10,21 +10,33 @@ async function init() {
     const isAdmin = sessionStorage.getItem('mashily_user');
 
     if (!isAdmin) {
-        // محاولة جلب البيانات من السيرفر (GitHub) للزوار فقط
-        try {
-            const response = await fetch('db.json?v=' + new Date().getTime()); // منع التخزين المؤقت
-            if (response.ok) {
-                const data = await response.json();
-                // تحديث البيانات المحلية ببيانات السيرفر
-                if(data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
-                if(data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
-                if(data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
-                if(data.ticker) localStorage.setItem('tickerText', data.ticker);
-                if(data.proof) localStorage.setItem('proofText', data.proof);
-                if(data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
+        // 1) المصدر الرئيسي: ملف Excel (store-data.xlsx) على GitHub
+        let excelLoaded = false;
+        if (typeof fetchStoreFromExcel === 'function') {
+            const excelData = await fetchStoreFromExcel();
+            if (excelData) {
+                applyStoreData(excelData);
+                excelLoaded = true;
+                console.log('✅ تم تحميل البيانات من ملف Excel');
             }
-        } catch (e) {
-            console.log('وضع الأوفلاين أو لم يتم رفع ملف db.json بعد');
+        }
+        // 2) حل احتياطي: ملف db.json
+        if (!excelLoaded) {
+            try {
+                const response = await fetch('db.json?v=' + new Date().getTime()); // منع التخزين المؤقت
+                if (response.ok) {
+                    const data = await response.json();
+                    // تحديث البيانات المحلية ببيانات السيرفر
+                    if(data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
+                    if(data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
+                    if(data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
+                    if(data.ticker) localStorage.setItem('tickerText', data.ticker);
+                    if(data.proof) localStorage.setItem('proofText', data.proof);
+                    if(data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
+                }
+            } catch (e) {
+                console.log('وضع الأوفلاين أو لم يتم رفع ملف db.json بعد');
+            }
         }
     }
 
@@ -107,9 +119,30 @@ async function init() {
         themeIcon.style.color = themeColors[savedTheme] || '#e67e22';
     }
 
-    // 2. تحديث شريط الأخبار السفلي
-    const ticker = document.getElementById('ticker-text');
-    if(ticker) ticker.innerText = localStorage.getItem('tickerText') || "🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥";
+    // 2. تحديث شريط الأخبار السفلي (يعرض كل الرسائل من ملف Excel بالتناوب حسب مدة كل رسالة)
+    const tickerEl = document.getElementById('ticker-text');
+    if(tickerEl) {
+        let tickerMsgs = JSON.parse(localStorage.getItem('tickerMessages')) || [];
+        // توافق مع البيانات القديمة (نصوص فقط)
+        if (tickerMsgs.length && typeof tickerMsgs[0] === 'string') {
+            tickerMsgs = tickerMsgs.map(t => ({ text: t, duration: 5 }));
+        }
+        if (tickerMsgs.length === 0) {
+            const single = localStorage.getItem('tickerText');
+            if (single) tickerMsgs = [{ text: single, duration: 5 }];
+        }
+        if (tickerMsgs.length === 0) tickerMsgs = [{ text: "🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥", duration: 5 }];
+        let tickerIndex = 0;
+        const showTickerMsg = () => {
+            tickerEl.innerText = tickerMsgs[tickerIndex].text;
+            const dur = (tickerMsgs[tickerIndex].duration || 5) * 1000;
+            setTimeout(() => {
+                tickerIndex = (tickerIndex + 1) % tickerMsgs.length;
+                showTickerMsg();
+            }, dur);
+        };
+        showTickerMsg();
+    }
 
     // 3. عرض الأقسام والمنتجات مع تأثير التحميل
     renderCategories();
@@ -893,8 +926,15 @@ function showSocialProof() {
     ];
 
     // جلب القائمة من لوحة المدير (مفصولة بفاصلة) أو استخدام الافتراضية
-    const savedText = localStorage.getItem('proofText');
-    const messages = savedText ? savedText.split(',') : defaultMessages;
+    let messages = JSON.parse(localStorage.getItem('proofMessages')) || [];
+    // توافق مع البيانات القديمة (نصوص فقط)
+    if (messages.length && typeof messages[0] === 'string') {
+        messages = messages.map(t => ({ text: t, duration: 5 }));
+    }
+    if (messages.length === 0) {
+        const savedText = localStorage.getItem('proofText');
+        messages = savedText ? savedText.split(',').map(t => ({ text: t, duration: 5 })) : defaultMessages.map(t => ({ text: t, duration: 5 }));
+    }
     
     // اختيار رسالة عشوائية
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
@@ -907,10 +947,10 @@ function showSocialProof() {
         document.body.appendChild(toast);
     }
     
-    toast.innerHTML = `<i class="fas fa-bullhorn" style="margin-left:8px; color:var(--primary);"></i> ${randomMessage}`;
+    toast.innerHTML = `<i class="fas fa-bullhorn" style="margin-left:8px; color:var(--primary);"></i> ${randomMessage.text}`;
     toast.classList.add('show');
     
-    setTimeout(() => { toast.classList.remove('show'); }, 5000);
+    setTimeout(() => { toast.classList.remove('show'); }, (randomMessage.duration || 5) * 1000);
 }
 
 // تشغيل إشعار كل 20 ثانية (رسالة مختلفة كل مرة)
