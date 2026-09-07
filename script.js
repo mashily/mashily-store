@@ -103,6 +103,7 @@ async function init() {
     
     const themeIcons = {
         'light': 'fas fa-sun',
+        'white': 'fas fa-circle',
         'ocean': 'fas fa-water',
         'rose': 'fas fa-heart',
         'mint': 'fas fa-leaf',
@@ -112,6 +113,7 @@ async function init() {
     
     const themeColors = {
         'light': '#5a8f7b',
+        'white': '#2e8b57',
         'ocean': '#2f6f8f',
         'rose': '#c97b84',
         'mint': '#5b9a7e',
@@ -193,6 +195,7 @@ function setTheme(themeName, event) {
     
     const icons = {
         'light': 'fas fa-sun',
+        'white': 'fas fa-circle',
         'ocean': 'fas fa-water',
         'rose': 'fas fa-heart',
         'mint': 'fas fa-leaf',
@@ -202,6 +205,7 @@ function setTheme(themeName, event) {
     
     const colors = {
         'light': '#5a8f7b',
+        'white': '#2e8b57',
         'ocean': '#2f6f8f',
         'rose': '#c97b84',
         'mint': '#5b9a7e',

@@ -23,6 +23,17 @@
     --ticker-bg: #3d4442;
 }
 
+/* White Theme - أبيض نقي */
+[data-theme="white"] {
+    --primary: #2e8b57;
+    --bg: #ffffff;
+    --card: #f9fafb;
+    --text: #1f2937;
+    --card-bg: #ffffff;
+    --border: #e5e7eb;
+    --ticker-bg: #14532d;
+}
+
 /* Ocean Theme - أزرق هادئ */
 [data-theme="ocean"] {
     --primary: #2f6f8f;
@@ -119,6 +130,10 @@ header {
 /* تأثيرات الثيمات على الأيقونة */
 [data-theme="light"] #theme-icon {
     color: #5a8f7b;
+}
+
+[data-theme="white"] #theme-icon {
+    color: #2e8b57;
 }
 
 [data-theme="ocean"] #theme-icon {

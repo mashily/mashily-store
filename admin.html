@@ -6,43 +6,123 @@
     <title>لوحة تحكم متجر مشالى</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kLmbG4dGzcPTBFlnA+p/A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13Ka07paqdeTu0WR1d45h426IwqESpidRhu398jM5+57ablS4hG3/Gsf3y3k0s00DA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="html2canvas.min.js"></script>
+    <script src="jspdf.umd.min.js"></script>
+    <script src="qrcode.min.js"></script>
+    <script src="xlsx.full.min.js"></script>
     <script src="excel-loader.js"></script>
     <script src="invoice.js"></script>
     <style>
         :root {
-            --primary: #4361ee;
-            --primary-dark: #3a0ca3;
+            --primary: #2e8b57;
+            --primary-dark: #1f6e43;
             --secondary: #4cc9f0;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
             --dark: #1e293b;
-            --light: #f8fafc;
+            --light: #f0f7f4;
             --surface: #ffffff;
-            --border: #e2e8f0;
+            --border: #d5e8de;
             --text: #334155;
             --text-light: #64748b;
-            --sidebar-bg: #0f172a;
-            --sidebar-text: #94a3b8;
-            --sidebar-active: #4361ee;
+            --sidebar-bg: #14532d;
+            --sidebar-text: #a7d7c0;
+            --sidebar-active: #2e8b57;
             --radius: 8px;
             --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
             --font-main: 'Cairo', sans-serif;
         }
 
-        [data-theme="dark"] {
-            --primary: #4cc9f0;
-            --primary-dark: #4895ef;
-            --light: #0f172a;
-            --surface: #1e293b;
-            --border: #334155;
-            --text: #f1f5f9;
-            --text-light: #94a3b8;
-            --sidebar-bg: #020617;
+        [data-theme="light"] {
+            --primary: #2e8b57;
+            --primary-dark: #1f6e43;
+            --light: #f0f7f4;
+            --surface: #ffffff;
+            --border: #d5e8de;
+            --text: #334155;
+            --text-light: #64748b;
+            --sidebar-bg: #14532d;
+            --sidebar-text: #a7d7c0;
+            --sidebar-active: #2e8b57;
+        }
+
+        [data-theme="white"] {
+            --primary: #2e8b57;
+            --primary-dark: #1f6e43;
+            --light: #ffffff;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --sidebar-bg: #ffffff;
+            --sidebar-text: #4b5563;
+            --sidebar-active: #2e8b57;
+        }
+
+        [data-theme="ocean"] {
+            --primary: #2f6f8f;
+            --primary-dark: #245a75;
+            --light: #f4f8fa;
+            --surface: #ffffff;
+            --border: #d5e3ec;
+            --text: #2c3e50;
+            --text-light: #5d7a8c;
+            --sidebar-bg: #1f4a5e;
+            --sidebar-text: #b8d4e0;
+            --sidebar-active: #2f6f8f;
+        }
+
+        [data-theme="rose"] {
+            --primary: #c97b84;
+            --primary-dark: #a85f68;
+            --light: #fdf7f8;
+            --surface: #ffffff;
+            --border: #f0d9dc;
+            --text: #4a3b3d;
+            --text-light: #8a6a6e;
+            --sidebar-bg: #6d3a40;
+            --sidebar-text: #e5c6ca;
+            --sidebar-active: #c97b84;
+        }
+
+        [data-theme="mint"] {
+            --primary: #5b9a7e;
+            --primary-dark: #46805f;
+            --light: #f6faf8;
+            --surface: #ffffff;
+            --border: #d9eae2;
+            --text: #33423b;
+            --text-light: #6d8578;
+            --sidebar-bg: #2f5c48;
+            --sidebar-text: #bcd9c9;
+            --sidebar-active: #5b9a7e;
+        }
+
+        [data-theme="neon"] {
+            --primary: #00D4FF;
+            --primary-dark: #00a8cc;
+            --light: #000000;
+            --surface: #0A0A1A;
+            --border: #00D4FF;
+            --text: #FFFFFF;
+            --text-light: #9aa7b8;
+            --sidebar-bg: #05050f;
+            --sidebar-text: #7fd8ef;
+            --sidebar-active: #00D4FF;
+        }
+
+        [data-theme="gold"] {
+            --primary: #FFD700;
+            --primary-dark: #ccaa00;
+            --light: #0F0E0B;
+            --surface: #1A1915;
+            --border: #FFD700;
+            --text: #FFFFFF;
+            --text-light: #b8ad8a;
+            --sidebar-bg: #0a0906;
+            --sidebar-text: #d8c98a;
+            --sidebar-active: #FFD700;
         }
 
         * {
@@ -614,6 +694,22 @@
         .admin-comment-item { background: var(--light); padding: 10px; border-radius: 8px; border-right: 4px solid var(--primary); }
         .admin-comment-item.new { border-right-color: var(--warning); }
         .admin-reply-box { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+
+        /* ===== وضع مضغوط (أصغر) ===== */
+        body { font-size: 0.9rem; }
+        .main-content { padding: 12px !important; }
+        .top-header { padding: 10px 15px !important; margin-bottom: 12px !important; }
+        .card, .stat-card, .dashboard-card { padding: 12px !important; }
+        .form-group { margin-bottom: 8px !important; }
+        .form-group label { font-size: 0.8rem !important; }
+        .form-group input, .form-group select, .form-group textarea { padding: 6px 8px !important; font-size: 0.85rem !important; }
+        .btn { padding: 6px 12px !important; font-size: 0.85rem !important; }
+        .btn-small { padding: 4px 8px !important; font-size: 0.8rem !important; }
+        table th, table td { padding: 6px 8px !important; font-size: 0.85rem !important; }
+        .nav-link { padding: 8px 10px !important; font-size: 0.85rem !important; }
+        h2 { font-size: 1.1rem !important; }
+        h3 { font-size: 1rem !important; }
+        h4 { font-size: 0.95rem !important; }
     </style>
 </head>
 <body>
@@ -695,9 +791,20 @@
                     <h2 id="page-title" style="margin:0; font-size:1.2rem; color: var(--text);">لوحة القيادة</h2>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <button class="icon-btn" onclick="toggleTheme()" title="تغيير الثيم">
-                        <i class="fas fa-moon" id="theme-icon-btn"></i>
-                    </button>
+                    <div style="position:relative;">
+                        <button class="icon-btn" onclick="toggleThemeMenu(event)" title="تغيير الثيم">
+                        <i class="fas fa-palette" id="theme-icon-btn"></i>
+                        </button>
+                        <div id="theme-menu-admin" style="position:absolute; top:45px; left:0; background:var(--surface); border:2px solid var(--primary); border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.3); padding:8px; display:none; z-index:10000; width:190px;">
+                            <button onclick="setAdminTheme('light', event)" style="width:100%; display:flex; align-items:center; gap:8px; padding:7px 10px; margin:2px 0; border:none; border-radius:6px; cursor:pointer; background:#f0f7f4; color:#2e8b57; font-weight:bold; font-size:0.85rem;"><span style="width:14px; height:14px; border-radius:50%; background:#2e8b57; display:inline-block;"></span> أخضر هادئ</button>
+                            <button onclick="setAdminTheme('white', event)" style="width:100%; display:flex; align-items:center; gap:8px; padding:7px 10px; margin:2px 0; border:none; border-radius:6px; cursor:pointer; background:#ffffff; color:#1f2937; font-weight:bold; font-size:0.85rem; border:1px solid #e5e7eb;"><span style="width:14px; height:14px; border-radius:50%; background:#e5e7eb; display:inline-block;"></span> أبيض</button>
+                            <button onclick="setAdminTheme('ocean', event)" style="width:100%; display:flex; align-items:center; gap:8px; padding:7px 10px; margin:2px 0; border:none; border-radius:6px; cursor:pointer; background:#f4f8fa; color:#2f6f8f; font-weight:bold; font-size:0.85rem;"><span style="width:14px; height:14px; border-radius:50%; background:#2f6f8f; display:inline-block;"></span> المحيط</button>
+                            <button onclick="setAdminTheme('rose', event)" style="width:100%; display:flex; align-items:center; gap:8px; padding:7px 10px; margin:2px 0; border:none; border-radius:6px; cursor:pointer; background:#fdf7f8; color:#c97b84; font-weight:bold; font-size:0.85rem;"><span style="width:14px; height:14px; border-radius:50%; background:#c97b84; display:inline-block;"></span> الوردي</button>
+                            <button onclick="setAdminTheme('mint', event)" style="width:100%; display:flex; align-items:center; gap:8px; padding:7px 10px; margin:2px 0; border:none; border-radius:6px; cursor:pointer; background:#f6faf8; color:#5b9a7e; font-weight:bold; font-size:0.85rem;"><span style="width:14px; height:14px; border-radius:50%; background:#5b9a7e; display:inline-block;"></span> النعناع</button>
+                            <button onclick="setAdminTheme('neon', event)" style="width:100%; display:flex; align-items:center; gap:8px; padding:7px 10px; margin:2px 0; border:none; border-radius:6px; cursor:pointer; background:#000; color:#00D4FF; font-weight:bold; font-size:0.85rem;"><span style="width:14px; height:14px; border-radius:50%; background:#00D4FF; display:inline-block;"></span> نيون</button>
+                            <button onclick="setAdminTheme('gold', event)" style="width:100%; display:flex; align-items:center; gap:8px; padding:7px 10px; margin:2px 0; border:none; border-radius:6px; cursor:pointer; background:#0F0E0B; color:#FFD700; font-weight:bold; font-size:0.85rem;"><span style="width:14px; height:14px; border-radius:50%; background:#FFD700; display:inline-block;"></span> ذهبي</button>
+                        </div>
+                    </div>
                     <a href="index.html" class="btn btn-primary btn-small" target="_blank">
                         <i class="fas fa-external-link-alt"></i> المتجر
                     </a>
@@ -1251,6 +1358,9 @@
                         <input type="text" id="invoice-store-signature" placeholder="https://.../signature.png">
                     </div>
                 </div>
+                <button class="btn btn-success" onclick="saveStoreInfo()" style="margin-bottom: 10px;">
+                    <i class="fas fa-save"></i> حفظ بيانات المتجر
+                </button>
 
                 <div class="form-row">
                     <div class="form-group">
@@ -3611,12 +3721,30 @@
         }
 
         // --- وظائف الثيم والسايدبار ---
-        function toggleTheme() {
-            const body = document.body;
-            const isDark = body.getAttribute('data-theme') === 'dark';
-            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            document.getElementById('theme-icon-btn').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+        function toggleThemeMenu(event) {
+            if (event) event.stopPropagation();
+            const menu = document.getElementById('theme-menu-admin');
+            if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
         }
+        function setAdminTheme(themeName, event) {
+            if (event) { event.stopPropagation(); event.preventDefault(); }
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('theme', themeName); // نفس مفتاح المتجر
+            const menu = document.getElementById('theme-menu-admin');
+            if (menu) menu.style.display = 'none';
+        }
+        // إغلاق قائمة الثيمات عند النقر خارجها
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('theme-menu-admin');
+            if (menu && menu.style.display !== 'none' && !event.target.closest('#theme-menu-admin') && !event.target.closest('[onclick="toggleThemeMenu(event)"]')) {
+                menu.style.display = 'none';
+            }
+        });
+        // تطبيق الثيم المحفوظ عند فتح الصفحة
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');

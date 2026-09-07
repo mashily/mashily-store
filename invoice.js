@@ -576,6 +576,20 @@ function shareInvoiceAsPDF() {
     });
 }
 
+// ===== حفظ بيانات المتجر (تثبيت البيانات الأساسية) =====
+function saveStoreInfo() {
+    const storeInfo = {
+        storeName: document.getElementById('invoice-store-name')?.value.trim() || 'متجر مشالى',
+        storeAddress: document.getElementById('invoice-store-address')?.value.trim() || '',
+        storePhone: document.getElementById('invoice-store-phone')?.value.trim() || '',
+        commercial: document.getElementById('invoice-commercial')?.value.trim() || '',
+        storeLogo: document.getElementById('invoice-store-logo')?.value.trim() || '',
+        storeSignature: document.getElementById('invoice-store-signature')?.value.trim() || ''
+    };
+    localStorage.setItem('storeInvoiceSettings', JSON.stringify(storeInfo));
+    alert('✅ تم حفظ بيانات المتجر بنجاح!');
+}
+
 // ===== تهيئة تبويب الفواتير =====
 function initInvoiceTab() {
     displayInvoicesList();
