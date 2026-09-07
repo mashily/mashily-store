@@ -254,6 +254,9 @@ function createProductCard(p) {
         <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${p.id}, event)" title="${isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
             <i class="fas fa-heart"></i>
         </button>
+        <button class="share-btn" onclick="shareProduct(${p.id}, event)" title="مشاركة المنتج">
+            <i class="fas fa-share-alt"></i>
+        </button>
         <div class="img-container" onclick="openProductDetails(${p.id})">
             ${!isOut ? `<div class="pro-badge ${p.status==='عرض خاص'?'offer':''}">${p.status || 'مميز ✨'}</div>` : ''}
             ${discountPercent > 0 ? `<div style="position:absolute;bottom:10px;left:10px;background:#e74c3c;color:white;padding:4px 8px;border-radius:6px;font-size:0.75rem;font-weight:bold;">-${discountPercent}%</div>` : ''}
@@ -992,8 +995,42 @@ setInterval(() => {
     });
 }, 1000);
 
+// --- مشاركة المنتج ---
+function shareProduct(id, event) {
+    if (event) event.stopPropagation();
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+    const text = 'شاهد هذا المنتج من مشالي للإلكترونيات:\n' + product.name + '\nالسعر: ' + product.price + ' ج.م\n' + (product.image || '');
+    if (navigator.share) {
+        navigator.share({ title: product.name, text: text, url: window.location.href }).catch(() => {});
+    } else {
+        window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    }
+}
+
+// --- الإشعار الترحيبي (يظهر أول مرة فقط) ---
+function showWelcomeToast() {
+    if (localStorage.getItem('mashily_welcomed')) return;
+    localStorage.setItem('mashily_welcomed', '1');
+    let toast = document.getElementById('welcome-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'welcome-toast';
+        toast.style.cssText = 'position:fixed; bottom:75px; right:15px; background:var(--card); border:2px solid var(--primary); padding:15px 20px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.2); z-index:3000; font-size:0.9rem; max-width:280px; display:none;';
+        document.body.appendChild(toast);
+    }
+    toast.innerHTML = '<div style="display:flex; align-items:center; gap:12px;">' +
+        '<span style="font-size:2rem;">👋</span>' +
+        '<div><b style="color:var(--primary);">أهلاً بك في مشالي للإلكترونيات!</b>' +
+        '<p style="margin:4px 0 0 0; color:var(--text); font-size:0.85rem;">تصفح منتجاتنا واطلب عبر واتساب بسهولة.</p></div>' +
+        '</div>';
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 6000);
+}
+
 // بدء العمل عند تحميل الصفحة
 window.onload = init;
+setTimeout(showWelcomeToast, 2500);
 
 // --- الدخول السري للوحة التحكم ---
 let adminClicks = 0;

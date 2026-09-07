@@ -1333,3 +1333,48 @@ header {
     from { opacity: 1; }
     to { opacity: 0; }
 }
+
+/* زر مشاركة المنتج */
+.share-btn {
+    position: absolute;
+    top: 45px;
+    left: 10px;
+    background: rgba(255,255,255,0.9);
+    color: var(--primary);
+    border: 1px solid var(--border);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.3s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.share-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* ===== تحسين تجربة الموبايل ===== */
+@media (max-width: 600px) {
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 6px;
+        padding: 6px;
+    }
+    .img-container { height: 110px; }
+    .product-details h4 { font-size: 0.65rem; }
+    .price-tag { font-size: 0.7rem; }
+    .qty-btn { font-size: 0.6rem; padding: 3px 2px; }
+    .news-ticker { font-size: 0.75rem; }
+    .cart-sidebar { width: 85% !important; }
+    .whatsapp-float { width: 46px; height: 46px; bottom: 15px; left: 15px; font-size: 1.2rem; }
+    #install-btn { padding: 10px 14px; font-size: 0.8rem; bottom: 15px; left: 15px; }
+    .social-proof-toast { right: 10px; left: 10px; max-width: calc(100% - 20px); font-size: 0.75rem; }
+    #welcome-toast { right: 10px; left: 10px; max-width: calc(100% - 20px); }
+}
