@@ -175,6 +175,12 @@ async function init() {
 
     // تفعيل تأثير التكبير في نافذة المنتج
     setupZoomEffect();
+
+    // ضمان إغلاق السلة والمفضلة عند تحميل الصفحة (منع الفتح التلقائي على الموبايل)
+    const wsGuard = document.getElementById('wishlist-sidebar');
+    if (wsGuard) wsGuard.classList.remove('active');
+    const ovGuard = document.getElementById('overlay');
+    if (ovGuard) ovGuard.classList.remove('active');
 }
 
 // --- وظائف الثيمات ---
