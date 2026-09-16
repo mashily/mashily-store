@@ -2,110 +2,2638 @@
   "products": [
     {
       "id": 1,
-      "name": "سماعه",
-      "price": 100,
-      "originalPrice": 120,
-      "description": "سماعه ",
-      "image": "https://picsum.photos/200/300/?blur",
+      "name": "سماعة بلوتوث لاسلكية",
+      "price": 350,
+      "originalPrice": 450,
+      "description": "سماعة لاسلكية عالية الجودة بتصميم عصري وصوت نقي",
+      "image": "https://lh3.googleusercontent.com/d/1Qu_g6kNTYAR0v-KME6m1ai7wrkUtEx4f",
       "images": [
-        "https://picsum.photos/200/300/?blur",
-        "https://picsum.photos/200/300/?blur"
+        "https://lh3.googleusercontent.com/d/1Qu_g6kNTYAR0v-KME6m1ai7wrkUtEx4f",
+        "https://lh3.googleusercontent.com/d/1Qu_g6kNTYAR0v-KME6m1ai7wrkUtEx4f"
       ],
-      "category": "general",
-      "stock": 10,
-      "status": "☠️​ كويسه جدا ☠️​",
+      "category": "إلكترونيات",
+      "stock": 15,
+      "status": "عرض خاص",
       "tags": [
         "🔥 الأكثر مبيعاً",
-        "🔥 الأكثر مبيعاً"
+        "⚡ جديد"
       ],
       "specs": [
-        "سماعع"
+        "بطارية تدوم 20 ساعة",
+        "بلوتوث 5.3",
+        "مقاومة للماء"
       ],
-      "rating": 0,
-      "reviewCount": 0
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 12
     },
     {
       "id": 2,
-      "name": "ماوس (نسخة)",
-      "price": 100,
-      "originalPrice": 120,
-      "description": "ماوس \nمـــــــــاوس \nمـــــــــــــــاوس ",
-      "image": "https://picsum.photos/300/200?random=246",
+      "name": "ماوس ألعاب احترافي",
+      "price": 200,
+      "originalPrice": 280,
+      "description": "ماوس ألعاب بدقة عالية وأزرار سريعة الاستجابة",
+      "image": "https://picsum.photos/400/400?random=201",
       "images": [
-        "https://picsum.photos/300/200?random=246",
-        "https://picsum.photos/300/200?random=577",
-        "https://picsum.photos/300/200?random=16",
-        "https://picsum.photos/300/200?random=529",
-        "https://picsum.photos/300/200?random=931"
+        "https://picsum.photos/400/400?random=202"
       ],
-      "category": "general",
-      "stock": 10,
-      "status": "☠️​ خطير جدا ☠️​",
+      "category": "إلكترونيات",
+      "stock": 20,
+      "status": "جديد",
       "tags": [
-        "💥بوووووم💥"
+        "💥 قوي",
+        "🎮 مريح"
       ],
       "specs": [
-        "ماوس",
-        "مـــــاوس",
-        "مــــــــــــاوس"
+        "دقة 16000 DPI",
+        "إضاءة RGB",
+        "6 أزرار"
       ],
-      "rating": 0,
-      "reviewCount": 0
+      "offerEnds": "2026-01-01",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 8
     },
     {
       "id": 3,
-      "name": "سماعه",
-      "price": 100,
-      "originalPrice": 120,
-      "description": "سماعه ",
-      "image": "https://picsum.photos/200/300/?blur",
+      "name": "كيبورد ميكانيكي",
+      "price": 600,
+      "originalPrice": 800,
+      "description": "كيبورد ميكانيكي بمفاتيح سريعة وإضاءة ملونة",
+      "image": "https://picsum.photos/400/400?random=301",
       "images": [
-        "https://picsum.photos/200/300/?blur",
-        "https://picsum.photos/200/300/?blur"
+        "https://picsum.photos/400/400?random=302"
       ],
-      "category": "general",
+      "category": "إلكترونيات",
       "stock": 10,
-      "status": "☠️​ كويسه جدا ☠️​",
+      "status": "عرض خاص",
       "tags": [
-        "🔥 الأكثر مبيعاً",
         "🔥 الأكثر مبيعاً"
       ],
       "specs": [
-        "سماعع"
+        "مفاتيح ميكانيكية",
+        "إضاءة RGB",
+        "توصيل USB"
       ],
-      "rating": 0,
-      "reviewCount": 0
+      "offerEnds": "2020-01-01",
+      "videos": [],
+      "rating": 5,
+      "reviewCount": 20
     },
     {
       "id": 4,
-      "name": "ماوس (نسخة)",
-      "price": 100,
-      "originalPrice": 120,
-      "description": "ماوس \nمـــــــــاوس \nمـــــــــــــــاوس ",
-      "image": "https://picsum.photos/300/200?random=246",
+      "name": "شاحن سريع 65W",
+      "price": 250,
+      "originalPrice": 320,
+      "description": "شاحن سريع بقدرة 65 واط يدعم الشحن السريع",
+      "image": "https://picsum.photos/400/400?random=401",
       "images": [
-        "https://picsum.photos/300/200?random=246",
-        "https://picsum.photos/300/200?random=577",
-        "https://picsum.photos/300/200?random=16",
-        "https://picsum.photos/300/200?random=529",
-        "https://picsum.photos/300/200?random=931"
+        "https://picsum.photos/400/400?random=402"
       ],
-      "category": "general",
-      "stock": 10,
-      "status": "☠️​ خطير جدا ☠️​",
+      "category": "إلكترونيات",
+      "stock": 30,
+      "status": "جديد",
       "tags": [
-        "💥بوووووم💥"
+        "⚡ سريع"
       ],
       "specs": [
-        "ماوس",
-        "مـــــاوس",
-        "مــــــــــــاوس"
+        "قدرة 65W",
+        "منفذين USB-C",
+        "حماية من الحرارة"
       ],
-      "rating": 0,
-      "reviewCount": 0
+      "offerEnds": "2019-01-01",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 15
+    },
+    {
+      "id": 5,
+      "name": "سماعة رأس احترافية",
+      "price": 800,
+      "originalPrice": 1000,
+      "description": "سماعة رأس عازلة للضوضاء بجودة استوديو",
+      "image": "https://picsum.photos/400/400?random=501",
+      "images": [
+        "https://picsum.photos/400/400?random=502"
+      ],
+      "category": "إلكترونيات",
+      "stock": 8,
+      "status": "عرض خاص",
+      "tags": [
+        "🎵 صوت استوديو"
+      ],
+      "specs": [
+        "عازل للضوضاء",
+        "صوت عالي الجودة",
+        "ميكروفون مدمج"
+      ],
+      "offerEnds": "2026-11-30",
+      "videos": [],
+      "rating": 5,
+      "reviewCount": 25
+    },
+    {
+      "id": 6,
+      "name": "ساعة ذكية Ultra",
+      "price": 1250,
+      "originalPrice": 1800,
+      "description": "ساعة ذكية بشاشة AMOLED ومراقبة صحية متقدمة",
+      "image": "https://picsum.photos/400/400?random=601",
+      "images": [
+        "https://picsum.photos/400/400?random=602",
+        "https://picsum.photos/400/400?random=603"
+      ],
+      "category": "إلكترونيات",
+      "stock": 12,
+      "status": "عرض خاص",
+      "tags": [
+        "🔥 الأكثر مبيعاً",
+        "⌚ ذكية"
+      ],
+      "specs": [
+        "شاشة AMOLED",
+        "مقاومة للماء IP68",
+        "مراقبة القلب",
+        "GPS"
+      ],
+      "offerEnds": "2026-12-15",
+      "videos": [],
+      "rating": 5,
+      "reviewCount": 40
+    },
+    {
+      "id": 7,
+      "name": "هاتف ذكي Pro",
+      "price": 5200,
+      "originalPrice": 5800,
+      "description": "هاتف ذكي بشاشة كبيرة وكاميرا ممتازة",
+      "image": "https://picsum.photos/400/400?random=701",
+      "images": [
+        "https://picsum.photos/400/400?random=702",
+        "https://picsum.photos/400/400?random=703"
+      ],
+      "category": "إلكترونيات",
+      "stock": 7,
+      "status": "جديد",
+      "tags": [
+        "📱 الأحدث"
+      ],
+      "specs": [
+        "شاشة 6.7 بوصة",
+        "كاميرا 108MP",
+        "بطارية 5000mAh"
+      ],
+      "offerEnds": "2026-10-01",
+      "videos": [],
+      "rating": 5,
+      "reviewCount": 30
+    },
+    {
+      "id": 8,
+      "name": "باور بانك 20000mAh",
+      "price": 400,
+      "originalPrice": 520,
+      "description": "باور بانك سريع الشحن بسعة كبيرة",
+      "image": "https://picsum.photos/400/400?random=801",
+      "images": [
+        "https://picsum.photos/400/400?random=802"
+      ],
+      "category": "إكسسوارات",
+      "stock": 25,
+      "status": "جديد",
+      "tags": [
+        "🔋 سعة كبيرة"
+      ],
+      "specs": [
+        "سعة 20000mAh",
+        "شحن سريع",
+        "منفذين"
+      ],
+      "offerEnds": "2026-09-30",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 18
+    },
+    {
+      "id": 9,
+      "name": "كابل USB-C",
+      "price": 100,
+      "originalPrice": 150,
+      "description": "كابل USB-C متين وطويل",
+      "image": "https://picsum.photos/400/400?random=901",
+      "images": [
+        "https://picsum.photos/400/400?random=902"
+      ],
+      "category": "إكسسوارات",
+      "stock": 50,
+      "status": "جديد",
+      "tags": [
+        "🔌 متين"
+      ],
+      "specs": [
+        "طول 2 متر",
+        "شحن سريع",
+        "متين"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 10
+    },
+    {
+      "id": 10,
+      "name": "جراب موبايل",
+      "price": 80,
+      "originalPrice": 120,
+      "description": "جراب حماية أنيق للموبايل",
+      "image": "https://picsum.photos/400/400?random=1001",
+      "images": [
+        "https://picsum.photos/400/400?random=1002"
+      ],
+      "category": "إكسسوارات",
+      "stock": 40,
+      "status": "جديد",
+      "tags": [
+        "🛡️ حماية"
+      ],
+      "specs": [
+        "مادة سيليكون",
+        "حماية من الصدمات"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 14
+    },
+    {
+      "id": 11,
+      "name": "هاتف ذكي الترا 5G",
+      "price": 3500,
+      "originalPrice": 4200,
+      "description": "شاشة ديناميك أموليد كاميرا 200 ميجابكسل",
+      "image": "https://picsum.photos/400/400?r=001",
+      "images": [
+        "https://picsum.photos/400/400?r=0011,https://picsum.photos/400/400?r=0012"
+      ],
+      "category": "جوالات",
+      "stock": 11,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "شاشة 6.8 بوصة",
+        "ذاكرة 512 جيجا",
+        "رام 12"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.1,
+      "reviewCount": 7
+    },
+    {
+      "id": 12,
+      "name": "هاتف برو ماكس ذكي",
+      "price": 2999,
+      "originalPrice": 3400,
+      "description": "هاتف متطور بكاميرا فائقة ثلاثية ونظام أمان متقدم",
+      "image": "https://picsum.photos/400/400?r=002",
+      "images": [
+        "https://picsum.photos/400/400?r=0021,https://picsum.photos/400/400?r=0022"
+      ],
+      "category": "جوالات",
+      "stock": 12,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "شاشة 6.7 بوصة",
+        "ذاكرة 256 جيجا",
+        "رام 8"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.2,
+      "reviewCount": 9
+    },
+    {
+      "id": 13,
+      "name": "هاتف ذكي اقتصادي",
+      "price": 800,
+      "originalPrice": 1100,
+      "description": "بطارية ضخمة وأداء ممتاز للمهام اليومية والشبكات",
+      "image": "https://picsum.photos/400/400?r=003",
+      "images": [
+        "https://picsum.photos/400/400?r=0031,https://picsum.photos/400/400?r=0032"
+      ],
+      "category": "جوالات",
+      "stock": 13,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "بطارية 5000 ميللي أمبير",
+        "ذاكرة 64 جيجا",
+        "رام 4"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.3,
+      "reviewCount": 11
+    },
+    {
+      "id": 14,
+      "name": "هاتف ذكي قابل للطي",
+      "price": 5500,
+      "originalPrice": 6200,
+      "description": "تصميم ثوري مرن شاشة مزدوجة فائقة النقاء",
+      "image": "https://picsum.photos/400/400?r=004",
+      "images": [
+        "https://picsum.photos/400/400?r=0041,https://picsum.photos/400/400?r=0042"
+      ],
+      "category": "جوالات",
+      "stock": 14,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "شاشة مرنة 7.6 بوصة",
+        "ذاكرة 512 جيجا",
+        "رام 12"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.4,
+      "reviewCount": 13
+    },
+    {
+      "id": 15,
+      "name": "هاتف جيمينج احترافي",
+      "price": 3200,
+      "originalPrice": 3800,
+      "description": "معالج رائد مع نظام تبريد مائي متطور للألعاب",
+      "image": "https://picsum.photos/400/400?r=005",
+      "images": [
+        "https://picsum.photos/400/400?r=0051,https://picsum.photos/400/400?r=0052"
+      ],
+      "category": "جوالات",
+      "stock": 15,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "معدل تحديث 144 هرتز",
+        "ذاكرة 256 جيجا",
+        "رام 16"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.5,
+      "reviewCount": 15
+    },
+    {
+      "id": 16,
+      "name": "هاتف نوت بلس الذكي",
+      "price": 2200,
+      "originalPrice": 2600,
+      "description": "يدعم القلم الذكي لإنتاجية وسرعة مذهلة في العمل",
+      "image": "https://picsum.photos/400/400?r=006",
+      "images": [
+        "https://picsum.photos/400/400?r=0061,https://picsum.photos/400/400?r=0062"
+      ],
+      "category": "جوالات",
+      "stock": 16,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "شاشة 6.7 بوصة",
+        "قلم مدمج",
+        "ذاكرة 256 جيجا"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.6,
+      "reviewCount": 17
+    },
+    {
+      "id": 17,
+      "name": "هاتف ذكي بلس المتطور",
+      "price": 1500,
+      "originalPrice": 1800,
+      "description": "كاميرا سيلفي بدقة عالية وتصميم زجاجي أنيق",
+      "image": "https://picsum.photos/400/400?r=007",
+      "images": [
+        "https://picsum.photos/400/400?r=0071,https://picsum.photos/400/400?r=0072"
+      ],
+      "category": "جوالات",
+      "stock": 17,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "كاميرا 64 ميجابكسل",
+        "ذاكرة 128 جيجا",
+        "رام 8"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.7,
+      "reviewCount": 19
+    },
+    {
+      "id": 18,
+      "name": "هاتف ذكي ميني الصغير",
+      "price": 1200,
+      "originalPrice": 1450,
+      "description": "حجم مدمج مريح بيد واحدة ومواصفات قوية",
+      "image": "https://picsum.photos/400/400?r=008",
+      "images": [
+        "https://picsum.photos/400/400?r=0081,https://picsum.photos/400/400?r=0082"
+      ],
+      "category": "جوالات",
+      "stock": 18,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "شاشة 5.4 بوصة",
+        "ذاكرة 128 جيجا",
+        "رام 6"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.8,
+      "reviewCount": 21
+    },
+    {
+      "id": 19,
+      "name": "هاتف متين للمهمات الشاقة",
+      "price": 1700,
+      "originalPrice": 2000,
+      "description": "مقاوم للصدمات والماء والغبار بمعايير عسكرية",
+      "image": "https://picsum.photos/400/400?r=009",
+      "images": [
+        "https://picsum.photos/400/400?r=0091,https://picsum.photos/400/400?r=0092"
+      ],
+      "category": "جوالات",
+      "stock": 19,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "معيار IP69K",
+        "بطارية 8000 ميللي أمبير",
+        "متين"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.9,
+      "reviewCount": 23
+    },
+    {
+      "id": 20,
+      "name": "هاتف لايت الاقتصادي المتطور",
+      "price": 950,
+      "originalPrice": 1200,
+      "description": "وزن خفيف وشاشة نقية بسعر منافس جداً",
+      "image": "https://picsum.photos/400/400?r=010",
+      "images": [
+        "https://picsum.photos/400/400?r=0101,https://picsum.photos/400/400?r=0102"
+      ],
+      "category": "جوالات",
+      "stock": 20,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "شاشة FHD+",
+        "ذاكرة 128 جيجا",
+        "رام 4"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 25
+    },
+    {
+      "id": 21,
+      "name": "حاسوب محمول للأعمال",
+      "price": 4500,
+      "originalPrice": 5100,
+      "description": "لابتوب خفيف الوزن ومثالي للإنتاجية اليومية والمكتبية",
+      "image": "https://picsum.photos/400/400?r=011",
+      "images": [
+        "https://picsum.photos/400/400?r=0111,https://picsum.photos/400/400?r=0112"
+      ],
+      "category": "كمبيوتر ومحمول",
+      "stock": 21,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "معالج i7",
+        "هارد 512 جيجا SSD",
+        "رام 16"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.1,
+      "reviewCount": 27
+    },
+    {
+      "id": 22,
+      "name": "لابتوب ألعاب قوي للغاية",
+      "price": 6500,
+      "originalPrice": 7500,
+      "description": "كرت شاشة منفصل لأقوى ألعاب الفيديو والمونتاج والرسوم",
+      "image": "https://picsum.photos/400/400?r=012",
+      "images": [
+        "https://picsum.photos/400/400?r=0121,https://picsum.photos/400/400?r=0122"
+      ],
+      "category": "كمبيوتر ومحمول",
+      "stock": 22,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "كرت RTX 4060",
+        "هارد 1 تيرابايت",
+        "رام 16"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.2,
+      "reviewCount": 29
+    },
+    {
+      "id": 23,
+      "name": "حاسوب محمول دفتري خفيف",
+      "price": 2100,
+      "originalPrice": 2500,
+      "description": "بطارية تدوم طويلاً وتصميم معدني نحيف جداً",
+      "image": "https://picsum.photos/400/400?r=013",
+      "images": [
+        "https://picsum.photos/400/400?r=0131,https://picsum.photos/400/400?r=0132"
+      ],
+      "category": "كمبيوتر ومحمول",
+      "stock": 23,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "شاشة 13.3 بوصة",
+        "بطارية 12 ساعة",
+        "رام 8"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.3,
+      "reviewCount": 31
+    },
+    {
+      "id": 24,
+      "name": "جهاز كمبيوتر مكتبي متكامل",
+      "price": 3800,
+      "originalPrice": 4400,
+      "description": "كمبيوتر شامل الشاشة والمعالج بقطع داخلية قوية",
+      "image": "https://picsum.photos/400/400?r=014",
+      "images": [
+        "https://picsum.photos/400/400?r=0141,https://picsum.photos/400/400?r=0142"
+      ],
+      "category": "كمبيوتر ومحمول",
+      "stock": 24,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "شاشة 24 بوصة الكل في واحد",
+        "هارد 1 تيرابايت"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.4,
+      "reviewCount": 33
+    },
+    {
+      "id": 25,
+      "name": "محطة عمل لمهندسي التصميم",
+      "price": 8500,
+      "originalPrice": 9800,
+      "description": "قوة معالجة جبارة لتطبيقات الهندسة والمحاكاة والرسم",
+      "image": "https://picsum.photos/400/400?r=015",
+      "images": [
+        "https://picsum.photos/400/400?r=0151,https://picsum.photos/400/400?r=0152"
+      ],
+      "category": "كمبيوتر ومحمول",
+      "stock": 25,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "معالج Xeon",
+        "كرت شاشة احترافي",
+        "رام 32"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.5,
+      "reviewCount": 35
+    },
+    {
+      "id": 26,
+      "name": "لابتوب متحول 2 في 1",
+      "price": 3300,
+      "originalPrice": 3900,
+      "description": "شاشة تعمل باللمس تدور 360 درجة لاستخدامه تابلت",
+      "image": "https://picsum.photos/400/400?r=016",
+      "images": [
+        "https://picsum.photos/400/400?r=0161,https://picsum.photos/400/400?r=0162"
+      ],
+      "category": "كمبيوتر ومحمول",
+      "stock": 26,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "شاشة لمس 14 بوصة",
+        "قلم ذكي",
+        "رام 8"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.6,
+      "reviewCount": 37
+    },
+    {
+      "id": 27,
+      "name": "حاسوب محمول للطلاب مطور",
+      "price": 1600,
+      "originalPrice": 1950,
+      "description": "أداء سلس للدراسة عن بعد وتصفح الويب والبرامج",
+      "image": "https://picsum.photos/400/400?r=017",
+      "images": [
+        "https://picsum.photos/400/400?r=0171,https://picsum.photos/400/400?r=0172"
+      ],
+      "category": "كمبيوتر ومحمول",
+      "stock": 27,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "هارد 256 جيجا SSD",
+        "رام 8",
+        "شاشة HD"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.7,
+      "reviewCount": 39
+    },
+    {
+      "id": 28,
+      "name": "جهاز كمبيوتر صغير ميني بي سي",
+      "price": 1400,
+      "originalPrice": 1700,
+      "description": "حجم كف اليد بمواصفات مكتبية كاملة وموفر للطاقة",
+      "image": "https://picsum.photos/400/400?r=018",
+      "images": [
+        "https://picsum.photos/400/400?r=0181,https://picsum.photos/400/400?r=0182"
+      ],
+      "category": "كمبيوتر ومحمول",
+      "stock": 28,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "معالج كور i5",
+        "منافذ متعددة",
+        "رام 8"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.8,
+      "reviewCount": 41
+    },
+    {
+      "id": 29,
+      "name": "لابتوب الترا بوك فاخر",
+      "price": 5800,
+      "originalPrice": 6600,
+      "description": "شاشة أوليد فائقة الألوان وهيكل من ألياف الكربون",
+      "image": "https://picsum.photos/400/400?r=019",
+      "images": [
+        "https://picsum.photos/400/400?r=0191,https://picsum.photos/400/400?r=0192"
+      ],
+      "category": "كمبيوتر ومحمول",
+      "stock": 29,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "شاشة OLED 4K",
+        "معالج رايزن 7",
+        "رام 16"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.9,
+      "reviewCount": 43
+    },
+    {
+      "id": 30,
+      "name": "كمبيوتر ألعاب مكتبي مجمع",
+      "price": 4900,
+      "originalPrice": 5600,
+      "description": "صندوق ألعاب بإضاءة RGB كاملة وقابلية للتحديث المستقبلي",
+      "image": "https://picsum.photos/400/400?r=020",
+      "images": [
+        "https://picsum.photos/400/400?r=0201,https://picsum.photos/400/400?r=0202"
+      ],
+      "category": "كمبيوتر ومحمول",
+      "stock": 30,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "معالج i5 جيل حديث",
+        "كرت RTX 3050",
+        "رام 16"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 45
+    },
+    {
+      "id": 31,
+      "name": "شاشة ذكية 55 بوصة",
+      "price": 1200,
+      "originalPrice": 1500,
+      "description": "شاشة بدقة 4K تدعم تطبيقات المشاهدة الذكية والإنترنت",
+      "image": "https://picsum.photos/400/400?r=021",
+      "images": [
+        "https://picsum.photos/400/400?r=0211,https://picsum.photos/400/400?r=0212"
+      ],
+      "category": "شاشات وتلفزيونات",
+      "stock": 31,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "دقة 4K UHD",
+        "تدعم الواي فاي",
+        "3 منافذ HDMI"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.1,
+      "reviewCount": 47
+    },
+    {
+      "id": 32,
+      "name": "شاشة ألعاب منحنية عريضة",
+      "price": 1600,
+      "originalPrice": 1900,
+      "description": "تجربة ألعاب غامرة بمعدل تحديث فائق واستجابة سريعة",
+      "image": "https://picsum.photos/400/400?r=022",
+      "images": [
+        "https://picsum.photos/400/400?r=0221,https://picsum.photos/400/400?r=0222"
+      ],
+      "category": "شاشات وتلفزيونات",
+      "stock": 32,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "حجم 32 بوصة",
+        "165 هرتز",
+        "وقت استجابة 1 ملي ثانية"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.2,
+      "reviewCount": 49
+    },
+    {
+      "id": 33,
+      "name": "تلفزيون ذكي عملاق 75 بوصة",
+      "price": 3999,
+      "originalPrice": 4600,
+      "description": "سينما منزلية حقيقية بألوان مذهلة ونظام صوت محيطي",
+      "image": "https://picsum.photos/400/400?r=023",
+      "images": [
+        "https://picsum.photos/400/400?r=0231,https://picsum.photos/400/400?r=0232"
+      ],
+      "category": "شاشات وتلفزيونات",
+      "stock": 33,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "دقة 4K مع ميزة HDR10+",
+        "ذكاء اصطناعي مدمج"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.3,
+      "reviewCount": 51
+    },
+    {
+      "id": 34,
+      "name": "شاشة مكتبية مسطحة حماية للعين",
+      "price": 450,
+      "originalPrice": 550,
+      "description": "مثالية للعمل الطويل والمذاكرة تمنع إجهاد العين",
+      "image": "https://picsum.photos/400/400?r=024",
+      "images": [
+        "https://picsum.photos/400/400?r=0241,https://picsum.photos/400/400?r=0242"
+      ],
+      "category": "شاشات وتلفزيونات",
+      "stock": 34,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "حجم 24 بوصة",
+        "تقنية تقليل الضوء الأزرق",
+        "FHD"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.4,
+      "reviewCount": 53
+    },
+    {
+      "id": 35,
+      "name": "تلفزيون كيو ليد ذكي 65",
+      "price": 2700,
+      "originalPrice": 3200,
+      "description": "ألوان نقية مذهلة بفضل تكنولوجيا النقاط الكمومية المتطورة",
+      "image": "https://picsum.photos/400/400?r=025",
+      "images": [
+        "https://picsum.photos/400/400?r=0251,https://picsum.photos/400/400?r=0252"
+      ],
+      "category": "شاشات وتلفزيونات",
+      "stock": 35,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "شاشة QLED",
+        "مليار لون",
+        "معالج ذكي سريع"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.5,
+      "reviewCount": 55
+    },
+    {
+      "id": 36,
+      "name": "شاشة احترافية لمصممي الجرافيك",
+      "price": 2200,
+      "originalPrice": 2550,
+      "description": "دقة ألوان متناهية تغطي كامل النطاقات اللونية المعتمدة",
+      "image": "https://picsum.photos/400/400?r=026",
+      "images": [
+        "https://picsum.photos/400/400?r=0261,https://picsum.photos/400/400?r=0262"
+      ],
+      "category": "شاشات وتلفزيونات",
+      "stock": 36,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "دقة 2K IPS",
+        "معايرة ألوان احترافية",
+        "27 بوصة"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.6,
+      "reviewCount": 57
+    },
+    {
+      "id": 37,
+      "name": "تلفزيون ذكي اقتصادي 43",
+      "price": 750,
+      "originalPrice": 900,
+      "description": "حجم مناسب لغرف النوم والمعيشة مع ميزات ذكية كاملة",
+      "image": "https://picsum.photos/400/400?r=027",
+      "images": [
+        "https://picsum.photos/400/400?r=0271,https://picsum.photos/400/400?r=0272"
+      ],
+      "category": "شاشات وتلفزيونات",
+      "stock": 37,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "دقة شاشة FHD",
+        "ريموت ذكي مدمج",
+        "اندرويد تي في"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.7,
+      "reviewCount": 59
+    },
+    {
+      "id": 38,
+      "name": "شاشة ألعاب أوليد خارقة",
+      "price": 4200,
+      "originalPrice": 4800,
+      "description": "أعمق مستويات اللون الأسود وسرعة خيالية للمحترفين",
+      "image": "https://picsum.photos/400/400?r=028",
+      "images": [
+        "https://picsum.photos/400/400?r=0281,https://picsum.photos/400/400?r=0282"
+      ],
+      "category": "شاشات وتلفزيونات",
+      "stock": 38,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "شاشة OLED",
+        "معدل 240 هرتز",
+        "حجم 27 بوصة جيمينج"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.8,
+      "reviewCount": 61
+    },
+    {
+      "id": 39,
+      "name": "شاشة عرض جدارية بروجيكتور",
+      "price": 1100,
+      "originalPrice": 1350,
+      "description": "جهاز عرض سينمائي مدمج لاسلكي سهل النقل بكل مكان",
+      "image": "https://picsum.photos/400/400?r=029",
+      "images": [
+        "https://picsum.photos/400/400?r=0291,https://picsum.photos/400/400?r=0292"
+      ],
+      "category": "شاشات وتلفزيونات",
+      "stock": 39,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "سطوع عالي 3000 لومن",
+        "يدعم الاندرويد والواي فاي"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.9,
+      "reviewCount": 63
+    },
+    {
+      "id": 40,
+      "name": "تلفزيون ذكي أوليد نحيف 55",
+      "price": 3400,
+      "originalPrice": 3950,
+      "description": "تصميم فائق النحافة كلوحة فنية مع ألوان مبهرة",
+      "image": "https://picsum.photos/400/400?r=030",
+      "images": [
+        "https://picsum.photos/400/400?r=0301,https://picsum.photos/400/400?r=0302"
+      ],
+      "category": "شاشات وتلفزيونات",
+      "stock": 40,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "شاشة OLED الذكية",
+        "صوت دولبي أتموس مدمج"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 65
+    },
+    {
+      "id": 41,
+      "name": "سماعة بلوتوث لاسلكية",
+      "price": 350,
+      "originalPrice": 450,
+      "description": "سماعة لاسلكية عالية الجودة تصميم عصري مريح جداً",
+      "image": "https://picsum.photos/400/400?r=031",
+      "images": [
+        "https://picsum.photos/400/400?r=0311,https://picsum.photos/400/400?r=0312"
+      ],
+      "category": "سماعات وصوتيات",
+      "stock": 41,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "بطارية تدوم 20 ساعة",
+        "بلوتوث 5.3",
+        "مقاومة للماء"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.1,
+      "reviewCount": 67
+    },
+    {
+      "id": 42,
+      "name": "سماعة رأس محيطية للألعاب",
+      "price": 280,
+      "originalPrice": 360,
+      "description": "تحديد اتجاه الصوت بدقة داخل الألعاب مع ميكروفون نقي",
+      "image": "https://picsum.photos/400/400?r=032",
+      "images": [
+        "https://picsum.photos/400/400?r=0321,https://picsum.photos/400/400?r=0322"
+      ],
+      "category": "سماعات وصوتيات",
+      "stock": 42,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "صوت محيطي 7.1",
+        "ميكروفون عازل للضوضاء",
+        "RGB"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.2,
+      "reviewCount": 69
+    },
+    {
+      "id": 43,
+      "name": "مكبر صوت بلوتوث ضد الماء",
+      "price": 190,
+      "originalPrice": 240,
+      "description": "سبيكر محمول قوي الصوت مناسب للرحلات والحفلات الخارجية",
+      "image": "https://picsum.photos/400/400?r=033",
+      "images": [
+        "https://picsum.photos/400/400?r=0331,https://picsum.photos/400/400?r=0332"
+      ],
+      "category": "سماعات وصوتيات",
+      "stock": 43,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "مقاوم للماء IPX7",
+        "بطارية 12 ساعة",
+        "باس عميق"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.3,
+      "reviewCount": 71
+    },
+    {
+      "id": 44,
+      "name": "سماعات أذن رياضية لاسلكية",
+      "price": 150,
+      "originalPrice": 200,
+      "description": "ثبات تام في الأذن أثناء الجري والتمارين الشاقة",
+      "image": "https://picsum.photos/400/400?r=034",
+      "images": [
+        "https://picsum.photos/400/400?r=0341,https://picsum.photos/400/400?r=0342"
+      ],
+      "category": "سماعات وصوتيات",
+      "stock": 44,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "مقاومة للتعرق",
+        "خطاف أذن مرن",
+        "بلوتوث متطور"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.4,
+      "reviewCount": 73
+    },
+    {
+      "id": 45,
+      "name": "مكبر صوت منزلي ساوند بار",
+      "price": 680,
+      "originalPrice": 800,
+      "description": "يوزع الصوت بشكل احترافي تحت التلفاز لتجربة سينما",
+      "image": "https://picsum.photos/400/400?r=035",
+      "images": [
+        "https://picsum.photos/400/400?r=0351,https://picsum.photos/400/400?r=0352"
+      ],
+      "category": "سماعات وصوتيات",
+      "stock": 45,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "صوت دولبي ديجيتال",
+        "مضخم صوت لاسلكي مدمج منفصل"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.5,
+      "reviewCount": 75
+    },
+    {
+      "id": 46,
+      "name": "ميكروفون احترافي للبث والتسجيل",
+      "price": 400,
+      "originalPrice": 490,
+      "description": "نقاء صوتي فائق لصناع المحتوى والبودكاست والألعاب",
+      "image": "https://picsum.photos/400/400?r=036",
+      "images": [
+        "https://picsum.photos/400/400?r=0361,https://picsum.photos/400/400?r=0362"
+      ],
+      "category": "سماعات وصوتيات",
+      "stock": 46,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "منفذ USB سهل التشغيل",
+        "نمط التقاط قلبي",
+        "فلتر صوت"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.6,
+      "reviewCount": 77
+    },
+    {
+      "id": 47,
+      "name": "سماعة رأس لاسلكية عازلة للضوضاء",
+      "price": 850,
+      "originalPrice": 1100,
+      "description": "تزل تماماً أصوات الضجيج الخارجي بالطائرة أو المكتب",
+      "image": "https://picsum.photos/400/400?r=037",
+      "images": [
+        "https://picsum.photos/400/400?r=0371,https://picsum.photos/400/400?r=0372"
+      ],
+      "category": "سماعات وصوتيات",
+      "stock": 47,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "تقنية إلغاء الضوضاء النشط ANC",
+        "بطارية 40 ساعة"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.7,
+      "reviewCount": 79
+    },
+    {
+      "id": 48,
+      "name": "نظام مسرح منزلي متكامل",
+      "price": 1900,
+      "originalPrice": 2300,
+      "description": "مجموعة مكبرات صوتية لتوزيع الصوت بكامل غرفتك",
+      "image": "https://picsum.photos/400/400?r=038",
+      "images": [
+        "https://picsum.photos/400/400?r=0381,https://picsum.photos/400/400?r=0382"
+      ],
+      "category": "سماعات وصوتيات",
+      "stock": 48,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "5.1 قناة صوتية",
+        "قوة 1000 واط",
+        "مشغل بلوراي مدمج"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.8,
+      "reviewCount": 81
+    },
+    {
+      "id": 49,
+      "name": "سماعة أذن سلكية كلاسيكية",
+      "price": 450,
+      "originalPrice": 520,
+      "description": "لعشاق الصوتيات النقي جداً بدون أي تأخير لاسلكي",
+      "image": "https://picsum.photos/400/400?r=039",
+      "images": [
+        "https://picsum.photos/400/400?r=0391,https://picsum.photos/400/400?r=0392"
+      ],
+      "category": "سماعات وصوتيات",
+      "stock": 49,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "منفذ 3.5 ملم",
+        "موصلات مطلية بالذهب",
+        "سلك مضفر متين"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.9,
+      "reviewCount": 83
+    },
+    {
+      "id": 50,
+      "name": "مكبر صوت ذكي مع مساعد صوتي",
+      "price": 300,
+      "originalPrice": 380,
+      "description": "تحكم في منزلك بصوتك واطلب تشغيل الموسيقى بسهولة",
+      "image": "https://picsum.photos/400/400?r=040",
+      "images": [
+        "https://picsum.photos/400/400?r=0401,https://picsum.photos/400/400?r=0402"
+      ],
+      "category": "سماعات وصوتيات",
+      "stock": 10,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "مساعد صوتي ذكي مدمج",
+        "اتصال واي فاي وبلوتوث"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 85
+    },
+    {
+      "id": 51,
+      "name": "ساعة ذكية رياضية متطورة",
+      "price": 180,
+      "originalPrice": 250,
+      "description": "ساعة ذكية لتتبع الأنشطة الرياضية ونبضات القلب بدقة",
+      "image": "https://picsum.photos/400/400?r=041",
+      "images": [
+        "https://picsum.photos/400/400?r=0411,https://picsum.photos/400/400?r=0412"
+      ],
+      "category": "ساعات ذكية",
+      "stock": 11,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "مقاومة للتعرق",
+        "تتبع النوم",
+        "شاشة تعمل باللمس"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.1,
+      "reviewCount": 87
+    },
+    {
+      "id": 52,
+      "name": "ساعة ذكية فائقة بهيكل تيتانيوم",
+      "price": 900,
+      "originalPrice": 1150,
+      "description": "شاشة كريستال ياقوتي مضادة للخدش وبطارية تدوم أياماً",
+      "image": "https://picsum.photos/400/400?r=042",
+      "images": [
+        "https://picsum.photos/400/400?r=0421,https://picsum.photos/400/400?r=0422"
+      ],
+      "category": "ساعات ذكية",
+      "stock": 12,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "مستشعر GPS مزدوج",
+        "قياس أكسجين الدم",
+        "متينة جداً"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.2,
+      "reviewCount": 89
+    },
+    {
+      "id": 53,
+      "name": "سوار لياقة بدنية اقتصادي",
+      "price": 85,
+      "originalPrice": 120,
+      "description": "خفيف الوزن يتتبع خطواتك وسعراتك الحرارية طوال اليوم",
+      "image": "https://picsum.photos/400/400?r=043",
+      "images": [
+        "https://picsum.photos/400/400?r=0431,https://picsum.photos/400/400?r=0432"
+      ],
+      "category": "ساعات ذكية",
+      "stock": 13,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "شاشة أموليد صغيرة",
+        "بطارية 14 يوم",
+        "حساب نبضات قلب"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.3,
+      "reviewCount": 91
+    },
+    {
+      "id": 54,
+      "name": "ساعة ذكية كلاسيكية رجالية",
+      "price": 400,
+      "originalPrice": 490,
+      "description": "تصميم دائري يشبه الساعات الفاخرة مع ميزات ذكية",
+      "image": "https://picsum.photos/400/400?r=044",
+      "images": [
+        "https://picsum.photos/400/400?r=0441,https://picsum.photos/400/400?r=0442"
+      ],
+      "category": "ساعات ذكية",
+      "stock": 14,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "سوار جلدي طبيعي",
+        "شاشة دائم العمل",
+        "ميزة المكالمات"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.4,
+      "reviewCount": 93
+    },
+    {
+      "id": 55,
+      "name": "ساعة ذكية للأطفال مع تعقب",
+      "price": 160,
+      "originalPrice": 210,
+      "description": "تتيح لك الاطمئنان على طفلك والاتصال به وتحديد موقعه",
+      "image": "https://picsum.photos/400/400?r=045",
+      "images": [
+        "https://picsum.photos/400/400?r=0451,https://picsum.photos/400/400?r=0452"
+      ],
+      "category": "ساعات ذكية",
+      "stock": 15,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "زر استغاثة SOS",
+        "تحديد موقع GPS",
+        "كاميرا مدمجة صغيرة"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.5,
+      "reviewCount": 95
+    },
+    {
+      "id": 56,
+      "name": "ساعة ذكية نسائية أنيقة",
+      "price": 380,
+      "originalPrice": 450,
+      "description": "تصميم ناعم وجميل مع تتبع كامل للصحة والتمارين",
+      "image": "https://picsum.photos/400/400?r=046",
+      "images": [
+        "https://picsum.photos/400/400?r=0461,https://picsum.photos/400/400?r=0462"
+      ],
+      "category": "ساعات ذكية",
+      "stock": 16,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "إطار معدني روز جولد",
+        "تتبع الدورة الصحية",
+        "إشعارات"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.6,
+      "reviewCount": 97
+    },
+    {
+      "id": 57,
+      "name": "ساعة ذكية تدعم شريحة اتصال",
+      "price": 550,
+      "originalPrice": 680,
+      "description": "تعمل بشكل مستقل تماماً عن الهاتف لإجراء المكالمات",
+      "image": "https://picsum.photos/400/400?r=047",
+      "images": [
+        "https://picsum.photos/400/400?r=0471,https://picsum.photos/400/400?r=0472"
+      ],
+      "category": "ساعات ذكية",
+      "stock": 17,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "منفذ شريحة 4G LTE",
+        "متجر تطبيقات مدمج",
+        "ذاكرة مدمجة"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.7,
+      "reviewCount": 99
+    },
+    {
+      "id": 58,
+      "name": "ساعة رياضية مخصصة للجري والسباحة",
+      "price": 700,
+      "originalPrice": 820,
+      "description": "خرائط حية على معصمك وتحليل دقيق لمجهودك البدني",
+      "image": "https://picsum.photos/400/400?r=048",
+      "images": [
+        "https://picsum.photos/400/400?r=0481,https://picsum.photos/400/400?r=0482"
+      ],
+      "category": "ساعات ذكية",
+      "stock": 18,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "خرائط مدمجة",
+        "مقاومة مياه 50 متر",
+        "قياس الجهد البدني"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.8,
+      "reviewCount": 101
+    },
+    {
+      "id": 59,
+      "name": "ساعة ذكية بشاشة منحنية ثلاثية",
+      "price": 290,
+      "originalPrice": 350,
+      "description": "مظهر مستقبلي جذاب جداً وتدعم استقبال كافة الرسائل",
+      "image": "https://picsum.photos/400/400?r=049",
+      "images": [
+        "https://picsum.photos/400/400?r=0491,https://picsum.photos/400/400?r=0492"
+      ],
+      "category": "ساعات ذكية",
+      "stock": 19,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "شاشة ثلاثية الأبعاد",
+        "بلوتوث 5.2",
+        "استقبال مكالمات"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.9,
+      "reviewCount": 103
+    },
+    {
+      "id": 60,
+      "name": "ساعة ذكية رفيعة للغاية",
+      "price": 220,
+      "originalPrice": 280,
+      "description": "هيكل نحيف خفيف جداً على المعصم ومريحة أثناء النوم",
+      "image": "https://picsum.photos/400/400?r=050",
+      "images": [
+        "https://picsum.photos/400/400?r=0501,https://picsum.photos/400/400?r=0502"
+      ],
+      "category": "ساعات ذكية",
+      "stock": 20,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "سمك 9 ملم فقط",
+        "شاشة نقية HD",
+        "تتبع دقيق للصحة اليومية"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 105
+    },
+    {
+      "id": 61,
+      "name": "ماوس ألعاب احترافي دقيق",
+      "price": 200,
+      "originalPrice": 280,
+      "description": "ماوس ألعاب بدقة عالية وأزرار سريعة الاستجابة مريح جداً",
+      "image": "https://picsum.photos/400/400?r=051",
+      "images": [
+        "https://picsum.photos/400/400?r=0511,https://picsum.photos/400/400?r=0512"
+      ],
+      "category": "ألعاب وفيديو جيم",
+      "stock": 21,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "سلكي",
+        "مريح",
+        "16000 DPI",
+        "إضاءة RGB"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.1,
+      "reviewCount": 107
+    },
+    {
+      "id": 62,
+      "name": "لوحة مفاتيح ميكانيكية مدمجة",
+      "price": 350,
+      "originalPrice": 440,
+      "description": "سويتشات ميكانيكية سريعة وعمر افتراضي طويل جداً للألعاب",
+      "image": "https://picsum.photos/400/400?r=052",
+      "images": [
+        "https://picsum.photos/400/400?r=0521,https://picsum.photos/400/400?r=0522"
+      ],
+      "category": "ألعاب وفيديو جيم",
+      "stock": 22,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "سويتشات زرقاء حاسمة",
+        "إضاءة RGB لكل زر",
+        "كابل مفصول"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.2,
+      "reviewCount": 109
+    },
+    {
+      "id": 63,
+      "name": "منصة ألعاب منزلية حديثة",
+      "price": 2200,
+      "originalPrice": 2500,
+      "description": "جهاز الكونسول الرائد لتشغيل أحدث الألعاب بدقة خارقة",
+      "image": "https://picsum.photos/400/400?r=053",
+      "images": [
+        "https://picsum.photos/400/400?r=0531,https://picsum.photos/400/400?r=0532"
+      ],
+      "category": "ألعاب وفيديو جيم",
+      "stock": 23,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "دقة 4K جيمينج",
+        "هارد فائق السرعة SSD",
+        "ذراع تحكم لاسلكي"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.3,
+      "reviewCount": 111
+    },
+    {
+      "id": 64,
+      "name": "كرسي ألعاب مريح لساعات طويلة",
+      "price": 800,
+      "originalPrice": 950,
+      "description": "تصميم مريح يدعم الظهر والرقبة بشكل كامل لمنع الآلام",
+      "image": "https://picsum.photos/400/400?r=054",
+      "images": [
+        "https://picsum.photos/400/400?r=0541,https://picsum.photos/400/400?r=0542"
+      ],
+      "category": "ألعاب وفيديو جيم",
+      "stock": 24,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "وسائد دعم متحركة",
+        "مسند ظهر قابل للإمالة",
+        "جلد فاخر"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.4,
+      "reviewCount": 113
+    },
+    {
+      "id": 65,
+      "name": "ذراع تحكم لاسلكي للكمبيوتر",
+      "price": 140,
+      "originalPrice": 185,
+      "description": "متوافق مع أجهزة الحاسوب والكونسول استجابة فورية",
+      "image": "https://picsum.photos/400/400?r=055",
+      "images": [
+        "https://picsum.photos/400/400?r=0551,https://picsum.photos/400/400?r=0552"
+      ],
+      "category": "ألعاب وفيديو جيم",
+      "stock": 25,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "اتصال لاسلكي 2.4 جيجا هرتز",
+        "ميزة الاهتزاز",
+        "بطارية مدمجة"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.5,
+      "reviewCount": 115
+    },
+    {
+      "id": 66,
+      "name": "نظارة واقع افتراضي مستقلة",
+      "price": 1800,
+      "originalPrice": 2100,
+      "description": "ادخل عالم الواقع الافتراضي بدون الحاجة لأسلاك أو كمبيوتر",
+      "image": "https://picsum.photos/400/400?r=056",
+      "images": [
+        "https://picsum.photos/400/400?r=0561,https://picsum.photos/400/400?r=0562"
+      ],
+      "category": "ألعاب وفيديو جيم",
+      "stock": 26,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "شاشة عالية الدقة",
+        "تتبع حركي كامل",
+        "مساحة تخزين مدمجة"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.6,
+      "reviewCount": 117
+    },
+    {
+      "id": 67,
+      "name": "سماعة رأس محيطية لاسلكية قيمنق",
+      "price": 490,
+      "originalPrice": 580,
+      "description": "حرية حركة كاملة بدون أسلاك مع صوت محيطي مذهل",
+      "image": "https://picsum.photos/400/400?r=057",
+      "images": [
+        "https://picsum.photos/400/400?r=0571,https://picsum.photos/400/400?r=0572"
+      ],
+      "category": "ألعاب وفيديو جيم",
+      "stock": 27,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "اتصال لاسلكي بدون تأخير",
+        "عمر بطارية 30 ساعة",
+        "مريحة"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.7,
+      "reviewCount": 119
+    },
+    {
+      "id": 68,
+      "name": "قاعدة تبريد لابتوب الألعاب شاقة",
+      "price": 95,
+      "originalPrice": 130,
+      "description": "مراوح ضخمة صامتة للحفاظ على برودة حاسوبك وأدائه القوي",
+      "image": "https://picsum.photos/400/400?r=058",
+      "images": [
+        "https://picsum.photos/400/400?r=0581,https://picsum.photos/400/400?r=0582"
+      ],
+      "category": "ألعاب وفيديو جيم",
+      "stock": 28,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "5 مراوح تبريد عالية السرعة",
+        "منافذ يو اس بي إضافية"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.8,
+      "reviewCount": 121
+    },
+    {
+      "id": 69,
+      "name": "جهاز ألعاب محمول ذكي",
+      "price": 1500,
+      "originalPrice": 1750,
+      "description": "شغل كافة ألعاب الكمبيوتر الضخمة في أي مكان تذهب إليه",
+      "image": "https://picsum.photos/400/400?r=059",
+      "images": [
+        "https://picsum.photos/400/400?r=0591,https://picsum.photos/400/400?r=0592"
+      ],
+      "category": "ألعاب وفيديو جيم",
+      "stock": 29,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "شاشة لمس 7 بوصة",
+        "معالج ألعاب محمول",
+        "يد تحكم مدمجة"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.9,
+      "reviewCount": 123
+    },
+    {
+      "id": 70,
+      "name": "بطاقة التقاط بث الألعاب بدقة فائقة",
+      "price": 320,
+      "originalPrice": 390,
+      "description": "سجل وابث ألعابك مباشرة لمنصات البث بنقاء تام",
+      "image": "https://picsum.photos/400/400?r=060",
+      "images": [
+        "https://picsum.photos/400/400?r=0601,https://picsum.photos/400/400?r=0602"
+      ],
+      "category": "ألعاب وفيديو جيم",
+      "stock": 30,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "مدخل ومخرج HDMI بدقة 4K",
+        "تسجيل بسلاسة 60 إطار بالثانية"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 125
+    },
+    {
+      "id": 71,
+      "name": "كاميرا تصوير بدقة 24MP احترافية",
+      "price": 1800,
+      "originalPrice": 2100,
+      "description": "كاميرا احترافية بدون مرآة لمحبي التوثيق وصناعة المحتوى",
+      "image": "https://picsum.photos/400/400?r=061",
+      "images": [
+        "https://picsum.photos/400/400?r=0611,https://picsum.photos/400/400?r=0612"
+      ],
+      "category": "كاميرات وتصوير",
+      "stock": 31,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "تصوير Full HD",
+        "عدسة 18-55mm",
+        "واي فاي مدمج"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.1,
+      "reviewCount": 127
+    },
+    {
+      "id": 72,
+      "name": "كاميرا أكشن رياضية ضد الماء",
+      "price": 450,
+      "originalPrice": 550,
+      "description": "سجل مغامراتك الرياضية والسباحة بدقة فائقة وثبات مذهل",
+      "image": "https://picsum.photos/400/400?r=062",
+      "images": [
+        "https://picsum.photos/400/400?r=0621,https://picsum.photos/400/400?r=0622"
+      ],
+      "category": "كاميرات وتصوير",
+      "stock": 32,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "تصوير بدقة 4K",
+        "تثبيت صلب للاهتزاز",
+        "ضد الماء لعمق 10م"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.2,
+      "reviewCount": 129
+    },
+    {
+      "id": 73,
+      "name": "مانع اهتزاز غيمبال للهواتف ذكي",
+      "price": 310,
+      "originalPrice": 380,
+      "description": "صور مقاطع فيديو سينمائية ناعمة جداً بهاتفك الذكي تلقائياً",
+      "image": "https://picsum.photos/400/400?r=063",
+      "images": [
+        "https://picsum.photos/400/400?r=0631,https://picsum.photos/400/400?r=0632"
+      ],
+      "category": "كاميرات وتصوير",
+      "stock": 33,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "تتبع ذكي للوجوه",
+        "بطارية تدوم 15 ساعة",
+        "تطبيق تحكم"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.3,
+      "reviewCount": 131
+    },
+    {
+      "id": 74,
+      "name": "طائرة درون صغيرة للتصوير الجوي",
+      "price": 1200,
+      "originalPrice": 1450,
+      "description": "التقط صوراً ومقاطع فيديو مذهلة من السماء بكل سهولة وأمان",
+      "image": "https://picsum.photos/400/400?r=064",
+      "images": [
+        "https://picsum.photos/400/400?r=0641,https://picsum.photos/400/400?r=0642"
+      ],
+      "category": "كاميرات وتصوير",
+      "stock": 34,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "كاميرا 4K مدمجة",
+        "زمن طيران 30 دقيقة",
+        "عودة تلقائية للمنزل"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.4,
+      "reviewCount": 133
+    },
+    {
+      "id": 75,
+      "name": "عدسة تصوير بورتريه سريعة",
+      "price": 600,
+      "originalPrice": 700,
+      "description": "عزل مذهل للخلفية وإضاءة ممتازة لصور أشخاص احترافية",
+      "image": "https://picsum.photos/400/400?r=065",
+      "images": [
+        "https://picsum.photos/400/400?r=0651,https://picsum.photos/400/400?r=0652"
+      ],
+      "category": "كاميرات وتصوير",
+      "stock": 35,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "فتحة عدسة واسعة f/1.8",
+        "بعد بؤري 50 ملم",
+        "فوكس سريع"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.5,
+      "reviewCount": 135
+    },
+    {
+      "id": 76,
+      "name": "كاميرا مراقبة خارجية ذكية واي فاي",
+      "price": 180,
+      "originalPrice": 240,
+      "description": "تابع أمن منزلك من هاتفك مباشرة مع ميزة الرؤية الليلية",
+      "image": "https://picsum.photos/400/400?r=066",
+      "images": [
+        "https://picsum.photos/400/400?r=0661,https://picsum.photos/400/400?r=0662"
+      ],
+      "category": "كاميرات وتصوير",
+      "stock": 36,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "دقة FHD",
+        "مقاومة للمطر والغبار",
+        "استشعار حركة ذكي"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.6,
+      "reviewCount": 137
+    },
+    {
+      "id": 77,
+      "name": "حامل كاميرا ثلاثي كربون فايبر تريبود",
+      "price": 220,
+      "originalPrice": 280,
+      "description": "ثبات كامل لكاميرتك خفيف الوزن وسهل التنقل بالميدان",
+      "image": "https://picsum.photos/400/400?r=067",
+      "images": [
+        "https://picsum.photos/400/400?r=0671,https://picsum.photos/400/400?r=0672"
+      ],
+      "category": "كاميرات وتصوير",
+      "stock": 37,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "هيكل كربون فايبر قوي",
+        "رأس كروي احترافي",
+        "حقيبة حمل"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.7,
+      "reviewCount": 139
+    },
+    {
+      "id": 78,
+      "name": "إضاءة حلقة دائرية رينج لايت مطورة",
+      "price": 80,
+      "originalPrice": 115,
+      "description": "إضاءة مثالية لتصوير الفيديو والبث المباشر والمكياج",
+      "image": "https://picsum.photos/400/400?r=068",
+      "images": [
+        "https://picsum.photos/400/400?r=0681,https://picsum.photos/400/400?r=0682"
+      ],
+      "category": "كاميرات وتصوير",
+      "stock": 38,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "قطر 18 بوصة",
+        "درجات ألوان متعددة",
+        "حامل هاتف مرن مدمج"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.8,
+      "reviewCount": 141
+    },
+    {
+      "id": 79,
+      "name": "كاميرا فورية لطباعة الصور فوراً",
+      "price": 260,
+      "originalPrice": 310,
+      "description": "التقط الصور واطبع الذكريات في نفس اللحظة بشكل كلاسيكي",
+      "image": "https://picsum.photos/400/400?r=069",
+      "images": [
+        "https://picsum.photos/400/400?r=0691,https://picsum.photos/400/400?r=0692"
+      ],
+      "category": "كاميرات وتصوير",
+      "stock": 39,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "طباعة فورية تلقائية",
+        "مرآة سيلفي مدمجة",
+        "تصميم أنيق"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.9,
+      "reviewCount": 143
+    },
+    {
+      "id": 80,
+      "name": "حقيبة كاميرات احترافية مقاومة للماء",
+      "price": 110,
+      "originalPrice": 145,
+      "description": "احمِ كامل عتاد التصوير والعدسات واللابتوب من الصدمات المطر",
+      "image": "https://picsum.photos/400/400?r=070",
+      "images": [
+        "https://picsum.photos/400/400?r=0701,https://picsum.photos/400/400?r=0702"
+      ],
+      "category": "كاميرات وتصوير",
+      "stock": 40,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "فواصل داخلية متحركة",
+        "جيب لابتوب مخصص",
+        "حماية ضد المطر"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 145
+    },
+    {
+      "id": 81,
+      "name": "شاحن جداري سريع 65W متطور",
+      "price": 75,
+      "originalPrice": 110,
+      "description": "شاحن متعدد المنافذ يدعم الشحن السريع الآمن لكافة أجهزتك",
+      "image": "https://picsum.photos/400/400?r=071",
+      "images": [
+        "https://picsum.photos/400/400?r=0711,https://picsum.photos/400/400?r=0712"
+      ],
+      "category": "إكسسوارات",
+      "stock": 41,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "تقنية GaN متطورة",
+        "منفذين USB-C",
+        "منفذ USB-A"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.1,
+      "reviewCount": 147
+    },
+    {
+      "id": 82,
+      "name": "بنك طاقة ضخم بسعة 20000mAh",
+      "price": 120,
+      "originalPrice": 160,
+      "description": "اشحن هاتفك وأجهزتك عدة مرات متتالية في الرحلات والسفر",
+      "image": "https://picsum.photos/400/400?r=072",
+      "images": [
+        "https://picsum.photos/400/400?r=0721,https://picsum.photos/400/400?r=0722"
+      ],
+      "category": "إكسسوارات",
+      "stock": 42,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "دعم شحن سريع بقوة 22.5 واط",
+        "شاشة رقمية لنسبة الشحن"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.2,
+      "reviewCount": 149
+    },
+    {
+      "id": 83,
+      "name": "قاعدة شحن لاسلكي مغناطيسي 3 في 1",
+      "price": 140,
+      "originalPrice": 190,
+      "description": "اشحن هاتفك وساعتك وسماعتك في نفس الوقت وبمكان واحد نظيف",
+      "image": "https://picsum.photos/400/400?r=073",
+      "images": [
+        "https://picsum.photos/400/400?r=0731,https://picsum.photos/400/400?r=0732"
+      ],
+      "category": "إكسسوارات",
+      "stock": 43,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "شحن مغناطيسي متوافق مع الهواتف الحديثة",
+        "حماية حرارية"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.3,
+      "reviewCount": 151
+    },
+    {
+      "id": 84,
+      "name": "كابل شحن قماشي متين مضفر سريع",
+      "price": 20,
+      "originalPrice": 30,
+      "description": "كابل شديد التحمل ضد القطع يدعم نقل البيانات السريع",
+      "image": "https://picsum.photos/400/400?r=074",
+      "images": [
+        "https://picsum.photos/400/400?r=0741,https://picsum.photos/400/400?r=0742"
+      ],
+      "category": "إكسسوارات",
+      "stock": 44,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "طول 2 متر",
+        "موصلات معدنية قوية",
+        "يدعم الشحن فائق السرعة"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.4,
+      "reviewCount": 153
+    },
+    {
+      "id": 85,
+      "name": "موصل هاب متعدد المنافذ 7 في 1",
+      "price": 110,
+      "originalPrice": 145,
+      "description": "وسع منافذ لابتوبك لتشمل قراءة كروت الذاكرة وشاشات العرض",
+      "image": "https://picsum.photos/400/400?r=075",
+      "images": [
+        "https://picsum.photos/400/400?r=0751,https://picsum.photos/400/400?r=0752"
+      ],
+      "category": "إكسسوارات",
+      "stock": 45,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "مخرج شاشة HDMI بدقة 4K",
+        "منافذ USB 3.0",
+        "منفذ شحن محمول"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.5,
+      "reviewCount": 155
+    },
+    {
+      "id": 86,
+      "name": "ذاكرة فلاش يو اس بي مزدوجة للهواتف",
+      "price": 45,
+      "originalPrice": 60,
+      "description": "انقل ملفاتك وصورك مباشرة من هاتفك للكمبيوتر بكل سهولة",
+      "image": "https://picsum.photos/400/400?r=076",
+      "images": [
+        "https://picsum.photos/400/400?r=0761,https://picsum.photos/400/400?r=0762"
+      ],
+      "category": "إكسسوارات",
+      "stock": 46,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "سعة 128 جيجا",
+        "منفذ USB-C مدمج",
+        "منفذ USB-A التقليدي"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.6,
+      "reviewCount": 157
+    },
+    {
+      "id": 87,
+      "name": "كارت ذاكرة تخزين فائق السرعة",
+      "price": 65,
+      "originalPrice": 85,
+      "description": "مثالي لكاميرات الأكشن وهواتف الاندرويد لتسجيل فيديو 4K",
+      "image": "https://picsum.photos/400/400?r=077",
+      "images": [
+        "https://picsum.photos/400/400?r=0771,https://picsum.photos/400/400?r=0772"
+      ],
+      "category": "إكسسوارات",
+      "stock": 47,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "سعة 256 جيجا بايت",
+        "سرعة قراءة 120 ميجا",
+        "فئة V30 احترافية"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.7,
+      "reviewCount": 159
+    },
+    {
+      "id": 88,
+      "name": "منظم كابلات مكتبي مغناطيسي",
+      "price": 15,
+      "originalPrice": 25,
+      "description": "حافظ على ترتيب مكتبك وامنع تشابك كابلات شواحنك اليومية",
+      "image": "https://picsum.photos/400/400?r=078",
+      "images": [
+        "https://picsum.photos/400/400?r=0781,https://picsum.photos/400/400?r=0782"
+      ],
+      "category": "إكسسوارات",
+      "stock": 48,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "قاعدة مغناطيسية تثبت بالسطح",
+        "5 قطع مغناطيسية للامساك"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.8,
+      "reviewCount": 161
+    },
+    {
+      "id": 89,
+      "name": "محول بلوتوث لاسلكي للسيارة مدمج",
+      "price": 30,
+      "originalPrice": 45,
+      "description": "شغل مكالماتك وموسيقاك لاسلكياً على سماعات السيارة القديمة",
+      "image": "https://picsum.photos/400/400?r=079",
+      "images": [
+        "https://picsum.photos/400/400?r=0791,https://picsum.photos/400/400?r=0792"
+      ],
+      "category": "إكسسوارات",
+      "stock": 49,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "بلوتوث 5.0",
+        "ميكروفون مدمج للمكالمات",
+        "مخرج صوت نقي AUX"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.9,
+      "reviewCount": 163
+    },
+    {
+      "id": 90,
+      "name": "شاحن سيارة ذكي سريع ومنفذين",
+      "price": 40,
+      "originalPrice": 55,
+      "description": "شحن سريع وآمن للغاية لهاتفك أثناء القيادة بذكاء كامل",
+      "image": "https://picsum.photos/400/400?r=080",
+      "images": [
+        "https://picsum.photos/400/400?r=0801,https://picsum.photos/400/400?r=0802"
+      ],
+      "category": "إكسسوارات",
+      "stock": 10,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "منفذ شحن QC 3.0 سريع",
+        "مخرجين كاملين",
+        "هيكل معدني متين"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 165
+    },
+    {
+      "id": 91,
+      "name": "مكنسة ذكية روبوت متطورة تكنو",
+      "price": 600,
+      "originalPrice": 750,
+      "description": "مكنسة ذكية تنظف وتمسح الأرضيات تلقائياً وتتجنب العوائق",
+      "image": "https://picsum.photos/400/400?r=081",
+      "images": [
+        "https://picsum.photos/400/400?r=0811,https://picsum.photos/400/400?r=0812"
+      ],
+      "category": "أجهزة منزلية ذكية",
+      "stock": 11,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "تحكم كامل بالتطبيق",
+        "تخطيط ليزر دقيق",
+        "تفريغ ذاتي"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.1,
+      "reviewCount": 167
+    },
+    {
+      "id": 92,
+      "name": "مصباح إضاءة ذكي RGB ملون",
+      "price": 25,
+      "originalPrice": 38,
+      "description": "غير ألوان غرفتك وتحكم بالإضاءة بصوتك أو عبر التطبيق",
+      "image": "https://picsum.photos/400/400?r=082",
+      "images": [
+        "https://picsum.photos/400/400?r=0821,https://picsum.photos/400/400?r=0822"
+      ],
+      "category": "أجهزة منزلية ذكية",
+      "stock": 12,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "اتصال واي فاي مباشر",
+        "16 مليون لون",
+        "متوافق مع المساعد"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.2,
+      "reviewCount": 169
+    },
+    {
+      "id": 93,
+      "name": "قفل باب ذكي متطور ببصمة الأصبع",
+      "price": 480,
+      "originalPrice": 580,
+      "description": "احمِ منزلك وافتح بابك بالبصمة أو كارت الأمان أو الهاتف",
+      "image": "https://picsum.photos/400/400?r=083",
+      "images": [
+        "https://picsum.photos/400/400?r=0831,https://picsum.photos/400/400?r=0832"
+      ],
+      "category": "أجهزة منزلية ذكية",
+      "stock": 13,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "بصمة أصبع حيوية",
+        "تطبيق هاتف للمراقبة",
+        "مفاتيح طوارئ"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.3,
+      "reviewCount": 171
+    },
+    {
+      "id": 94,
+      "name": "جرس باب ذكي مدمج مع كاميرا كام",
+      "price": 290,
+      "originalPrice": 360,
+      "description": "شاهد وتحدث مع زوارك أمام الباب مباشرة من أي مكان بالعالم",
+      "image": "https://picsum.photos/400/400?r=084",
+      "images": [
+        "https://picsum.photos/400/400?r=0841,https://picsum.photos/400/400?r=0842"
+      ],
+      "category": "أجهزة منزلية ذكية",
+      "stock": 14,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "كاميرا فيديو بدقة FHD",
+        "اتصال واي فاي حركي",
+        "ميكروفون"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.4,
+      "reviewCount": 173
+    },
+    {
+      "id": 95,
+      "name": "موزع عطور ذكي لاسلكي كامل",
+      "price": 90,
+      "originalPrice": 125,
+      "description": "عطر منزلك بجدولة زمنية دقيقة عبر هاتفك ومظهر عصري أنيق",
+      "image": "https://picsum.photos/400/400?r=085",
+      "images": [
+        "https://picsum.photos/400/400?r=0851,https://picsum.photos/400/400?r=0852"
+      ],
+      "category": "أجهزة منزلية ذكية",
+      "stock": 15,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "تحكم بالبلوتوث وتوقيت مخصص",
+        "إضاءة خافتة مدمجة هادئة"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.5,
+      "reviewCount": 175
+    },
+    {
+      "id": 96,
+      "name": "مقبس كهربائي ذكي واي فاي تكنو",
+      "price": 40,
+      "originalPrice": 55,
+      "description": "حول أي جهاز منزلي تقليدي لجهاز ذكي وتحكم بكهربائه وتوقيته",
+      "image": "https://picsum.photos/400/400?r=086",
+      "images": [
+        "https://picsum.photos/400/400?r=0861,https://picsum.photos/400/400?r=0862"
+      ],
+      "category": "أجهزة منزلية ذكية",
+      "stock": 16,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "جدولة مواعيد التشغيل",
+        "مراقبة استهلاك الطاقة الكلي للمنزل"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.6,
+      "reviewCount": 177
+    },
+    {
+      "id": 97,
+      "name": "جهاز تحكم عن بعد ذكي شامل ريموت",
+      "price": 60,
+      "originalPrice": 80,
+      "description": "تحكم في التكييف والتلفاز والرسيفر من هاتفك كبديل للريموتات",
+      "image": "https://picsum.photos/400/400?r=087",
+      "images": [
+        "https://picsum.photos/400/400?r=0871,https://picsum.photos/400/400?r=0872"
+      ],
+      "category": "أجهزة منزلية ذكية",
+      "stock": 17,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "يدعم الأشعة تحت الحمراء IR",
+        "تحكم واي فاي مدمج من الهاتف"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.7,
+      "reviewCount": 179
+    },
+    {
+      "id": 98,
+      "name": "ميزان جسم ذكي رقمي بلوتوث",
+      "price": 75,
+      "originalPrice": 105,
+      "description": "حلل مكونات جسمك بالكامل من دهون وعضلات وماء على هاتفك",
+      "image": "https://picsum.photos/400/400?r=088",
+      "images": [
+        "https://picsum.photos/400/400?r=0881,https://picsum.photos/400/400?r=0882"
+      ],
+      "category": "أجهزة منزلية ذكية",
+      "stock": 18,
+      "status": "جديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "تطبيق تتبع صحي بياني",
+        "تحليل 13 مؤشر للجسم",
+        "دقة عالية"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.8,
+      "reviewCount": 181
+    },
+    {
+      "id": 99,
+      "name": "مستشعر ذكي لتسريب المياه والغاز",
+      "price": 55,
+      "originalPrice": 75,
+      "description": "ينبهك فوراً على هاتفك في حالة حدوث أي تسريب طارئ بالمنزل",
+      "image": "https://picsum.photos/400/400?r=089",
+      "images": [
+        "https://picsum.photos/400/400?r=0891,https://picsum.photos/400/400?r=0892"
+      ],
+      "category": "أجهزة منزلية ذكية",
+      "stock": 19,
+      "status": "جديد",
+      "tags": [
+        "عرض خاص"
+      ],
+      "specs": [
+        "إنذار صوتي مدمج قوي",
+        "تنبيهات فورية على الموبايل واي فاي"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4.9,
+      "reviewCount": 183
+    },
+    {
+      "id": 100,
+      "name": "ستارة ذكية بمحرك لاسلكي تحكم",
+      "price": 350,
+      "originalPrice": 420,
+      "description": "افتح واغلق ستائرك تلقائياً مع شروق وغروب الشمس بذكاء",
+      "image": "https://picsum.photos/400/400?r=090",
+      "images": [
+        "https://picsum.photos/400/400?r=0901,https://picsum.photos/400/400?r=0902"
+      ],
+      "category": "أجهزة منزلية ذكية",
+      "stock": 20,
+      "status": "مستعمل كالجديد",
+      "tags": [
+        "الأكثر مبيعاً"
+      ],
+      "specs": [
+        "محرك صامت قوي",
+        "مؤقت تشغيل مجدول",
+        "ريموت تحكم لاسلكي"
+      ],
+      "offerEnds": "2026-12-31",
+      "videos": [],
+      "rating": 4,
+      "reviewCount": 185
     }
   ],
-  "categories": [],
+  "categories": [
+    {
+      "name": "إلكترونيات",
+      "icon": "fas fa-mobile-alt"
+    },
+    {
+      "name": "إكسسوارات",
+      "icon": "fas fa-plug"
+    },
+    {
+      "name": "جوالات",
+      "icon": "fas fa-mobile-alt"
+    },
+    {
+      "name": "كمبيوتر ومحمول",
+      "icon": "fas fa-laptop"
+    },
+    {
+      "name": "شاشات وتلفزيونات",
+      "icon": "fas fa-tv"
+    },
+    {
+      "name": "سماعات وصوتيات",
+      "icon": "fas fa-headphones"
+    },
+    {
+      "name": "ساعات ذكية",
+      "icon": "fas fa-watch-fitness"
+    },
+    {
+      "name": "ألعاب وفيديو جيم",
+      "icon": "fas fa-gamepad"
+    },
+    {
+      "name": "كاميرات وتصوير",
+      "icon": "fas fa-camera"
+    },
+    {
+      "name": "أجهزة منزلية ذكية",
+      "icon": "fas fa-home"
+    }
+  ],
   "academyCats": [
     {
       "name": "عام"
@@ -118,28 +2646,80 @@
   "videos": [
     {
       "id": 1770051311268,
-      "title": "ساعه كاملة من الابتهالات ",
+      "title": "ساعة كاملة من الأبتهالات",
       "url": "https://youtu.be/euLgHFCx8eQ?si=yC-FTHYfZXCGvlg9",
-      "category": "ابتهالات",
+      "category": "أبتهالات",
       "type": "free",
       "duration": "1:12:41",
-      "attachments": [],
-      "image": "data:image/jpeg;base64,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",
+      "image": "",
+      "password": "",
+      "likes": 0,
+      "dislikes": 0,
+      "comments": []
+    },
+    {
+      "id": 1770051311269,
+      "title": "مقدمة البرمجة بلغة بايثون",
+      "url": "https://youtu.be/example1",
+      "category": "برمجة",
+      "type": "free",
+      "duration": "0:30:00",
+      "image": "",
+      "password": "",
+      "likes": 0,
+      "dislikes": 0,
+      "comments": []
+    },
+    {
+      "id": 1770051311270,
+      "title": "شرح أساسيات التسويق الإلكتروني",
+      "url": "https://youtu.be/example2",
+      "category": "تسويق",
+      "type": "free",
+      "duration": "0:45:00",
+      "image": "",
+      "password": "",
+      "likes": 0,
+      "dislikes": 0,
+      "comments": []
+    },
+    {
+      "id": 1770051311271,
+      "title": "دورة تصميم الجرافيك للمبتدئين",
+      "url": "https://youtu.be/example3",
+      "category": "تصميم",
+      "type": "paid",
+      "duration": "1:00:00",
+      "image": "",
       "password": "",
       "likes": 0,
       "dislikes": 0,
       "comments": []
     }
   ],
-  "ticker": "عرض خاص هذا الأسبوع - خصم 20% على المعالجات!",
-  "proof": "نحن متخصصون في بيع الإلكترونيات والتكنولوجيا منذ 2020",
+  "ticker": "اللهم صل وسلم وبارك على سيدنا محمد وعلى اله وصحبه وسلم      اهلا بكم مع مشالي للالكترونيات",
+  "proof": "نحن متخصصون في بيع الإلكترونيات والتكنولوجيا منذ 2020,اهلا بكم في مشالي للالكترونيات ,welcome to mashily electronic ",
   "coupons": [
     {
       "code": "3212",
-      "value": 50,
-      "type": "fixed",
-      "expiry": "2026-09-06",
+      "value": 101,
+      "type": "percent",
+      "expiry": "2026-09-30",
       "minSpend": 1000
+    },
+    {
+      "code": "SAVE10",
+      "value": 10,
+      "type": "percent",
+      "expiry": "2026-12-31",
+      "minSpend": 500
+    },
+    {
+      "code": "WELCOME",
+      "value": 100,
+      "type": "fixed",
+      "expiry": "2026-10-31",
+      "minSpend": 2000
     }
   ]
 }
