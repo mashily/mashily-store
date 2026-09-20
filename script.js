@@ -4,6 +4,13 @@ let currentCategory = 'الكل';
 let currentSort = 'default';
 let appliedCoupon = null;
 let selectedPaymentMethod = 'cash';
+const DEFAULT_STORE_URL = 'https://mashily.github.io/mashily-store/';
+
+function getStoreUrl() {
+    const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    const url = (settings.website || DEFAULT_STORE_URL).trim();
+    return url || DEFAULT_STORE_URL;
+}
 
 async function init() {
     // التحقق مما إذا كان المستخدم مديراً (لتجنب مسح التعديلات المحلية عند التحديث)
@@ -88,7 +95,11 @@ async function init() {
         // تحديث رقم الواتساب
         if(settings.whatsapp) {
             const waFloat = document.getElementById('wa-float-btn');
-            if(waFloat) waFloat.href = `https://wa.me/${settings.whatsapp}`;
+            if(waFloat) {
+                const storeUrl = getStoreUrl();
+                const greet = `أريد تصفح المتجر: ${storeUrl}`;
+                waFloat.href = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(greet)}`;
+            }
         }
     }
 
@@ -423,7 +434,7 @@ function openProductDetails(id) {
     const shareBtn = document.getElementById('modal-share-btn');
     if(shareBtn) {
         shareBtn.onclick = () => {
-            const text = `شاهد هذا المنتج المميز من متجر مشالى: 🔥\n\n*${product.name}*\n\nالسعر: ${product.price} ج.م\n\n${product.description}\n\nرابط الصورة:\n${product.image}`;
+            const text = `شاهد هذا المنتج المميز من متجر مشالى: 🔥\n\n*${product.name}*\n\nالسعر: ${product.price} ج.م\n\n${product.description}\n\nرابط المتجر:\n${getStoreUrl()}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         };
     }
@@ -916,6 +927,7 @@ function sendToWhatsApp() {
         msg += `\n🎟️ كوبون خصم: ${appliedCoupon.code}`;
     }
     msg += `\n💰 الإجمالي النهائي: ${document.getElementById('total-price').innerText} ج.م\n💳 طريقة الدفع: ${paymentText}`;
+    msg += `\n\nرابط المتجر:\n${getStoreUrl()}`;
     
     window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`);
 }
@@ -1006,7 +1018,7 @@ function shareProduct(id, event) {
     if (event) event.stopPropagation();
     const product = products.find(p => p.id === id);
     if (!product) return;
-    const text = 'شاهد هذا المنتج من مشالي للإلكترونيات:\n' + product.name + '\nالسعر: ' + product.price + ' ج.م\n' + (product.image || '');
+    const text = 'شاهد هذا المنتج من مشالي للإلكترونيات:\n' + product.name + '\nالسعر: ' + product.price + ' ج.م\nرابط المتجر:\n' + getStoreUrl();
     if (navigator.share) {
         navigator.share({ title: product.name, text: text, url: window.location.href }).catch(() => {});
     } else {
@@ -2260,7 +2272,7 @@ function shareAcademyVideo() {
     const video = videos.find(v => v.id === currentAcademyVideoId);
     if(!video) return;
     
-    const text = `شاهد هذا الدرس المميز من أكاديمية مشالى: \n\n*${video.title}*\n\n${video.desc || ''}`;
+    const text = `شاهد هذا الدرس المميز من أكاديمية مشالى: \n\n*${video.title}*\n\n${video.desc || ''}\n\nرابط الأكاديمية:\n${getStoreUrl()}academy.html`;
     
     // استخدام واجهة المشاركة الحديثة إذا كانت مدعومة
     if (navigator.share) {

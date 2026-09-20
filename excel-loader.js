@@ -218,6 +218,7 @@ function buildStoreWorkbook() {
     // الإعدادات
     const setRows = [
         { 'المفتاح': 'whatsapp', 'القيمة': settings.whatsapp || '', 'الوصف': 'رقم الواتساب (بصيغة دولية بدون + أو 00)' },
+        { 'المفتاح': 'website', 'القيمة': settings.website || 'https://mashily.github.io/mashily-store/', 'الوصف': 'رابط المتجر على الإنترنت (لمعاينة واتساب والمشاركة)' },
         { 'المفتاح': 'vodafone', 'القيمة': settings.vodafone || '', 'الوصف': 'رقم فودافون كاش للتحويل' },
         { 'المفتاح': 'instapay', 'القيمة': settings.instapay || '', 'الوصف': 'اسم مستخدم انستاباي' },
         { 'المفتاح': 'qr', 'القيمة': settings.qr || '', 'الوصف': 'رابط صورة QR كود انستاباي (اختياري)' },
