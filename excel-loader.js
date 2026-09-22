@@ -171,20 +171,20 @@ function buildStoreWorkbook() {
     // المنتجات
     const prodRows = products.map(p => ({
         id: p.id,
-        'الاسم': p.name,
-        'السعر': p.price,
-        'السعر قبل الخصم': p.originalPrice || '',
-        'الوصف': p.description || '',
-        'الصورة الرئيسية': p.image || '',
-        'صور إضافية (|)': (p.images || []).join(' | '),
-        'الصنف': p.category || '',
-        'المخزون': p.stock,
-        'الحالة': p.status || '',
-        'الشارات (|)': (p.tags || []).join(' | '),
-        'المواصفات (|)': (p.specs || []).join(' | '),
+        title: p.name,
+        price: p.price,
+        sale_price: p.originalPrice || '',
+        description: p.description || '',
+        image_link: p.image || '',
+        additional_image_link: (p.images || []).join('|'),
+        product_type: p.category || '',
+        availability: p.stock === 'متوفر' ? 'in stock' : 'out of stock',
+        condition: p.status || 'new',
+        custom_label_0: (p.tags || []).join('|'),
+        custom_label_1: (p.specs || []).join('|'),
         'نهاية العرض': p.offerEnds || '',
-        'فيديوهات (|)': (p.videos || []).join(' | '),
-        'التقييم': p.rating || 0,
+        فيديوهات: (p.videos || []).join('|'),
+        التقييم: p.rating || 0,
         'عدد التقييمات': p.reviewCount || 0
     }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(prodRows), 'Products');
