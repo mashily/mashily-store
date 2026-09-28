@@ -48,6 +48,51 @@ function parseStock(availability, quantity) {
     return Number.isFinite(numericAvailability) ? (numericAvailability > 0 ? numericAvailability : 'out') : 'متوفر';
 }
 
+function isMessageActive(row) {
+    const active = String(getFirstValue(row, ['فعال', 'active'])).trim().toLowerCase();
+    return !['لا', 'no', 'false', '0', 'غير فعال', 'معطل'].includes(active);
+}
+
+function getPositiveSeconds(row, keys, fallback) {
+    const value = parseNum(getFirstValue(row, keys));
+    return value > 0 ? value : fallback;
+}
+
+function getNonNegativeSeconds(row, keys, fallback) {
+    const raw = getFirstValue(row, keys);
+    if (raw === '') return fallback;
+    const value = parseNum(raw);
+    return value >= 0 ? value : fallback;
+}
+
+function getTickerMessages(rows, isLegacy) {
+    return rows.reduce((messages, row) => {
+        const text = String(getFirstValue(row, ['الرسالة', 'message'])).trim();
+        const type = String(getFirstValue(row, ['النوع', 'type'])).trim().toLowerCase();
+        if (!text || !isMessageActive(row) || (isLegacy && type === 'proof')) return messages;
+        messages.push({
+            text,
+            duration: getPositiveSeconds(row, ['مدة العرض (ثانية)', 'المدة (ثانية)', 'duration'], 5),
+            speed: getPositiveSeconds(row, ['سرعة الحركة (ثانية)', 'سرعة الشريط (ثانية)', 'speed'], 20)
+        });
+        return messages;
+    }, []);
+}
+
+function getProofMessages(rows, isLegacy) {
+    return rows.reduce((messages, row) => {
+        const text = String(getFirstValue(row, ['الرسالة', 'message'])).trim();
+        const type = String(getFirstValue(row, ['النوع', 'type'])).trim().toLowerCase();
+        if (!text || !isMessageActive(row) || type === 'ticker' || (isLegacy && type !== 'proof')) return messages;
+        messages.push({
+            text,
+            duration: getPositiveSeconds(row, ['مدة الظهور (ثانية)', 'المدة (ثانية)', 'duration'], 4),
+            interval: getNonNegativeSeconds(row, ['الانتظار قبل التالي (ثانية)', 'الفاصل بين الإشعارات (ثانية)', 'interval'], 16)
+        });
+        return messages;
+    }, []);
+}
+
 // تحويل ورقة عمل إلى مصفوفة كائنات
 function sheetToObjects(sheet) {
     if (!sheet) return [];
@@ -97,9 +142,12 @@ async function fetchStoreFromExcel() {
             Coupons: [['الكود', 'code']],
             Settings: [['المفتاح', 'key'], ['القيمة', 'value']],
             Statuses: [['القيمة', 'value']],
-            Notifications: [['الرسالة', 'message'], ['النوع', 'type']]
+            Notifications: [['الرسالة', 'message']]
         };
         requiredSheets.forEach(name => validateSheetColumns(wb.Sheets[name], name, requiredColumns[name]));
+        if (wb.Sheets['Ticker']) {
+            validateSheetColumns(wb.Sheets['Ticker'], 'Ticker', [['الرسالة', 'message']]);
+        }
 
         // ---- المنتجات ----
         const prodRows = sheetToObjects(wb.Sheets['Products']);
@@ -172,22 +220,23 @@ async function fetchStoreFromExcel() {
         const stRows = sheetToObjects(wb.Sheets['Statuses']);
         data.statuses = stRows.map(r => r['القيمة']).filter(Boolean);
 
-        // ---- الإشعارات (شريط الأخبار + إشعارات الشراء) ----
+        // أوراق منفصلة للأخبار والإشعارات، مع دعم الورقة القديمة المختلطة.
         const notifRows = sheetToObjects(wb.Sheets['Notifications']);
-        const tickerMessages = [];
-        const proofMessages = [];
-        notifRows.forEach(r => {
-            const msg = String(r['الرسالة'] || '').trim();
-            if (!msg) return;
-            const active = String(r['فعال'] == null ? '' : r['فعال']).trim().toLowerCase();
-            if (['لا', 'no', 'false', '0', 'غير فعال', 'معطل'].includes(active)) return;
-            const dur = parseNum(r['المدة (ثانية)']) > 0 ? parseNum(r['المدة (ثانية)']) : 5;
-            const item = { text: msg, duration: dur };
-            if (String(r['النوع'] || '').trim().toLowerCase() === 'proof') proofMessages.push(item);
-            else tickerMessages.push(item);
-        });
-        data.tickerMessages = tickerMessages;
-        data.proofMessages = proofMessages;
+        const hasTickerSheet = Boolean(wb.Sheets['Ticker']);
+        if (hasTickerSheet) data.ticker = '';
+        const tickerMessages = getTickerMessages(
+            hasTickerSheet ? sheetToObjects(wb.Sheets['Ticker']) : notifRows,
+            !hasTickerSheet
+        );
+        data.tickerMessages = tickerMessages.length
+            ? tickerMessages
+            : (!hasTickerSheet && data.ticker ? [{ text: data.ticker, duration: 5, speed: 20 }] : []);
+        const proofMessages = getProofMessages(notifRows, !hasTickerSheet);
+        data.proofMessages = proofMessages.length
+            ? proofMessages
+            : (!hasTickerSheet && data.proof
+                ? data.proof.split(',').map(text => ({ text: text.trim(), duration: 5, interval: 16 })).filter(item => item.text)
+                : []);
 
         return data;
     } catch (e) {
@@ -295,12 +344,28 @@ function buildStoreWorkbook() {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(stRows), 'Statuses');
 
     // الإشعارات (شريط الأخبار + إشعارات الشراء)
-    const tickerMsgs = JSON.parse(localStorage.getItem('tickerMessages')) || [];
-    const proofMsgs = JSON.parse(localStorage.getItem('proofMessages')) || [];
-    const notifRows = [
-        ...tickerMsgs.map(m => ({ 'الرسالة': typeof m === 'string' ? m : m.text, 'النوع': 'ticker', 'المدة (ثانية)': typeof m === 'string' ? 5 : (m.duration || 5), 'فعال': 'نعم' })),
-        ...proofMsgs.map(m => ({ 'الرسالة': typeof m === 'string' ? m : m.text, 'النوع': 'proof', 'المدة (ثانية)': typeof m === 'string' ? 5 : (m.duration || 5), 'فعال': 'نعم' }))
-    ];
+    const savedTickerMessages = localStorage.getItem('tickerMessages');
+    const tickerMsgs = savedTickerMessages !== null
+        ? JSON.parse(savedTickerMessages)
+        : (ticker ? [{ text: ticker, duration: 5, speed: 20 }] : []);
+    const savedProofMessages = localStorage.getItem('proofMessages');
+    const proofMsgs = savedProofMessages !== null
+        ? JSON.parse(savedProofMessages)
+        : (proof ? proof.split(',').map(text => ({ text: text.trim(), duration: 4, interval: 16 })).filter(m => m.text) : []);
+    const tickerRows = tickerMsgs.map(m => ({
+        'الرسالة': typeof m === 'string' ? m : m.text,
+        'مدة العرض (ثانية)': typeof m === 'string' ? 5 : (m.duration || 5),
+        'سرعة الحركة (ثانية)': typeof m === 'string' ? 20 : (m.speed || 20),
+        'فعال': 'نعم'
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(tickerRows), 'Ticker');
+
+    const notifRows = proofMsgs.map(m => ({
+        'الرسالة': typeof m === 'string' ? m : m.text,
+        'مدة الظهور (ثانية)': typeof m === 'string' ? 4 : (m.duration || 4),
+        'الانتظار قبل التالي (ثانية)': typeof m === 'string' ? 16 : (m.interval || 16),
+        'فعال': 'نعم'
+    }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(notifRows), 'Notifications');
 
     return wb;

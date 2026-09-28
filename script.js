@@ -49,6 +49,7 @@ async function init() {
 
     // تحميل البيانات للمتغيرات
     products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+    startSocialProof();
 
     // --- إضافة منتج تجريبي (للتجربة) ---
     // هذا المنتج سيظهر دائماً في البداية لتجربة التصميم الجديد
@@ -144,13 +145,13 @@ async function init() {
         let tickerMsgs = JSON.parse(localStorage.getItem('tickerMessages')) || [];
         // توافق مع البيانات القديمة (نصوص فقط)
         if (tickerMsgs.length && typeof tickerMsgs[0] === 'string') {
-            tickerMsgs = tickerMsgs.map(t => ({ text: t, duration: 5 }));
-        }
-        if (tickerMsgs.length === 0) {
-            const single = localStorage.getItem('tickerText');
-            if (single) tickerMsgs = [{ text: single, duration: 5 }];
+            tickerMsgs = tickerMsgs.map(t => ({ text: t, duration: 5, speed: 20 }));
         }
         const hasExcelMessages = localStorage.getItem('tickerMessages') !== null;
+        if (tickerMsgs.length === 0 && !hasExcelMessages) {
+            const single = localStorage.getItem('tickerText');
+            if (single) tickerMsgs = [{ text: single, duration: 5, speed: 20 }];
+        }
         if (tickerMsgs.length === 0 && !hasExcelMessages) {
             tickerMsgs = [{ text: "🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥", duration: 5 }];
         }
@@ -162,12 +163,17 @@ async function init() {
             if (tickerContainer) tickerContainer.style.display = '';
             let tickerIndex = 0;
             const showTickerMsg = () => {
-                tickerEl.innerText = tickerMsgs[tickerIndex].text;
-                const dur = (tickerMsgs[tickerIndex].duration || 5) * 1000;
+                const message = tickerMsgs[tickerIndex];
+                tickerEl.innerText = message.text;
+                const duration = Number(message.duration) > 0 ? Number(message.duration) : 5;
+                const speed = Number(message.speed) > 0 ? Number(message.speed) : 20;
+                tickerEl.style.animation = 'none';
+                void tickerEl.offsetWidth;
+                tickerEl.style.animation = `ticker ${speed}s linear infinite`;
                 setTimeout(() => {
                     tickerIndex = (tickerIndex + 1) % tickerMsgs.length;
                     showTickerMsg();
-                }, dur);
+                }, duration * 1000);
             };
             showTickerMsg();
         }
@@ -961,35 +967,11 @@ function showSkeletons() {
 }
 
 // نظام إشعارات المشترين المتعددة (قائمة تلقائية)
-function showSocialProof() {
-    // قائمة الإشعارات الافتراضية إذا لم يحدد المدير قائمة مخصصة
-    const defaultMessages = [
-        "أحمد من القاهرة اشترى رسيفر سيناتور 🔥",
-        "محمد من المنصورة طلب قطعة واي فاي ⚡",
-        "خالد من طنطا انضم للأكاديمية الآن ✅",
-        "عميل جديد طلب وصلة HDMI أصلية 🔌",
-        "تم شحن طلب جديد إلى الإسكندرية بنجاح 🚚"
-    ];
+let socialProofMessages = [];
+let socialProofIndex = 0;
+let socialProofTimer = null;
 
-    // جلب القائمة من لوحة المدير (مفصولة بفاصلة) أو استخدام الافتراضية
-    const storedMessages = localStorage.getItem('proofMessages');
-    let messages = storedMessages ? JSON.parse(storedMessages) : [];
-    // توافق مع البيانات القديمة (نصوص فقط)
-    if (messages.length && typeof messages[0] === 'string') {
-        messages = messages.map(t => ({ text: t, duration: 5 }));
-    }
-    if (messages.length === 0) {
-        const savedText = localStorage.getItem('proofText');
-        messages = savedText ? savedText.split(',').map(t => ({ text: t.trim(), duration: 5 })).filter(t => t.text) : [];
-        if (messages.length === 0 && storedMessages === null) {
-            messages = defaultMessages.map(t => ({ text: t, duration: 5 }));
-        }
-    }
-    if (messages.length === 0) return;
-    
-    // اختيار رسالة عشوائية
-    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-
+function showSocialProof(message) {
     let toast = document.getElementById('social-toast');
     if(!toast) {
         toast = document.createElement('div');
@@ -997,15 +979,54 @@ function showSocialProof() {
         toast.className = 'social-proof-toast';
         document.body.appendChild(toast);
     }
-    
-    toast.innerHTML = `<i class="fas fa-bullhorn" style="margin-left:8px; color:var(--primary);"></i> ${randomMessage.text}`;
+
+    toast.replaceChildren();
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-bullhorn';
+    icon.style.marginLeft = '8px';
+    icon.style.color = 'var(--primary)';
+    toast.append(icon, document.createTextNode(` ${message.text}`));
+    toast.classList.remove('show');
+    void toast.offsetWidth;
     toast.classList.add('show');
-    
-    setTimeout(() => { toast.classList.remove('show'); }, (randomMessage.duration || 5) * 1000);
 }
 
-// تشغيل إشعار كل 20 ثانية (رسالة مختلفة كل مرة)
-setInterval(showSocialProof, 20000);
+function startSocialProof() {
+    if (socialProofTimer) clearTimeout(socialProofTimer);
+    const storedMessages = localStorage.getItem('proofMessages');
+    socialProofMessages = storedMessages ? JSON.parse(storedMessages) : [];
+    if (socialProofMessages.length && typeof socialProofMessages[0] === 'string') {
+        socialProofMessages = socialProofMessages.map(text => ({ text, duration: 5, interval: 16 }));
+    }
+    if (socialProofMessages.length === 0 && storedMessages === null) {
+        const savedText = localStorage.getItem('proofText');
+        socialProofMessages = savedText
+            ? savedText.split(',').map(text => ({ text: text.trim(), duration: 5, interval: 16 })).filter(item => item.text)
+            : [
+                "أحمد من القاهرة اشترى رسيفر سيناتور 🔥",
+                "محمد من المنصورة طلب قطعة واي فاي ⚡",
+                "خالد من طنطا انضم للأكاديمية الآن ✅",
+                "عميل جديد طلب وصلة HDMI أصلية 🔌",
+                "تم شحن طلب جديد إلى الإسكندرية بنجاح 🚚"
+            ].map(text => ({ text, duration: 5, interval: 16 }));
+    }
+    if (!socialProofMessages.length) return;
+
+    socialProofIndex = 0;
+    const showNext = () => {
+        const message = socialProofMessages[socialProofIndex % socialProofMessages.length];
+        socialProofIndex++;
+        showSocialProof(message);
+        const duration = Number(message.duration) > 0 ? Number(message.duration) : 4;
+        const interval = Number(message.interval) >= 0 ? Number(message.interval) : 16;
+        socialProofTimer = setTimeout(() => {
+            const toast = document.getElementById('social-toast');
+            if (toast) toast.classList.remove('show');
+            socialProofTimer = setTimeout(showNext, interval * 1000);
+        }, duration * 1000);
+    };
+    socialProofTimer = setTimeout(showNext, 5000);
+}
 
 // --- تحديث العداد التنازلي للعروض ---
 setInterval(() => {
