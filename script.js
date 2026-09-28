@@ -150,17 +150,27 @@ async function init() {
             const single = localStorage.getItem('tickerText');
             if (single) tickerMsgs = [{ text: single, duration: 5 }];
         }
-        if (tickerMsgs.length === 0) tickerMsgs = [{ text: "🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥", duration: 5 }];
-        let tickerIndex = 0;
-        const showTickerMsg = () => {
-            tickerEl.innerText = tickerMsgs[tickerIndex].text;
-            const dur = (tickerMsgs[tickerIndex].duration || 5) * 1000;
-            setTimeout(() => {
-                tickerIndex = (tickerIndex + 1) % tickerMsgs.length;
-                showTickerMsg();
-            }, dur);
-        };
-        showTickerMsg();
+        const hasExcelMessages = localStorage.getItem('tickerMessages') !== null;
+        if (tickerMsgs.length === 0 && !hasExcelMessages) {
+            tickerMsgs = [{ text: "🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥", duration: 5 }];
+        }
+        const tickerContainer = tickerEl.closest('.news-ticker');
+        if (tickerMsgs.length === 0) {
+            tickerEl.textContent = '';
+            if (tickerContainer) tickerContainer.style.display = 'none';
+        } else {
+            if (tickerContainer) tickerContainer.style.display = '';
+            let tickerIndex = 0;
+            const showTickerMsg = () => {
+                tickerEl.innerText = tickerMsgs[tickerIndex].text;
+                const dur = (tickerMsgs[tickerIndex].duration || 5) * 1000;
+                setTimeout(() => {
+                    tickerIndex = (tickerIndex + 1) % tickerMsgs.length;
+                    showTickerMsg();
+                }, dur);
+            };
+            showTickerMsg();
+        }
     }
 
     // 3. عرض الأقسام والمنتجات مع تأثير التحميل
@@ -306,12 +316,11 @@ function openProductDetails(id) {
     if (!product) return;
 
     // إعداد الصور
-    currentProductImages = [];
-    if (product.images && product.images.length > 0) {
-        product.images.forEach(src => currentProductImages.push({type: 'image', src: src}));
-    } else if (product.image) {
-        currentProductImages.push({type: 'image', src: product.image});
-    }
+    const productImages = Array.isArray(product.images)
+        ? product.images
+        : (product.images ? String(product.images).split(/[|\r\n]+/) : []);
+    const imageSources = [...new Set([product.image, ...productImages].map(src => String(src || '').trim()).filter(Boolean))];
+    currentProductImages = imageSources.map(src => ({type: 'image', src}));
     
     if (product.videos && product.videos.length > 0) {
         product.videos.forEach(src => currentProductImages.push({type: 'video', src: src}));
@@ -963,15 +972,20 @@ function showSocialProof() {
     ];
 
     // جلب القائمة من لوحة المدير (مفصولة بفاصلة) أو استخدام الافتراضية
-    let messages = JSON.parse(localStorage.getItem('proofMessages')) || [];
+    const storedMessages = localStorage.getItem('proofMessages');
+    let messages = storedMessages ? JSON.parse(storedMessages) : [];
     // توافق مع البيانات القديمة (نصوص فقط)
     if (messages.length && typeof messages[0] === 'string') {
         messages = messages.map(t => ({ text: t, duration: 5 }));
     }
     if (messages.length === 0) {
         const savedText = localStorage.getItem('proofText');
-        messages = savedText ? savedText.split(',').map(t => ({ text: t, duration: 5 })) : defaultMessages.map(t => ({ text: t, duration: 5 }));
+        messages = savedText ? savedText.split(',').map(t => ({ text: t.trim(), duration: 5 })).filter(t => t.text) : [];
+        if (messages.length === 0 && storedMessages === null) {
+            messages = defaultMessages.map(t => ({ text: t, duration: 5 }));
+        }
     }
+    if (messages.length === 0) return;
     
     // اختيار رسالة عشوائية
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];

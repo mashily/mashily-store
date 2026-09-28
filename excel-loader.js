@@ -4,31 +4,70 @@
    + تصدير البيانات الحالية إلى ملف Excel
    ============================================================ */
 
-// تقسيم خلية تحتوي أكثر من قيمة (مفصولة بـ |)
+// تقبل القيم المفصولة بعلامة | أو بأسطر جديدة كما في ملفات Excel.
 function parseSplit(value) {
     if (!value) return [];
-    return String(value).split('|').map(s => s.trim()).filter(s => s.length > 0);
+    const values = Array.isArray(value) ? value : String(value).split(/[|\r\n]+/);
+    return values.map(s => String(s).trim()).filter(s => s.length > 0);
 }
 
 // تحويل قيمة إلى رقم
 function parseNum(value) {
-    const n = parseFloat(value);
+    const n = parseFloat(String(value == null ? '' : value).replace(/,/g, '').trim());
     return isNaN(n) ? 0 : n;
+}
+
+function getFirstValue(row, keys) {
+    for (const key of keys) {
+        if (row[key] !== undefined && row[key] !== null && row[key] !== '') return row[key];
+    }
+    return '';
+}
+
+function parseProductImages(primary, additional) {
+    return [...new Set([...parseSplit(primary), ...parseSplit(additional)])];
+}
+
+function parseStock(availability, quantity) {
+    const status = String(availability == null ? '' : availability).trim().toLowerCase();
+    const outOfStockValues = ['out', 'out of stock', 'out_of_stock', 'sold out', 'نفد', 'نفد المخزون', 'غير متوفر', 'نفذت الكمية'];
+    if (outOfStockValues.includes(status)) return 'out';
+
+    const quantityValue = String(quantity == null ? '' : quantity).trim();
+    if (quantityValue) {
+        const quantityStatus = quantityValue.toLowerCase();
+        if (outOfStockValues.includes(quantityStatus)) return 'out';
+        const parsedQuantity = parseNum(quantityValue);
+        return parsedQuantity > 0 ? parsedQuantity : 'out';
+    }
+
+    if (!status || ['in stock', 'stock', 'available', 'متوفر', 'متاح', 'yes', 'true'].includes(status)) {
+        return 'متوفر';
+    }
+    const numericAvailability = Number(status);
+    return Number.isFinite(numericAvailability) ? (numericAvailability > 0 ? numericAvailability : 'out') : 'متوفر';
 }
 
 // تحويل ورقة عمل إلى مصفوفة كائنات
 function sheetToObjects(sheet) {
     if (!sheet) return [];
-    try {
-        const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-        // تخطي صفوف الملاحظات/التعليمات (تبدأ بـ 💡) حتى لا تُقرأ كبيانات
-        return rows.filter(r => {
-            const firstKey = Object.keys(r)[0];
-            const firstVal = r[firstKey];
-            return !(typeof firstVal === 'string' && firstVal.trim().startsWith('💡'));
-        });
-    } catch (e) {
-        return [];
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+    // تخطي صفوف الملاحظات/التعليمات (تبدأ بـ 💡) حتى لا تُقرأ كبيانات
+    return rows.filter(r => {
+        const firstKey = Object.keys(r)[0];
+        const firstVal = r[firstKey];
+        return !(typeof firstVal === 'string' && firstVal.trim().startsWith('💡'));
+    });
+}
+
+function validateSheetColumns(sheet, name, requiredGroups) {
+    const headers = (XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false })[0] || [])
+        .map(header => String(header).trim());
+    const missing = requiredGroups
+        .filter(group => !group.some(alias => headers.includes(alias)))
+        .map(group => group[0]);
+    if (missing.length) {
+        throw new Error(`أعمدة مطلوبة غير موجودة في ورقة ${name}: ${missing.join(', ')}`);
     }
 }
 
@@ -39,31 +78,52 @@ function sheetToObjects(sheet) {
 async function fetchStoreFromExcel() {
     try {
         const res = await fetch('store-data.xlsx?v=' + Date.now());
-        if (!res.ok) return null;
+        if (!res.ok) {
+            console.warn(`تعذر تحميل ملف Excel (HTTP ${res.status})، ستتم تجربة المصدر الاحتياطي.`);
+            return null;
+        }
         const buf = await res.arrayBuffer();
         const wb = XLSX.read(buf, { type: 'array' });
         const data = {};
+        const requiredSheets = ['Products', 'Categories', 'Videos', 'Coupons', 'Settings', 'Statuses', 'Notifications'];
+        const missingSheets = requiredSheets.filter(name => !wb.Sheets[name]);
+        if (missingSheets.length) {
+            throw new Error('أوراق Excel التالية غير موجودة: ' + missingSheets.join(', '));
+        }
+        const requiredColumns = {
+            Products: [['title', 'الاسم', 'name'], ['price']],
+            Categories: [['الاسم', 'name']],
+            Videos: [['العنوان', 'title'], ['الرابط', 'url']],
+            Coupons: [['الكود', 'code']],
+            Settings: [['المفتاح', 'key'], ['القيمة', 'value']],
+            Statuses: [['القيمة', 'value']],
+            Notifications: [['الرسالة', 'message'], ['النوع', 'type']]
+        };
+        requiredSheets.forEach(name => validateSheetColumns(wb.Sheets[name], name, requiredColumns[name]));
 
         // ---- المنتجات ----
         const prodRows = sheetToObjects(wb.Sheets['Products']);
-        data.products = prodRows.map(r => ({
-            id: r['id'] !== undefined && r['id'] !== '' ? r['id'] : (Date.now() + Math.floor(Math.random()*100000)),
-            name: r['title'] || '',
-            price: parseNum(r['price']),
-            originalPrice: parseNum(r['sale_price']) || null,
-            description: r['description'] || '',
-            image: r['image_link'] || '',
-            images: parseSplit(r['additional_image_link']),
-            category: r['product_type'] || 'الكل',
-            stock: String(r['availability']).toLowerCase() === 'out' ? 'out' : parseNum(r['المخزون']),
-            status: r['condition'] || '',
-            tags: parseSplit(r['custom_label_0']),
-            specs: parseSplit(r['custom_label_1']),
-            offerEnds: r['end'] || '',
-            videos: parseSplit(r['فيديوهات (|)']),
-            rating: parseNum(r['التقييم']),
-            reviewCount: parseNum(r['عدد التقييمات'])
-        })).filter(p => p.name);
+        data.products = prodRows.map(r => {
+            const images = parseProductImages(r['image_link'], r['additional_image_link']);
+            return {
+                id: r['id'] !== undefined && r['id'] !== '' ? r['id'] : (Date.now() + Math.floor(Math.random()*100000)),
+                name: getFirstValue(r, ['title', 'الاسم', 'name']),
+                price: parseNum(r['price']),
+                originalPrice: parseNum(r['sale_price']) || null,
+                description: getFirstValue(r, ['description', 'الوصف', 'desc']),
+                image: images[0] || '',
+                images,
+                category: getFirstValue(r, ['product_type', 'الصنف', 'category']) || 'الكل',
+                stock: parseStock(r['availability'], getFirstValue(r, ['المخزون', 'quantity', 'stock_quantity'])),
+                status: getFirstValue(r, ['condition', 'الحالة', 'status']),
+                tags: parseSplit(r['custom_label_0']),
+                specs: parseSplit(r['custom_label_1']),
+                offerEnds: getFirstValue(r, ['end', 'نهاية العرض', 'offerEnds']),
+                videos: parseSplit(getFirstValue(r, ['فيديوهات (|)', 'فيديوهات', 'videos'])),
+                rating: parseNum(r['التقييم']),
+                reviewCount: parseNum(r['عدد التقييمات'])
+            };
+        }).filter(p => p.name);
 
         // ---- الأصناف ----
         const catRows = sheetToObjects(wb.Sheets['Categories']);
@@ -100,10 +160,13 @@ async function fetchStoreFromExcel() {
         // ---- الإعدادات ----
         const setRows = sheetToObjects(wb.Sheets['Settings']);
         const settings = {};
-        setRows.forEach(r => { if (r['المفتاح']) settings[r['المفتاح']] = r['القيمة']; });
+        setRows.forEach(r => {
+            const key = String(r['المفتاح'] || '').trim();
+            if (key) settings[key] = r['القيمة'];
+        });
         data.settings = settings;
-        data.ticker = settings.ticker || '';
-        data.proof = settings.proof || '';
+        data.ticker = String(settings.ticker || '');
+        data.proof = String(settings.proof || '');
 
         // ---- الحالات ----
         const stRows = sheetToObjects(wb.Sheets['Statuses']);
@@ -114,12 +177,13 @@ async function fetchStoreFromExcel() {
         const tickerMessages = [];
         const proofMessages = [];
         notifRows.forEach(r => {
-            const msg = r['الرسالة'];
+            const msg = String(r['الرسالة'] || '').trim();
             if (!msg) return;
-            if (String(r['فعال']).trim() === 'لا') return; // رسالة غير فعالة
-            const dur = parseNum(r['المدة (ثانية)']) || 5; // مدة العرض بالثواني
+            const active = String(r['فعال'] == null ? '' : r['فعال']).trim().toLowerCase();
+            if (['لا', 'no', 'false', '0', 'غير فعال', 'معطل'].includes(active)) return;
+            const dur = parseNum(r['المدة (ثانية)']) > 0 ? parseNum(r['المدة (ثانية)']) : 5;
             const item = { text: msg, duration: dur };
-            if (String(r['النوع']).trim() === 'proof') proofMessages.push(item);
+            if (String(r['النوع'] || '').trim().toLowerCase() === 'proof') proofMessages.push(item);
             else tickerMessages.push(item);
         });
         data.tickerMessages = tickerMessages;
@@ -127,7 +191,7 @@ async function fetchStoreFromExcel() {
 
         return data;
     } catch (e) {
-        console.log('تعذر قراءة ملف Excel:', e);
+        console.error('تعذر قراءة ملف Excel؛ ستتم تجربة المصدر الاحتياطي:', e);
         return null;
     }
 }
@@ -141,15 +205,12 @@ function applyStoreData(data) {
     if (data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
     if (data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
     if (data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
-    if (data.ticker) localStorage.setItem('tickerText', data.ticker);
-    if (data.proof) localStorage.setItem('proofText', data.proof);
-    if (data.tickerMessages && data.tickerMessages.length) localStorage.setItem('tickerMessages', JSON.stringify(data.tickerMessages));
-    if (data.proofMessages && data.proofMessages.length) localStorage.setItem('proofMessages', JSON.stringify(data.proofMessages));
-    if (data.settings) {
-        const old = JSON.parse(localStorage.getItem('storeSettings')) || {};
-        const merged = Object.assign({}, old, data.settings);
-        localStorage.setItem('storeSettings', JSON.stringify(merged));
-    }
+    if (data.statuses) localStorage.setItem('storeStatuses', JSON.stringify(data.statuses));
+    if (data.ticker !== undefined) localStorage.setItem('tickerText', data.ticker);
+    if (data.proof !== undefined) localStorage.setItem('proofText', data.proof);
+    if (data.tickerMessages) localStorage.setItem('tickerMessages', JSON.stringify(data.tickerMessages));
+    if (data.proofMessages) localStorage.setItem('proofMessages', JSON.stringify(data.proofMessages));
+    if (data.settings) localStorage.setItem('storeSettings', JSON.stringify(data.settings));
     return true;
 }
 
@@ -178,12 +239,13 @@ function buildStoreWorkbook() {
         image_link: p.image || '',
         additional_image_link: (p.images || []).join('|'),
         product_type: p.category || '',
-        availability: p.stock === 'متوفر' ? 'in stock' : 'out of stock',
+        availability: p.stock === 'out' ? 'out of stock' : 'in stock',
+        'المخزون': p.stock !== null && p.stock !== '' && Number.isFinite(Number(p.stock)) ? Number(p.stock) : '',
         condition: p.status || 'new',
         custom_label_0: (p.tags || []).join('|'),
         custom_label_1: (p.specs || []).join('|'),
-        'نهاية العرض': p.offerEnds || '',
-        فيديوهات: (p.videos || []).join('|'),
+        end: p.offerEnds || '',
+        'فيديوهات (|)': (p.videos || []).join('|'),
         التقييم: p.rating || 0,
         'عدد التقييمات': p.reviewCount || 0
     }));
