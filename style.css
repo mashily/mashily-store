@@ -1365,7 +1365,7 @@ header {
 /* ===== تحسين تجربة الموبايل ===== */
 @media (max-width: 600px) {
     .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 6px;
         padding: 6px;
     }
@@ -1379,4 +1379,167 @@ header {
     #install-btn { padding: 10px 14px; font-size: 0.8rem; bottom: 15px; left: 15px; }
     .social-proof-toast { right: 10px; left: 10px; max-width: calc(100% - 20px); font-size: 0.75rem; }
     #welcome-toast { right: 10px; left: 10px; max-width: calc(100% - 20px); }
+}
+
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+@media (max-width: 768px) {
+    .academy-header-top {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 8px 12px !important;
+        gap: 8px;
+    }
+
+    .academy-header-top .logo {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        font-size: clamp(1rem, 5vw, 1.4rem) !important;
+    }
+
+    .store-header-main {
+        box-sizing: border-box;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+        padding: 8px 10px !important;
+    }
+
+    .store-brand {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .store-brand > a {
+        font-size: clamp(1.2rem, 6vw, 1.6rem) !important;
+    }
+
+    #site-tagline {
+        max-width: 100%;
+        white-space: normal !important;
+        line-height: 1.4;
+    }
+
+    #store-academy-link {
+        grid-column: 1 / -1;
+        justify-self: start;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    #store-academy-link h2 {
+        font-size: 0.85rem !important;
+        min-width: 0;
+        flex-wrap: wrap;
+        overflow-wrap: anywhere;
+    }
+
+    #store-header-controls {
+        grid-column: 1 / -1;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px !important;
+        min-width: 0;
+    }
+
+    .store-search-controls {
+        max-width: none !important;
+        min-width: 0;
+    }
+
+    .store-search-controls select,
+    .store-search-controls input {
+        box-sizing: border-box;
+    }
+
+    .categories-wrapper {
+        position: relative !important;
+    }
+
+    #product-cats,
+    .cat-nav-scroll {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        justify-content: flex-start !important;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #product-cats > *,
+    .cat-nav-scroll > * {
+        flex: 0 0 auto;
+    }
+
+    .academy-controls {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .search-box,
+    .search-box input {
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .video-grid {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding-right: 8px;
+        padding-left: 8px;
+    }
+
+    .academy-hero {
+        margin-right: 0;
+        margin-left: 0;
+        padding-right: 14px;
+        padding-left: 14px;
+    }
+
+    .academy-hero h1 {
+        font-size: clamp(1.5rem, 7vw, 2.2rem);
+        overflow-wrap: anywhere;
+    }
+
+    .video-modal-content {
+        box-sizing: border-box;
+        width: calc(100% - 20px);
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 360px) {
+    .store-header-main {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    #store-header-controls {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .video-grid {
+        gap: 6px;
+    }
+}
+
+@media (display-mode: standalone) {
+    body {
+        padding-bottom: calc(60px + env(safe-area-inset-bottom));
+    }
+
+    .news-ticker {
+        bottom: env(safe-area-inset-bottom);
+    }
 }

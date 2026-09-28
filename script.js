@@ -12,6 +12,55 @@ function getStoreUrl() {
     return url || DEFAULT_STORE_URL;
 }
 
+function applySiteBranding(settings) {
+    const brandName = settings.brand_name || 'مشالى';
+    const siteName = settings.site_name || `متجر ${brandName} | الإلكترونيات`;
+    const academyName = settings.academy_name || `أكاديمية ${brandName} التعليمية`;
+    const siteDescription = settings.site_description || 'متجر إلكترونيات وفيديوهات تعليمية';
+    const academyDescription = settings.academy_description || 'منصتك لتعلم صيانة الإلكترونيات والبرمجة وأحدث التقنيات.';
+    const pageIsAcademy = Boolean(document.getElementById('academy-grid'));
+    const pageTitle = pageIsAcademy ? `${academyName} | ${brandName}` : siteName;
+    document.title = pageTitle;
+
+    const textValues = {
+        'site-brand-name': brandName,
+        'site-tagline': settings.site_tagline || 'للإلكترونيات والفيديوهات التعليمية',
+        'store-academy-name': academyName,
+        'academy-store-name': `متجر ${brandName}`,
+        'academy-page-name': academyName,
+        'academy-page-description': academyDescription,
+        'academy-footer-text': `© ${new Date().getFullYear()} ${academyName} - جميع الحقوق محفوظة`
+    };
+    Object.entries(textValues).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element && value) element.textContent = value;
+    });
+
+    const description = pageIsAcademy ? academyDescription : siteDescription;
+    const metaValues = {
+        'site-meta-description': pageIsAcademy ? academyDescription : siteDescription,
+        'site-og-title': pageTitle,
+        'site-og-description': description,
+        'site-twitter-title': pageTitle,
+        'site-twitter-description': description,
+        'academy-meta-description': academyDescription,
+        'academy-og-title': pageTitle,
+        'academy-og-description': academyDescription
+    };
+    Object.entries(metaValues).forEach(([id, value]) => {
+        const meta = document.getElementById(id);
+        if (meta) meta.setAttribute('content', value);
+    });
+    document.querySelectorAll('meta[name="application-name"]').forEach(meta => {
+        meta.setAttribute('content', settings.short_name || brandName);
+    });
+
+    const themeColor = /^#[0-9a-f]{6}$/i.test(String(settings.theme_color || ''))
+        ? settings.theme_color
+        : '#2e8b57';
+    document.querySelectorAll('meta[name="theme-color"]').forEach(meta => meta.setAttribute('content', themeColor));
+}
+
 async function init() {
     // التحقق مما إذا كان المستخدم مديراً (لتجنب مسح التعديلات المحلية عند التحديث)
     const isAdmin = sessionStorage.getItem('mashily_user');
@@ -49,6 +98,7 @@ async function init() {
 
     // تحميل البيانات للمتغيرات
     products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+    applySiteBranding(JSON.parse(localStorage.getItem('storeSettings')) || {});
     startSocialProof();
 
     // --- إضافة منتج تجريبي (للتجربة) ---

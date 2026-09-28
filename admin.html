@@ -3112,11 +3112,12 @@
 
         function saveSettings(e) {
             e.preventDefault();
-            const settings = {
+            const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+            Object.assign(settings, {
                 vodafone: document.getElementById('setting-vodafone').value,
                 instapay: document.getElementById('setting-instapay').value,
                 qr: document.getElementById('setting-qr').value
-            };
+            });
             localStorage.setItem('storeSettings', JSON.stringify(settings));
 
             // تغيير كلمة المرور إذا تم إدخالها
@@ -3669,6 +3670,13 @@
             // حذف النسق القديم للبيانات لضمان الانتقال للنسق الجديد
             localStorage.removeItem('gh_credentials');
 
+            const publishedExcelData = (typeof fetchStoreFromExcel === 'function')
+                ? await fetchStoreFromExcel()
+                : null;
+            if (publishedExcelData && publishedExcelData.settings) {
+                localStorage.setItem('storeSettings', JSON.stringify(publishedExcelData.settings));
+            }
+
             const db = {
                 products: products,
                 categories: storeCategories,
@@ -3707,7 +3715,11 @@
                 if (excelB64) {
                     ok = await pushFile('store-data.xlsx', excelB64) && ok;
                 }
-                if(ok) { alert('تم النشر بنجاح! 🚀'); document.getElementById('publish-modal').style.display='none'; }
+                const manifestB64 = (typeof getSiteManifestBase64 === 'function') ? getSiteManifestBase64() : null;
+                if (manifestB64) {
+                    ok = await pushFile('manifest.json', manifestB64) && ok;
+                }
+                if(ok) { alert('تم النشر بنجاح! 🚀 تم تحديث بيانات المتجر واسم تطبيق الهاتف. قد تحتاج بعض الأجهزة إلى إعادة تثبيت التطبيق لتحديث الاسم.'); document.getElementById('publish-modal').style.display='none'; }
                 else alert('فشل النشر');
             } catch(e) { alert('خطأ: ' + e.message); }
         }

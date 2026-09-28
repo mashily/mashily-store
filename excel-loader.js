@@ -330,6 +330,15 @@ function buildStoreWorkbook() {
     const setRows = [
         { 'المفتاح': 'whatsapp', 'القيمة': settings.whatsapp || '', 'الوصف': 'رقم الواتساب (بصيغة دولية بدون + أو 00)' },
         { 'المفتاح': 'website', 'القيمة': settings.website || 'https://mashily.github.io/mashily-store/', 'الوصف': 'رابط المتجر على الإنترنت (لمعاينة واتساب والمشاركة)' },
+        { 'المفتاح': 'brand_name', 'القيمة': settings.brand_name || 'مشالى', 'الوصف': 'اسم العلامة التجارية الظاهر في رأس الموقع' },
+        { 'المفتاح': 'site_name', 'القيمة': settings.site_name || 'متجر مشالى | الإلكترونيات', 'الوصف': 'اسم الموقع وعنوان صفحة المتجر' },
+        { 'المفتاح': 'app_name', 'القيمة': settings.app_name || settings.site_name || 'متجر مشالى | الإلكترونيات', 'الوصف': 'الاسم الكامل لتطبيق الهاتف المثبت' },
+        { 'المفتاح': 'short_name', 'القيمة': settings.short_name || 'مشالى', 'الوصف': 'الاسم المختصر لأيقونة التطبيق المثبت' },
+        { 'المفتاح': 'site_tagline', 'القيمة': settings.site_tagline || 'للإلكترونيات والفيديوهات التعليمية', 'الوصف': 'العبارة المختصرة أسفل شعار المتجر' },
+        { 'المفتاح': 'site_description', 'القيمة': settings.site_description || 'متجر إلكترونيات وفيديوهات تعليمية', 'الوصف': 'وصف الموقع للمتصفح والمشاركة' },
+        { 'المفتاح': 'academy_name', 'القيمة': settings.academy_name || 'أكاديمية مشالى التعليمية', 'الوصف': 'اسم صفحة الأكاديمية' },
+        { 'المفتاح': 'academy_description', 'القيمة': settings.academy_description || 'منصتك لتعلم صيانة الإلكترونيات والبرمجة وأحدث التقنيات.', 'الوصف': 'الوصف التعريفي للأكاديمية' },
+        { 'المفتاح': 'theme_color', 'القيمة': settings.theme_color || '#2e8b57', 'الوصف': 'لون المتصفح وشريط التطبيق بصيغة HEX' },
         { 'المفتاح': 'vodafone', 'القيمة': settings.vodafone || '', 'الوصف': 'رقم فودافون كاش للتحويل' },
         { 'المفتاح': 'instapay', 'القيمة': settings.instapay || '', 'الوصف': 'اسم مستخدم انستاباي' },
         { 'المفتاح': 'qr', 'القيمة': settings.qr || '', 'الوصف': 'رابط صورة QR كود انستاباي (اختياري)' },
@@ -386,4 +395,27 @@ function getStoreWorkbookBase64() {
     if (typeof XLSX === 'undefined') return null;
     const wb = buildStoreWorkbook();
     return XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+}
+
+function getSiteManifestBase64() {
+    const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    const themeColor = /^#[0-9a-f]{6}$/i.test(String(settings.theme_color || ''))
+        ? settings.theme_color
+        : '#2e8b57';
+    const manifest = {
+        name: settings.app_name || settings.site_name || 'متجر مشالى | الإلكترونيات',
+        short_name: settings.short_name || settings.brand_name || 'مشالى',
+        description: settings.site_description || 'متجر الإلكترونيات والفيديوهات التعليمية',
+        start_url: './index.html',
+        scope: './',
+        display: 'standalone',
+        background_color: themeColor,
+        theme_color: themeColor,
+        orientation: 'portrait-primary',
+        icons: [
+            { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+            { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+        ]
+    };
+    return btoa(unescape(encodeURIComponent(JSON.stringify(manifest, null, 2))));
 }

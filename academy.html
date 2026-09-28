@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="أكاديمية مشالى التعليمية - منصتك الأولى لتعلم صيانة الإلكترونيات، البرمجة، وأحدث التقنيات. دروس حصرية ومجانية.">
+    <meta id="academy-meta-description" name="description" content="أكاديمية مشالى التعليمية - منصتك الأولى لتعلم صيانة الإلكترونيات، البرمجة، وأحدث التقنيات. دروس حصرية ومجانية.">
     <meta name="keywords" content="صيانة, إلكترونيات, برمجة, تعليم, دورات, مشالى, أكاديمية">
     <meta name="author" content="Mashily Store">
     <link rel="canonical" href="https://mashily.github.io/mashily-store/academy.html">
+    <link rel="manifest" href="manifest.json">
+    <meta id="academy-theme-color" name="theme-color" content="#2e8b57">
+    <meta id="academy-application-name" name="application-name" content="مشالى">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ar_AR">
     <meta property="og:url" content="https://mashily.github.io/mashily-store/academy.html">
-    <meta property="og:title" content="أكاديمية مشالى | تعلم واحترف">
-    <meta property="og:description" content="أكاديمية مشالى التعليمية - دروس صيانة الإلكترونيات والبرمجة.">
+    <meta id="academy-og-title" property="og:title" content="أكاديمية مشالى | تعلم واحترف">
+    <meta id="academy-og-description" property="og:description" content="أكاديمية مشالى التعليمية - دروس صيانة الإلكترونيات والبرمجة.">
     <meta property="og:image" content="https://mashily.github.io/mashily-store/icon-512.png">
     <meta name="twitter:card" content="summary_large_image">
     <title>أكاديمية مشالى | تعلم واحترف</title>
@@ -21,9 +25,9 @@
 <body>
     <!-- الهيدر -->
     <header>
-        <div class="header-top" style="padding: 10px 20px;">
+        <div class="header-top academy-header-top" style="padding: 10px 20px;">
             <a href="index.html" class="logo" style="font-size: 1.5rem;">
-                ⚡ متجر مشالى
+                ⚡ <span id="academy-store-name">متجر مشالى</span>
             </a>
             <div style="display: flex; gap: 15px; align-items: center;">
                 <a href="index.html" style="text-decoration: none; color: var(--text); font-weight: bold; font-size: 0.9rem;">
@@ -46,8 +50,8 @@
     <div class="academy-hero">
         <div class="hero-content">
             <div class="hero-icon"><i class="fas fa-graduation-cap"></i></div>
-            <h1>أكاديمية مشالى التعليمية</h1>
-            <p>منصتك الأولى لتعلم صيانة الإلكترونيات، البرمجة، وأحدث التقنيات. محتوى حصري ومميز بانتظارك.</p>
+            <h1 id="academy-page-name">أكاديمية مشالى التعليمية</h1>
+            <p id="academy-page-description">منصتك الأولى لتعلم صيانة الإلكترونيات، البرمجة، وأحدث التقنيات. محتوى حصري ومميز بانتظارك.</p>
             <div class="hero-stats">
                 <span><i class="fas fa-video"></i> +50 درس</span>
                 <span><i class="fas fa-users"></i> +1000 طالب</span>
@@ -138,7 +142,7 @@
 
     <!-- الفوتر -->
     <footer style="text-align: center; padding: 20px; color: var(--text-light); margin-top: 50px; border-top: 1px solid var(--border);">
-        <p>© 2024 أكاديمية مشالى - جميع الحقوق محفوظة</p>
+        <p id="academy-footer-text">© 2026 أكاديمية مشالى - جميع الحقوق محفوظة</p>
     </footer>
 
     <script src="xlsx.full.min.js"></script>
