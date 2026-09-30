@@ -1640,6 +1640,12 @@
                 <button class="btn btn-success" style="background:#217346; font-size:1rem; padding:12px 25px;" onclick="exportStoreToExcel()">
                     <i class="fas fa-file-excel"></i> تصدير ملف Excel كامل
                 </button>
+
+                <h3 style="margin-top: 30px;"><i class="fab fa-whatsapp" style="color:#25d366;"></i> كتالوج واتساب بيزنس / Meta Commerce</h3>
+                <p>أنشئ ملفاً محدثاً من ورقة <b>Products</b> داخل <b>store-data.xlsx</b>، ثم ارفعه إلى كتالوج Meta.</p>
+                <button id="export-whatsapp-catalog-btn" class="btn btn-success" style="background:#25a95b; font-size:1rem; padding:12px 25px;" onclick="exportWhatsAppCatalog(this)">
+                    <i class="fas fa-file-csv"></i> تصدير كتالوج واتساب (store-products.csv)
+                </button>
                 
                 <h3 style="margin-top: 30px;"><i class="fas fa-upload"></i> استيراد البيانات</h3>
                 <p>استيراد بيانات من ملف JSON (استبدال البيانات الحالية)</p>
@@ -3016,6 +3022,77 @@
             
             XLSX.writeFile(wb, "products_backup.xlsx");
             showAlert('تم تصدير المنتجات إلى Excel بنجاح', 'success');
+        }
+
+        async function exportWhatsAppCatalog(button) {
+            if (typeof fetchStoreFromExcel !== 'function') {
+                showAlert('محمل ملف Excel غير متاح. أعد تحميل لوحة الإدارة وحاول مجدداً.', 'error');
+                return;
+            }
+
+            const originalMarkup = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ تجهيز الكتالوج من Excel...';
+            try {
+                const storeData = await fetchStoreFromExcel();
+                if (!storeData || !Array.isArray(storeData.products) || storeData.products.length === 0) {
+                    throw new Error('تعذر قراءة منتجات من ورقة Products في store-data.xlsx.');
+                }
+
+                const headers = [
+                    'id', 'title', 'price', 'sale_price', 'description', 'image_link',
+                    'additional_image_link', 'product_type', 'availability', 'condition',
+                    'custom_label_0', 'custom_label_1', 'end', 'فيديوهات (|)', 'التقييم', 'عدد التقييمات'
+                ];
+                const quoteCell = value => `"${String(value == null ? '' : value).replace(/"/g, '""')}"`;
+                const rows = storeData.products.map(product => {
+                    const images = Array.isArray(product.images)
+                        ? [...new Set(product.images.map(image => String(image || '').trim()).filter(Boolean))]
+                        : [];
+                    if (!images.length && product.image) images.push(String(product.image).trim());
+                    const price = Number(product.price) || 0;
+                    const originalPrice = Number(product.originalPrice) || 0;
+                    const hasDiscount = originalPrice > price;
+                    const availability = product.stock === 'out' ? 'out of stock' : 'in stock';
+                    const fields = [
+                        product.id,
+                        product.name,
+                        `${hasDiscount ? originalPrice : price} EGP`,
+                        hasDiscount ? `${price} EGP` : '',
+                        product.description || '',
+                        images.join('\n'),
+                        images.join('\n'),
+                        product.category || '',
+                        availability,
+                        'new',
+                        Array.isArray(product.tags) ? product.tags.join(' | ') : '',
+                        Array.isArray(product.specs) ? product.specs.join('\n') : '',
+                        product.offerEnds || '',
+                        Array.isArray(product.videos) ? product.videos.join('|') : '',
+                        Number(product.rating) || '',
+                        Number(product.reviewCount) || ''
+                    ];
+                    return fields.map(quoteCell).join(';');
+                });
+
+                const csv = `\uFEFF${headers.map(quoteCell).join(';')}\r\n${rows.join('\r\n')}`;
+                const file = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+                const url = URL.createObjectURL(file);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'store-products.csv';
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                showAlert(`تم تصدير كتالوج واتساب من ${storeData.products.length} منتجاً إلى store-products.csv. ارفع الملف إلى Commerce Manager لتحديث الكتالوج.`, 'success');
+            } catch (error) {
+                console.error('تعذر تصدير كتالوج واتساب من ملف Excel:', error);
+                showAlert(error instanceof Error ? error.message : 'تعذر تصدير كتالوج واتساب.', 'error');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalMarkup;
+            }
         }
 
         function downloadExcelTemplate() {
