@@ -12,6 +12,29 @@ function getStoreUrl() {
     return url || DEFAULT_STORE_URL;
 }
 
+function getProductVideoSource(source) {
+    try {
+        const url = new URL(source);
+        if (!['https:', 'http:'].includes(url.protocol)) return {type: 'invalid', src: ''};
+        const host = url.hostname.toLowerCase().replace(/^www\./, '');
+        let videoId = '';
+        if (host === 'youtu.be') {
+            videoId = url.pathname.split('/').filter(Boolean)[0] || '';
+        } else if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'youtube-nocookie.com') {
+            const pathParts = url.pathname.split('/').filter(Boolean);
+            if (url.pathname === '/watch') videoId = url.searchParams.get('v') || '';
+            else if (['embed', 'shorts', 'live'].includes(pathParts[0])) videoId = pathParts[1] || '';
+        }
+        if (/^[\w-]{11}$/.test(videoId)) {
+            return {type: 'youtube', src: `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&playsinline=1`};
+        }
+        if (/\.(mp4|webm|ogg)$/i.test(url.pathname)) return {type: 'file', src: url.href};
+        return {type: 'link', src: url.href};
+    } catch (error) {
+        return {type: 'invalid', src: ''};
+    }
+}
+
 function applySiteBranding(settings) {
     const brandName = settings.brand_name || 'مشالى';
     const siteName = settings.site_name || `متجر ${brandName} | الإلكترونيات`;
@@ -326,7 +349,7 @@ function toggleDarkMode() {
 // دالة مساعدة لإنشاء كارت المنتج (لإعادة الاستخدام)
 function createProductCard(p) {
     const isOut = p.stock === 'out';
-    const hasTimer = p.offerEnds && new Date(p.offerEnds) > new Date();
+    const hasTimer = isProductOfferActive(p);
     const wishlist = JSON.parse(localStorage.getItem('MASHILY_WISHLIST')) || [];
     const isInWishlist = wishlist.some(item => item.id === p.id);
     const oldPrice = p.originalPrice || p.oldPrice;
@@ -353,7 +376,8 @@ function createProductCard(p) {
                 ${oldPrice ? `<s style="color:#95a5a6; font-size:0.8rem; margin-left:5px;">${oldPrice}</s>` : ''}
                 ${p.price} ج.م
             </div>
-            ${hasTimer ? `<div class="countdown-timer" data-ends="${p.offerEnds}">جاري التحميل...</div>` : ''}
+            ${renderProductRating(p)}
+            ${hasTimer ? `<div class="countdown-timer" data-ends="${parseOfferDate(p.offerEnds, true)}">جاري التحميل...</div>` : ''}
             <button class="qty-btn" style="background:${isOut?'#95a5a6':'var(--primary)'}" 
                 onclick="${isOut ? "alert('عذراً، المنتج غير متوفر حالياً')" : `addToCart(${p.id})`}">
                 ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
@@ -391,7 +415,7 @@ function openProductDetails(id) {
     // --- عرض التفاصيل الكاملة (ميتا داتا) ---
     const oldPrice = product.originalPrice || product.oldPrice;
     const discountPercent = oldPrice ? Math.round(((oldPrice - product.price) / oldPrice) * 100) : 0;
-    const hasTimer = product.offerEnds && new Date(product.offerEnds) > new Date();
+    const hasTimer = isProductOfferActive(product);
     
     let metaHTML = '';
     
@@ -412,9 +436,12 @@ function openProductDetails(id) {
         metaHTML += `<span style="background:#27ae60; color:white; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:bold;">متوفر: ${product.stock} ✅</span>`;
     }
 
+    const productRating = renderProductRating(product);
+    if (productRating) metaHTML += productRating;
+
     // 4. عداد العرض (كامل العرض)
     if (hasTimer) {
-        metaHTML += `<div class="countdown-timer" data-ends="${product.offerEnds}" style="width:100%; text-align:center; margin-top:8px; font-size:1rem; padding:10px; background:#fff3cd; color:#d35400; border:1px dashed #e67e22; border-radius:8px; font-weight:bold;">جاري التحميل...</div>`;
+        metaHTML += `<div class="countdown-timer" data-ends="${parseOfferDate(product.offerEnds, true)}" style="width:100%; text-align:center; margin-top:8px; font-size:1rem; padding:10px; background:#fff3cd; color:#d35400; border:1px dashed #e67e22; border-radius:8px; font-weight:bold;">جاري التحميل...</div>`;
     }
 
     const metaContainer = document.getElementById('modal-meta');
@@ -517,23 +544,38 @@ function updateGallery() {
     const img = document.getElementById('modal-img');
     const videoContainer = document.getElementById('modal-video');
     const container = document.querySelector('.gallery-container');
+    if (!img || !videoContainer || !container) return;
 
-    if (item.type === 'image') {
+    if (!item) {
+        img.style.display = 'none';
+        videoContainer.style.display = 'none';
+        videoContainer.innerHTML = '';
+        container.style.cursor = 'default';
+    } else if (item.type === 'image') {
         img.style.display = 'block';
         videoContainer.style.display = 'none';
-        videoContainer.innerHTML = ''; // إيقاف الفيديو عند الانتقال
+        videoContainer.innerHTML = '';
         img.src = item.src;
         container.style.cursor = 'zoom-in';
     } else {
         img.style.display = 'none';
         videoContainer.style.display = 'flex';
-        videoContainer.innerHTML = `<video controls autoplay style="max-width:100%; max-height:100%; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.2);"><source src="${item.src}" type="video/mp4">المتصفح لا يدعم الفيديو.</video>`;
+        const videoUrl = getProductVideoSource(item.src);
+        if (videoUrl.type === 'youtube') {
+            videoContainer.innerHTML = `<iframe src="${videoUrl.src}" title="فيديو المنتج" style="width:100%; height:100%; border:0; border-radius:8px;" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+        } else if (videoUrl.type === 'file') {
+            videoContainer.innerHTML = `<video controls playsinline preload="metadata" style="max-width:100%; max-height:100%; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.2);"><source src="${videoUrl.src}">المتصفح لا يدعم الفيديو.</video>`;
+        } else if (videoUrl.type === 'invalid') {
+            videoContainer.textContent = 'رابط الفيديو غير صالح؛ استخدم رابط HTTPS أو HTTP.';
+        } else {
+            videoContainer.innerHTML = `<a href="${videoUrl.src}" target="_blank" rel="noopener noreferrer">فتح الفيديو في نافذة جديدة</a>`;
+        }
         container.style.cursor = 'default';
     }
-    
+
     // تحديث النقاط
     const dotsContainer = document.getElementById('modal-dots');
-    dotsContainer.innerHTML = currentProductImages.map((_, i) => 
+    if (dotsContainer) dotsContainer.innerHTML = currentProductImages.map((_, i) => 
         `<div class="dot ${i === currentGalleryIndex ? 'active' : ''}" onclick="currentGalleryIndex=${i}; updateGallery()"></div>`
     ).join('');
 
@@ -558,6 +600,7 @@ function updateGallery() {
 }
 
 function changeGalleryImage(dir) {
+    if (!currentProductImages.length) return;
     currentGalleryIndex += dir;
     if (currentGalleryIndex >= currentProductImages.length) currentGalleryIndex = 0;
     if (currentGalleryIndex < 0) currentGalleryIndex = currentProductImages.length - 1;
@@ -671,6 +714,80 @@ function renderProducts(items) {
     grid.innerHTML = items.map(p => createProductCard(p)).join('');
 }
 
+function parseOfferDate(value, isEndDate) {
+    if (value === null || value === undefined || String(value).trim() === '') return NaN;
+    const raw = String(value).trim();
+    const excelSerial = Number(raw);
+    if (Number.isFinite(excelSerial) && excelSerial > 0) {
+        const excelDate = new Date(Date.UTC(1899, 11, 30) + excelSerial * 86400000);
+        const hasTime = excelSerial % 1 !== 0;
+        return new Date(
+            excelDate.getUTCFullYear(),
+            excelDate.getUTCMonth(),
+            excelDate.getUTCDate(),
+            hasTime ? excelDate.getUTCHours() : (isEndDate ? 23 : 0),
+            hasTime ? excelDate.getUTCMinutes() : (isEndDate ? 59 : 0),
+            hasTime ? excelDate.getUTCSeconds() : (isEndDate ? 59 : 0),
+            hasTime ? excelDate.getUTCMilliseconds() : 0
+        ).getTime();
+    }
+
+    const isoDate = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (isoDate) {
+        const [, year, month, day, hour, minute, second] = isoDate;
+        const hasTime = hour !== undefined;
+        return new Date(
+            Number(year),
+            Number(month) - 1,
+            Number(day),
+            hasTime ? Number(hour) : (isEndDate ? 23 : 0),
+            hasTime ? Number(minute) : (isEndDate ? 59 : 0),
+            hasTime ? Number(second || 0) : (isEndDate ? 59 : 0)
+        ).getTime();
+    }
+
+    const arabicMonthNames = {
+        'يناير': 0, 'فبراير': 1, 'مارس': 2, 'أبريل': 3, 'ابريل': 3,
+        'مايو': 4, 'يونيو': 5, 'يوليو': 6, 'أغسطس': 7, 'اغسطس': 7,
+        'سبتمبر': 8, 'أكتوبر': 9, 'اكتوبر': 9, 'نوفمبر': 10, 'ديسمبر': 11
+    };
+    const arabicDate = raw.match(/^(\d{1,2})[-/\s]+([\u0600-\u06ff]+)(?:[-/\s]+(\d{4}))?$/);
+    if (arabicDate && Object.prototype.hasOwnProperty.call(arabicMonthNames, arabicDate[2])) {
+        const month = arabicMonthNames[arabicDate[2]];
+        return new Date(
+            Number(arabicDate[3] || new Date().getFullYear()),
+            month,
+            Number(arabicDate[1]),
+            isEndDate ? 23 : 0,
+            isEndDate ? 59 : 0,
+            isEndDate ? 59 : 0
+        ).getTime();
+    }
+
+    const parsed = Date.parse(raw);
+    return Number.isFinite(parsed) ? parsed : NaN;
+}
+
+function isProductOfferActive(product, now = Date.now()) {
+    const end = parseOfferDate(product.offerEnds, true);
+    const start = product.offerStarts ? parseOfferDate(product.offerStarts, false) : NaN;
+    return Number.isFinite(end) && end > now && (!product.offerStarts || (Number.isFinite(start) && start <= now));
+}
+
+function renderProductRating(product) {
+    const rating = Math.max(0, Math.min(5, Number(product.rating) || 0));
+    if (!rating) return '';
+    const starCount = Math.round(rating * 2);
+    let stars = '';
+    for (let i = 1; i <= 5; i++) {
+        const icon = starCount >= i * 2 ? 'fa-star' : (starCount === i * 2 - 1 ? 'fa-star-half-alt' : 'far fa-star');
+        stars += `<i class="${icon.startsWith('far') ? icon : `fas ${icon}`}" aria-hidden="true"></i>`;
+    }
+    const reviewCount = Number(product.reviewCount) || 0;
+    const ratingText = Number.isInteger(rating) ? String(rating) : rating.toFixed(1);
+    return `<span class="product-rating" role="img" aria-label="التقييم ${ratingText} من 5${reviewCount > 0 ? ` من ${reviewCount} تقييم` : ''}"><span class="rating-stars">${stars}</span><span class="rating-value">${ratingText}</span>${reviewCount > 0 ? `<span class="rating-count">(${reviewCount})</span>` : ''}</span>`;
+}
+
 // فتح/إغلاق بيانات الصنف عند الضغط على الصورة
 function toggleProductInfo(element) {
     const card = element.closest('.product-card');
@@ -722,7 +839,7 @@ function filterByCategory(cat) {
     
     let filtered;
     if (cat === 'الكل') filtered = products;
-    else if (cat === 'offers') filtered = products.filter(p => p.offerEnds && new Date(p.offerEnds) > new Date());
+    else if (cat === 'offers') filtered = products.filter(p => isProductOfferActive(p));
     else filtered = products.filter(p => p.category === cat);
     
     // تطبيق الترتيب
@@ -1080,12 +1197,17 @@ function startSocialProof() {
 
 // --- تحديث العداد التنازلي للعروض ---
 setInterval(() => {
+    let expiredOfferVisible = false;
     document.querySelectorAll('.countdown-timer').forEach(el => {
-        const end = new Date(el.dataset.ends).getTime();
+        const end = Number(el.dataset.ends);
         const now = new Date().getTime();
         const diff = end - now;
         
-        if(diff < 0) {
+        if(!Number.isFinite(end)) {
+            el.textContent = 'تاريخ العرض غير صالح';
+        } else if(diff <= 0) {
+            if (!el.dataset.expired) expiredOfferVisible = true;
+            el.dataset.expired = 'true';
             el.innerHTML = "انتهى العرض ⌛";
             el.style.color = "#7f8c8d"; el.style.borderColor = "#ccc"; el.style.background = "#eee";
         } else {
@@ -1096,6 +1218,7 @@ setInterval(() => {
             el.innerHTML = `🔥 باقي ${d}ي ${h}س ${m}د ${s}ث`;
         }
     });
+    if (expiredOfferVisible && currentCategory === 'offers') filterByCategory('offers');
 }, 1000);
 
 // --- مشاركة المنتج ---

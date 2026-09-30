@@ -383,6 +383,26 @@ header {
     font-size: 0.75rem; 
 }
 
+.product-rating {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: var(--text-light);
+    font-size: 0.62rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+.rating-stars {
+    display: inline-flex;
+    gap: 1px;
+    color: #e6a700;
+    direction: ltr;
+}
+.rating-value { font-weight: 700; }
+.rating-count { color: var(--text-light); }
+.modal-info-section .product-rating { font-size: 0.9rem; }
+
 /* عداد العروض الخاصة */
 .countdown-timer {
     font-size: 0.7rem;
