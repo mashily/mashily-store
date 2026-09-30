@@ -1611,6 +1611,11 @@ body {
         font-size: clamp(1rem, 5vw, 1.4rem) !important;
     }
 
+    .academy-header-top .logo img {
+        max-width: min(140px, 38vw);
+        height: 44px !important;
+    }
+
     .store-header-main {
         box-sizing: border-box;
         display: grid !important;
