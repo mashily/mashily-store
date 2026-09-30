@@ -252,6 +252,26 @@ async function fetchStoreFromExcel() {
                 ? data.proof.split(',').map(text => ({ text: text.trim(), duration: 5, interval: 16 })).filter(item => item.text)
                 : []);
 
+        const popupRows = wb.Sheets['Popups'] ? sheetToObjects(wb.Sheets['Popups']) : [];
+        data.popups = popupRows
+            .map(row => ({
+                active: isMessageActive(row),
+                location: String(getFirstValue(row, ['المكان', 'location']) || 'الكل').trim().toLowerCase(),
+                type: String(getFirstValue(row, ['النوع', 'type']) || 'ترحيب').trim(),
+                title: String(getFirstValue(row, ['العنوان', 'title']) || '').trim(),
+                message: String(getFirstValue(row, ['الرسالة', 'message']) || '').trim(),
+                image: String(getFirstValue(row, ['رابط الصورة', 'الصورة', 'image']) || '').trim(),
+                buttonText: String(getFirstValue(row, ['نص الزر', 'buttonText']) || '').trim(),
+                buttonUrl: String(getFirstValue(row, ['رابط الزر', 'buttonUrl']) || '').trim(),
+                starts: getFirstValue(row, ['يبدأ في', 'بداية العرض', 'starts']),
+                ends: getFirstValue(row, ['ينتهي في', 'نهاية العرض', 'ends']),
+                duration: getPositiveSeconds(row, ['مدة الظهور (ثانية)', 'مدة العرض (ثانية)', 'duration'], 8),
+                celebration: isMessageActive({فعال: getFirstValue(row, ['تأثير احتفالي', 'celebration'])}),
+                celebrationDuration: getPositiveSeconds(row, ['مدة التأثير (ثانية)', 'celebrationDuration'], 2),
+                decorations: parseSplit(getFirstValue(row, ['رموز التأثير (|)', 'رموز التأثير', 'decorations']))
+            }))
+            .filter(popup => popup.title || popup.message);
+
         return data;
     } catch (e) {
         console.error('تعذر قراءة ملف Excel؛ ستتم تجربة المصدر الاحتياطي:', e);
@@ -273,6 +293,7 @@ function applyStoreData(data) {
     if (data.proof !== undefined) localStorage.setItem('proofText', data.proof);
     if (data.tickerMessages) localStorage.setItem('tickerMessages', JSON.stringify(data.tickerMessages));
     if (data.proofMessages) localStorage.setItem('proofMessages', JSON.stringify(data.proofMessages));
+    if (data.popups) localStorage.setItem('storePopups', JSON.stringify(data.popups));
     if (data.settings) localStorage.setItem('storeSettings', JSON.stringify(data.settings));
     return true;
 }
@@ -289,6 +310,7 @@ function buildStoreWorkbook() {
     const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
     const ticker = localStorage.getItem('tickerText') || '';
     const proof = localStorage.getItem('proofText') || '';
+    const popups = JSON.parse(localStorage.getItem('storePopups')) || [];
 
     const wb = XLSX.utils.book_new();
 
@@ -391,6 +413,28 @@ function buildStoreWorkbook() {
         'فعال': 'نعم'
     }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(notifRows), 'Notifications');
+
+    const popupRows = popups.map(popup => ({
+        'فعال': popup.active === false ? 'لا' : 'نعم',
+        'المكان': popup.location || 'الكل',
+        'النوع': popup.type || 'ترحيب',
+        'العنوان': popup.title || '',
+        'الرسالة': popup.message || '',
+        'رابط الصورة': popup.image || '',
+        'نص الزر': popup.buttonText || '',
+        'رابط الزر': popup.buttonUrl || '',
+        'يبدأ في': popup.starts || '',
+        'ينتهي في': popup.ends || '',
+        'مدة الظهور (ثانية)': popup.duration || 8,
+        'تأثير احتفالي': popup.celebration ? 'نعم' : 'لا',
+        'مدة التأثير (ثانية)': popup.celebrationDuration || 2,
+        'رموز التأثير (|)': (popup.decorations || []).join('|')
+    }));
+    const popupHeaders = ['فعال', 'المكان', 'النوع', 'العنوان', 'الرسالة', 'رابط الصورة', 'نص الزر', 'رابط الزر', 'يبدأ في', 'ينتهي في', 'مدة الظهور (ثانية)', 'تأثير احتفالي', 'مدة التأثير (ثانية)', 'رموز التأثير (|)'];
+    const popupSheet = popupRows.length
+        ? XLSX.utils.json_to_sheet(popupRows, {header: popupHeaders})
+        : XLSX.utils.aoa_to_sheet([popupHeaders]);
+    XLSX.utils.book_append_sheet(wb, popupSheet, 'Popups');
 
     return wb;
 }

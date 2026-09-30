@@ -281,6 +281,198 @@ async function init() {
     if (wsGuard) wsGuard.classList.remove('active');
     const ovGuard = document.getElementById('overlay');
     if (ovGuard) ovGuard.classList.remove('active');
+
+    setTimeout(showStoreCampaignPopup, 1800);
+}
+
+function getCampaignPage() {
+    if (document.getElementById('academy-grid')) return 'academy';
+    if (document.getElementById('products-grid')) return 'store';
+    return '';
+}
+
+function getCampaignUrl(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    try {
+        const url = new URL(raw, window.location.href);
+        return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+    } catch (error) {
+        return '';
+    }
+}
+
+function getActiveCampaignPopup() {
+    const page = getCampaignPage();
+    if (!page) return null;
+    const popups = JSON.parse(localStorage.getItem('storePopups') || '[]');
+    const now = Date.now();
+
+    return popups.find(popup => {
+        if (popup.active === false) return false;
+        const location = String(popup.location || 'الكل').trim().toLowerCase();
+        const targetsPage = ['الكل', 'all', 'المتجر والأكاديمية', 'المتجر والاكاديمية'].includes(location)
+            || (page === 'store' && ['المتجر', 'store', 'shop'].includes(location))
+            || (page === 'academy' && ['الأكاديمية', 'الاكاديمية', 'academy'].includes(location));
+        if (!targetsPage) return false;
+
+        const starts = popup.starts ? parseOfferDate(popup.starts, false) : NaN;
+        const ends = popup.ends ? parseOfferDate(popup.ends, true) : NaN;
+        if (popup.starts && !Number.isFinite(starts)) {
+            console.warn('تم تجاهل نافذة ترويجية بسبب تاريخ بداية غير صالح:', popup.title);
+            return false;
+        }
+        if (popup.ends && !Number.isFinite(ends)) {
+            console.warn('تم تجاهل نافذة ترويجية بسبب تاريخ نهاية غير صالح:', popup.title);
+            return false;
+        }
+        return (!Number.isFinite(starts) || starts <= now) && (!Number.isFinite(ends) || ends >= now);
+    }) || null;
+}
+
+function isAcademyVideoOpen() {
+    const modal = document.getElementById('video-player-modal');
+    return Boolean(modal && modal.style.display === 'flex');
+}
+
+function showStoreCampaignPopup() {
+    if (sessionStorage.getItem('mashily_campaign_shown_this_visit')) return;
+    if (getCampaignPage() === 'academy' && isAcademyVideoOpen()) {
+        setTimeout(showStoreCampaignPopup, 3000);
+        return;
+    }
+    const campaign = getActiveCampaignPopup();
+    if (!campaign) return;
+
+    sessionStorage.setItem('mashily_campaign_shown_this_visit', '1');
+
+    const page = getCampaignPage();
+    const celebrationDuration = Math.max(1, Math.min(6, Number(campaign.celebrationDuration) || 2));
+    const shouldCelebrate = Boolean(campaign.celebration)
+        && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (shouldCelebrate) launchCampaignCelebration(celebrationDuration, campaign.decorations);
+
+    const showDialog = () => {
+        if (page === 'academy' && isAcademyVideoOpen()) {
+            sessionStorage.removeItem('mashily_campaign_shown_this_visit');
+            const celebration = document.querySelector('.store-campaign-celebration');
+            if (celebration) celebration.remove();
+            setTimeout(showStoreCampaignPopup, 3000);
+            return;
+        }
+        const overlay = document.createElement('div');
+        overlay.className = 'store-campaign-overlay';
+        overlay.setAttribute('role', 'presentation');
+
+        const dialog = document.createElement('section');
+        dialog.className = 'store-campaign-dialog';
+        dialog.setAttribute('role', 'dialog');
+        dialog.setAttribute('aria-modal', 'true');
+        dialog.setAttribute('aria-labelledby', 'store-campaign-title');
+
+        const closeButton = document.createElement('button');
+        closeButton.className = 'store-campaign-close';
+        closeButton.type = 'button';
+        closeButton.setAttribute('aria-label', 'إغلاق الإعلان');
+        closeButton.innerHTML = '&times;';
+        dialog.appendChild(closeButton);
+
+        const type = document.createElement('span');
+        type.className = 'store-campaign-type';
+        type.textContent = campaign.type || 'إعلان';
+        dialog.appendChild(type);
+
+        const title = document.createElement('h2');
+        title.id = 'store-campaign-title';
+        title.textContent = campaign.title || 'أهلاً بك';
+        dialog.appendChild(title);
+
+        if (campaign.image) {
+            const imageUrl = getCampaignUrl(campaign.image);
+            if (imageUrl) {
+                const image = document.createElement('img');
+                image.className = 'store-campaign-image';
+                image.src = imageUrl;
+                image.alt = campaign.title || 'صورة العرض';
+                image.loading = 'eager';
+                dialog.appendChild(image);
+            }
+        }
+
+        const message = document.createElement('p');
+        message.className = 'store-campaign-message';
+        message.textContent = campaign.message || '';
+        dialog.appendChild(message);
+
+        if (campaign.buttonText && campaign.buttonUrl) {
+            const buttonUrl = getCampaignUrl(campaign.buttonUrl);
+            if (buttonUrl) {
+                const action = document.createElement('a');
+                action.className = 'store-campaign-action';
+                action.href = buttonUrl;
+                action.textContent = campaign.buttonText;
+                if (new URL(buttonUrl).origin !== window.location.origin) {
+                    action.target = '_blank';
+                    action.rel = 'noopener noreferrer';
+                }
+                dialog.appendChild(action);
+            }
+        }
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+        let closeTimer;
+        const close = () => {
+            clearTimeout(closeTimer);
+            document.removeEventListener('keydown', onKeyDown);
+            overlay.classList.remove('is-visible');
+            setTimeout(() => overlay.remove(), 250);
+        };
+        const onKeyDown = event => {
+            if (event.key === 'Escape') close();
+        };
+        closeButton.addEventListener('click', close);
+        overlay.addEventListener('click', event => {
+            if (event.target === overlay) close();
+        });
+        document.addEventListener('keydown', onKeyDown);
+        const duration = Math.max(1, Math.min(120, Number(campaign.duration) || 8));
+        closeTimer = setTimeout(close, duration * 1000);
+        closeButton.focus();
+    };
+
+    if (shouldCelebrate) {
+        setTimeout(showDialog, celebrationDuration * 1000);
+    } else {
+        showDialog();
+    }
+}
+
+function launchCampaignCelebration(durationSeconds, decorations = ['🎈', '❤️', '🎉', '✨', '💛']) {
+    const existing = document.querySelector('.store-campaign-celebration');
+    if (existing) existing.remove();
+    const layer = document.createElement('div');
+    layer.className = 'store-campaign-celebration';
+    layer.setAttribute('aria-hidden', 'true');
+
+    const selectedDecorations = Array.isArray(decorations) && decorations.length
+        ? decorations
+        : ['🎈', '❤️', '🎉', '✨', '💛'];
+    for (let index = 0; index < 28; index++) {
+        const particle = document.createElement('span');
+        particle.className = 'campaign-particle';
+        particle.textContent = selectedDecorations[Math.floor(Math.random() * selectedDecorations.length)];
+        particle.style.setProperty('--particle-left', `${Math.random() * 100}%`);
+        particle.style.setProperty('--particle-delay', `${Math.random() * Math.min(0.8, durationSeconds / 3)}s`);
+        particle.style.setProperty('--particle-duration', `${durationSeconds}s`);
+        particle.style.setProperty('--particle-drift', `${Math.round((Math.random() - 0.5) * 160)}px`);
+        particle.style.setProperty('--particle-size', `${1.2 + Math.random() * 1.8}rem`);
+        layer.appendChild(particle);
+    }
+    document.body.appendChild(layer);
+    setTimeout(() => layer.remove(), (durationSeconds + 1) * 1000);
 }
 
 // --- وظائف الثيمات ---
@@ -1242,28 +1434,8 @@ function shareProduct(id, event) {
 }
 
 // --- الإشعار الترحيبي (يظهر أول مرة فقط) ---
-function showWelcomeToast() {
-    if (localStorage.getItem('mashily_welcomed')) return;
-    localStorage.setItem('mashily_welcomed', '1');
-    let toast = document.getElementById('welcome-toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'welcome-toast';
-        toast.style.cssText = 'position:fixed; bottom:75px; right:15px; background:var(--card); border:2px solid var(--primary); padding:15px 20px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.2); z-index:3000; font-size:0.9rem; max-width:280px; display:none;';
-        document.body.appendChild(toast);
-    }
-    toast.innerHTML = '<div style="display:flex; align-items:center; gap:12px;">' +
-        '<span style="font-size:2rem;">👋</span>' +
-        '<div><b style="color:var(--primary);">أهلاً بك في مشالي للإلكترونيات!</b>' +
-        '<p style="margin:4px 0 0 0; color:var(--text); font-size:0.85rem;">تصفح منتجاتنا واطلب عبر واتساب بسهولة.</p></div>' +
-        '</div>';
-    toast.style.display = 'block';
-    setTimeout(() => { toast.style.display = 'none'; }, 6000);
-}
-
 // بدء العمل عند تحميل الصفحة
 window.onload = init;
-setTimeout(showWelcomeToast, 2500);
 
 // --- الدخول السري للوحة التحكم ---
 let adminClicks = 0;
@@ -2295,32 +2467,58 @@ function playVideo(id) {
 
     const modal = document.getElementById('video-player-modal');
     const container = document.getElementById('video-frame-container');
+    const fullscreenButton = document.getElementById('academy-fullscreen-btn');
     const progressContainer = document.getElementById('video-progress-container');
     const progressBar = document.getElementById('video-progress-bar');
     const attachmentsContainer = document.getElementById('video-attachments-container');
+    const notice = document.getElementById('academy-player-notice');
     
     // إعادة تعيين الشريط
     if(progressBar) progressBar.style.width = '0%';
     if(progressContainer) progressContainer.style.display = 'none';
     if(attachmentsContainer) attachmentsContainer.innerHTML = '';
+    if(notice) {
+        notice.textContent = '';
+        notice.hidden = true;
+    }
 
+    const videoSource = getProductVideoSource(video.url || '');
     let embedCode = '';
-    if (video.url.includes('youtube') || video.url.includes('youtu.be')) {
-        embedCode = `<iframe src="https://www.youtube.com/embed/${video.url.split('/').pop().split('v=')[1] || video.url.split('/').pop()}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-    } else {
-        embedCode = `<video id="active-academy-video" controls autoplay style="width:100%; height:100%;"><source src="${video.url}" type="video/mp4">المتصفح لا يدعم الفيديو.</video>`;
+    if (videoSource.type === 'youtube') {
+        const separator = videoSource.src.includes('?') ? '&' : '?';
+        const youtubeOrigin = `${separator}autoplay=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
+        embedCode = `<iframe title="فيديو تعليمي" src="${videoSource.src}${youtubeOrigin}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen></iframe>`;
+    } else if (videoSource.type === 'file' || videoSource.type === 'link') {
+        embedCode = `<video id="active-academy-video" controls autoplay playsinline preload="metadata" style="width:100%; height:100%;"><source src="${videoSource.src}">المتصفح لا يدعم الفيديو.</video>`;
         if(progressContainer) progressContainer.style.display = 'block';
+    } else {
+        embedCode = `<div class="video-unavailable-message">${videoSource.type === 'invalid' ? 'رابط الفيديو غير صالح.' : 'هذا النوع من روابط الفيديو غير مدعوم للمشاهدة داخل الصفحة.'}</div>`;
     }
 
     container.innerHTML = embedCode;
+    if (fullscreenButton) container.appendChild(fullscreenButton);
     modal.style.display = 'flex';
+    updateAcademyFullscreenButton();
 
     // تفعيل شريط التقدم للفيديوهات المباشرة
     const videoPlayer = document.getElementById('active-academy-video');
+    if(videoPlayer) {
+        videoPlayer.play().catch(error => {
+            console.info('التشغيل التلقائي للفيديو غير متاح؛ استخدم زر التشغيل في المشغل.', error);
+            if (notice) {
+                notice.textContent = 'اضغط زر التشغيل داخل الفيديو لبدء المشاهدة.';
+                notice.hidden = false;
+            }
+        });
+        videoPlayer.addEventListener('webkitbeginfullscreen', updateAcademyFullscreenButton);
+        videoPlayer.addEventListener('webkitendfullscreen', updateAcademyFullscreenButton);
+    }
     if(videoPlayer && progressBar) {
         videoPlayer.addEventListener('timeupdate', () => {
-            const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
-            progressBar.style.width = `${percent}%`;
+            if (Number.isFinite(videoPlayer.duration) && videoPlayer.duration > 0) {
+                const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+                progressBar.style.width = `${percent}%`;
+            }
         });
     }
 
@@ -2334,6 +2532,99 @@ function playVideo(id) {
     // --- إعداد التفاعلات (لايك وتعليقات) ---
     setupVideoInteractions(video);
 }
+
+function updateAcademyFullscreenButton() {
+    const button = document.getElementById('academy-fullscreen-btn');
+    if (!button) return;
+    const isFullscreen = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+    const icon = button.querySelector('i');
+    if (icon) icon.className = `fas ${isFullscreen ? 'fa-compress' : 'fa-expand'}`;
+    button.setAttribute('aria-label', isFullscreen ? 'الخروج من ملء الشاشة' : 'تكبير الفيديو');
+    button.title = isFullscreen ? 'الخروج من ملء الشاشة' : 'تكبير الفيديو';
+}
+
+function playAcademyIframeVideo(iframe) {
+    if (!iframe || !iframe.contentWindow) return;
+    const origin = new URL(iframe.src).origin;
+    iframe.contentWindow.postMessage(
+        JSON.stringify({event: 'command', func: 'playVideo', args: []}),
+        origin
+    );
+}
+
+function toggleAcademyVideoFullscreen() {
+    const container = document.getElementById('video-frame-container');
+    const video = document.getElementById('active-academy-video');
+    const iframe = container ? container.querySelector('iframe') : null;
+    const notice = document.getElementById('academy-player-notice');
+    if (!container) return;
+    if (notice) {
+        notice.textContent = '';
+        notice.hidden = true;
+    }
+
+    const isFullscreen = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+    if (isFullscreen) {
+        const exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exitFullscreen) {
+            const result = exitFullscreen.call(document);
+            if (result && typeof result.catch === 'function') {
+                result.catch(error => console.warn('تعذر الخروج من وضع ملء الشاشة.', error));
+            }
+        }
+        return;
+    }
+
+    try {
+        if (video && typeof video.webkitEnterFullscreen === 'function') {
+            video.play().catch(error => console.info('التشغيل التلقائي للفيديو غير متاح.', error));
+            video.webkitEnterFullscreen();
+            return;
+        }
+
+        const fullscreenTarget = container;
+        const enterFullscreen = fullscreenTarget.requestFullscreen || fullscreenTarget.webkitRequestFullscreen;
+        if (enterFullscreen) {
+            const result = enterFullscreen.call(fullscreenTarget);
+            if (result && typeof result.catch === 'function') {
+                result.catch(error => {
+                    console.warn('تعذر فتح الفيديو في وضع ملء الشاشة.', error);
+                    if (notice) {
+                        notice.textContent = iframe
+                            ? 'استخدم زر ملء الشاشة داخل مشغل YouTube على هذا الجهاز.'
+                            : 'تعذر تفعيل ملء الشاشة؛ استخدم زر التكبير في عناصر تحكم الفيديو.';
+                        notice.hidden = false;
+                    }
+                });
+            }
+            if (iframe) playAcademyIframeVideo(iframe);
+        } else {
+            console.warn('وضع ملء الشاشة غير مدعوم في هذا المتصفح.');
+            if (iframe) playAcademyIframeVideo(iframe);
+            if (notice) {
+                notice.textContent = iframe
+                    ? 'استخدم زر ملء الشاشة داخل مشغل YouTube على هذا الجهاز.'
+                    : 'وضع ملء الشاشة غير مدعوم في هذا المتصفح.';
+                notice.hidden = false;
+            }
+        }
+
+        if (video) {
+            video.play().catch(error => console.info('التشغيل التلقائي للفيديو غير متاح.', error));
+        }
+    } catch (error) {
+        console.warn('تعذر فتح الفيديو في وضع ملء الشاشة.', error);
+        if (notice) {
+            notice.textContent = iframe
+                ? 'استخدم زر ملء الشاشة داخل مشغل YouTube على هذا الجهاز.'
+                : 'تعذر تفعيل ملء الشاشة؛ استخدم زر التكبير في عناصر تحكم الفيديو.';
+            notice.hidden = false;
+        }
+    }
+}
+
+document.addEventListener('fullscreenchange', updateAcademyFullscreenButton);
+document.addEventListener('webkitfullscreenchange', updateAcademyFullscreenButton);
 
 function updateAcademyProfileUI() {
     const user = getAcademyUser();
@@ -2658,7 +2949,22 @@ function submitReply(commentId) {
 }
 
 function closeVideoModal() {
+    const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fullscreenElement) {
+        const exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exitFullscreen) {
+            const result = exitFullscreen.call(document);
+            if (result && typeof result.catch === 'function') {
+                result.catch(error => console.warn('تعذر الخروج من وضع ملء الشاشة عند إغلاق الفيديو.', error));
+            }
+        }
+    }
     document.getElementById('video-player-modal').style.display = 'none';
-    document.getElementById('video-frame-container').innerHTML = '';
-
+    const container = document.getElementById('video-frame-container');
+    const fullscreenButton = document.getElementById('academy-fullscreen-btn');
+    if (fullscreenButton) {
+        container.replaceChildren(fullscreenButton);
+    } else {
+        container.innerHTML = '';
+    }
 }

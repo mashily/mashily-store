@@ -93,8 +93,12 @@
         <div class="video-modal-content">
             <button class="close-video-btn" onclick="closeVideoModal()">✕</button>
             <div id="video-frame-container" class="video-frame-container">
+                <button id="academy-fullscreen-btn" class="academy-fullscreen-btn" type="button" onclick="toggleAcademyVideoFullscreen()" aria-label="تكبير الفيديو" title="تكبير الفيديو">
+                    <i class="fas fa-expand" aria-hidden="true"></i>
+                </button>
                 <!-- سيتم وضع الفيديو هنا -->
             </div>
+            <div id="academy-player-notice" class="academy-player-notice" role="status" aria-live="polite" hidden></div>
             <div id="video-progress-container" class="video-progress-container">
                 <div id="video-progress-bar" class="video-progress-bar"></div>
             </div>
