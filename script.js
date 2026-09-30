@@ -356,7 +356,7 @@ function createProductCard(p) {
     const discountPercent = oldPrice ? Math.round(((oldPrice - p.price) / oldPrice) * 100) : 0;
     
     return `
-    <div class="product-card" onmouseleave="hideAllInfos()">
+    <div class="product-card ${isOut ? 'product-unavailable' : ''}" onmouseleave="hideAllInfos()">
         <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${p.id}, event)" title="${isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
             <i class="fas fa-heart"></i>
         </button>
@@ -366,8 +366,8 @@ function createProductCard(p) {
         <div class="img-container" onclick="openProductDetails(${p.id})">
             ${!isOut ? `<div class="pro-badge ${p.status==='عرض خاص'?'offer':''}">${p.status || 'مميز ✨'}</div>` : ''}
             ${discountPercent > 0 ? `<div style="position:absolute;bottom:10px;left:10px;background:#e74c3c;color:white;padding:4px 8px;border-radius:6px;font-size:0.75rem;font-weight:bold;">-${discountPercent}%</div>` : ''}
-            <img src="${p.image}" alt="${p.name}" style="${isOut ? 'filter: grayscale(100%); opacity: 0.6;' : ''}">
-            ${isOut ? '<div class="out-badge">نفدت الكمية ❌</div>' : ''}
+            <img src="${p.image}" alt="${p.name}">
+            ${isOut ? '<div class="out-badge">غير متوفر حالياً ❌</div>' : ''}
             <div class="product-info-overlay">${p.desc || 'منتج أصلي من متجر مشالي'}</div>
         </div>
         <div class="product-details">
@@ -378,8 +378,8 @@ function createProductCard(p) {
             </div>
             ${renderProductRating(p)}
             ${hasTimer ? `<div class="countdown-timer" data-ends="${parseOfferDate(p.offerEnds, true)}">جاري التحميل...</div>` : ''}
-            <button class="qty-btn" style="background:${isOut?'#95a5a6':'var(--primary)'}" 
-                onclick="${isOut ? "alert('عذراً، المنتج غير متوفر حالياً')" : `addToCart(${p.id})`}">
+            <button class="qty-btn" ${isOut ? 'disabled' : ''} style="background:${isOut?'#95a5a6':'var(--primary)'}" 
+                ${isOut ? '' : `onclick="addToCart(${p.id})"`}>
                 ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
             </button>
         </div>
@@ -430,11 +430,8 @@ function openProductDetails(id) {
     }
     
     // 3. حالة المخزون
-    if (product.stock === 'out') {
-        metaHTML += `<span style="background:#95a5a6; color:white; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:bold;">نفدت الكمية ❌</span>`;
-    } else {
-        metaHTML += `<span style="background:#27ae60; color:white; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:bold;">متوفر: ${product.stock} ✅</span>`;
-    }
+    const availabilityColor = product.stock === 'out' ? '#95a5a6' : '#27ae60';
+    metaHTML += `<span style="background:${availabilityColor}; color:white; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:bold;">${getProductAvailabilityText(product.stock)}</span>`;
 
     const productRating = renderProductRating(product);
     if (productRating) metaHTML += productRating;
@@ -468,9 +465,11 @@ function openProductDetails(id) {
         btn.innerText = 'غير متوفر';
         btn.style.background = '#95a5a6';
         btn.onclick = null;
+        btn.disabled = true;
     } else {
         btn.innerText = 'إضافة للسلة';
         btn.style.background = 'var(--primary)';
+        btn.disabled = false;
         btn.onclick = () => { addToCart(product.id); closeProductModal(); };
     }
 
@@ -786,6 +785,14 @@ function renderProductRating(product) {
     const reviewCount = Number(product.reviewCount) || 0;
     const ratingText = Number.isInteger(rating) ? String(rating) : rating.toFixed(1);
     return `<span class="product-rating" role="img" aria-label="التقييم ${ratingText} من 5${reviewCount > 0 ? ` من ${reviewCount} تقييم` : ''}"><span class="rating-stars">${stars}</span><span class="rating-value">${ratingText}</span>${reviewCount > 0 ? `<span class="rating-count">(${reviewCount})</span>` : ''}</span>`;
+}
+
+function getProductAvailabilityText(stock) {
+    if (stock === 'out') return 'غير متوفر حالياً ❌';
+    const quantity = Number(stock);
+    return Number.isFinite(quantity) && quantity > 0
+        ? `متوفر (الكمية: ${quantity}) ✅`
+        : 'متوفر ✅';
 }
 
 // فتح/إغلاق بيانات الصنف عند الضغط على الصورة

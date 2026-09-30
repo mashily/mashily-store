@@ -29,19 +29,32 @@ function parseProductImages(primary, additional) {
 }
 
 function parseStock(availability, quantity) {
-    const status = String(availability == null ? '' : availability).trim().toLowerCase();
-    const outOfStockValues = ['out', 'out of stock', 'out_of_stock', 'sold out', 'نفد', 'نفد المخزون', 'غير متوفر', 'نفذت الكمية'];
-    if (outOfStockValues.includes(status)) return 'out';
+    const status = String(availability == null ? '' : availability)
+        .trim()
+        .toLowerCase()
+        .replace(/[\u064B-\u065F\u0670]/g, '')
+        .replace(/[إأآ]/g, 'ا')
+        .replace(/\s+/g, ' ');
+    const isOutOfStock = value => {
+        const normalized = String(value == null ? '' : value)
+            .trim()
+            .toLowerCase()
+            .replace(/[\u064B-\u065F\u0670]/g, '')
+            .replace(/[إأآ]/g, 'ا')
+            .replace(/\s+/g, ' ');
+        return ['out', 'out of stock', 'out_of_stock', 'sold out', 'unavailable', 'not available', 'نفد', 'نفذ', 'نفد المخزون', 'نفذ المخزون', 'غير متوفر', 'غير متاح', 'نفذت الكمية', 'لا', 'no', 'false', '0'].includes(normalized)
+            || /(غير متوفر|غير متاح|نفد|نفذ المخزون|out of stock|sold out|unavailable|not available)/.test(normalized);
+    };
+    if (isOutOfStock(status)) return 'out';
 
     const quantityValue = String(quantity == null ? '' : quantity).trim();
     if (quantityValue) {
-        const quantityStatus = quantityValue.toLowerCase();
-        if (outOfStockValues.includes(quantityStatus)) return 'out';
+        if (isOutOfStock(quantityValue)) return 'out';
         const parsedQuantity = parseNum(quantityValue);
         return parsedQuantity > 0 ? parsedQuantity : 'out';
     }
 
-    if (!status || ['in stock', 'stock', 'available', 'متوفر', 'متاح', 'yes', 'true'].includes(status)) {
+    if (!status || ['in stock', 'stock', 'available', 'متوفر', 'متاح', 'yes', 'true', 'نعم'].includes(status)) {
         return 'متوفر';
     }
     const numericAvailability = Number(status);
