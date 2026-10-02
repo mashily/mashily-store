@@ -2304,15 +2304,69 @@ function changeUsername() {
     }
 }
 
-// دالة التشفير البسيطة (للتحقق من كلمات المرور)
-function simpleHash(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; 
+const ACADEMY_PAID_ACCESS_KEY = 'academyPaidAccess';
+
+function normalizeAcademyAccessCode(code) {
+    return String(code || '').trim().toUpperCase();
+}
+
+function getAcademyPaidAccessHistory() {
+    return JSON.parse(localStorage.getItem(ACADEMY_PAID_ACCESS_KEY) || '{}');
+}
+
+function hasActiveAcademyPaidAccess() {
+    const accessHistory = getAcademyPaidAccessHistory();
+    const codes = JSON.parse(localStorage.getItem('academyAccessCodes') || '[]');
+    return codes.some(item => {
+        const access = accessHistory[normalizeAcademyAccessCode(item.code)];
+        return item.active !== false && access
+            && Number.isFinite(Number(access.expiresAt))
+            && Date.now() < Number(access.expiresAt);
+    });
+}
+
+function activateAcademyPaidAccess() {
+    if (hasActiveAcademyPaidAccess()) return true;
+
+    const accessCodes = JSON.parse(localStorage.getItem('academyAccessCodes') || '[]');
+    const activeCodes = accessCodes.filter(item => item.active !== false
+        && item.code && Number(item.durationDays) > 0);
+    if (!activeCodes.length) {
+        alert('الفيديوهات المدفوعة غير مفعّلة حالياً. أضف كوداً فعالاً في ورقة Codes بملف Excel.');
+        return false;
     }
-    return Math.abs(hash).toString();
+
+    const enteredCode = normalizeAcademyAccessCode(prompt('أدخل كود تشغيل الفيديوهات المدفوعة:'));
+    if (!enteredCode) return false;
+
+    const matchingCode = activeCodes.find(item => normalizeAcademyAccessCode(item.code) === enteredCode);
+    if (!matchingCode) {
+        alert('الكود غير صحيح أو غير فعال.');
+        return false;
+    }
+
+    const accessHistory = getAcademyPaidAccessHistory();
+    const previousAccess = accessHistory[enteredCode];
+    if (previousAccess) {
+        if (Number.isFinite(Number(previousAccess.expiresAt)) && Date.now() < Number(previousAccess.expiresAt)) {
+            return true;
+        }
+        alert('انتهت مدة استخدام هذا الكود على هذا الجهاز. أضف كوداً جديداً في ورقة Codes.');
+        return false;
+    }
+
+    const activatedAt = Date.now();
+    const expiresAt = activatedAt + Math.floor(Number(matchingCode.durationDays)) * 24 * 60 * 60 * 1000;
+    accessHistory[enteredCode] = {
+        activatedAt,
+        expiresAt
+    };
+    localStorage.setItem(ACADEMY_PAID_ACCESS_KEY, JSON.stringify(accessHistory));
+    showAcademyNotification(
+        `تم تفعيل الفيديوهات المدفوعة حتى ${new Date(expiresAt).toLocaleDateString('ar-EG')}`,
+        'success'
+    );
+    return true;
 }
 
 function initAcademyPage() {
@@ -2629,11 +2683,7 @@ function playVideo(id, resumePlayback = false) {
     const video = videos[videoIndex];
 
     if(video.type === 'locked') {
-        const userPass = prompt("🔒 هذا المحتوى خاص ومشفر. الرجاء إدخال كود التفعيل:");
-        if(!userPass || simpleHash(userPass) !== video.password) {
-            alert("❌ كود التفعيل غير صحيح!");
-            return;
-        }
+        if (!activateAcademyPaidAccess()) return;
     }
 
     saveActiveAcademyVideoProgress();

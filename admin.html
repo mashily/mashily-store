@@ -1196,15 +1196,11 @@
                     </div>
                     <div class="form-group">
                         <label>نوع المحتوى</label>
-                        <select id="video-type" onchange="toggleVideoPass()">
+                        <select id="video-type">
                             <option value="free">🔓 مجاني</option>
-                            <option value="locked">🔒 مشفر (يتطلب كود)</option>
+                            <option value="locked">🔒 مدفوع (يفتحه كود Excel)</option>
                         </select>
                     </div>
-                </div>
-                <div class="form-group" id="video-pass-group" style="display:none;">
-                    <label>كود التفعيل (كلمة المرور)</label>
-                    <input type="text" id="video-pass" placeholder="اتركه فارغاً إذا لم ترد تغيير الكود الحالي">
                 </div>
                 <div class="form-group">
                     <label>صورة مصغرة (Thumbnail)</label>
@@ -1633,9 +1629,13 @@
                 <div class="alert alert-success">
                     <i class="fas fa-info-circle"></i>
                     <div>
-                        <strong>طريقة العمل:</strong> اضغط الزر التالي لتحميل ملف <b>store-data.xlsx</b> بكل بيانات المتجر (المنتجات، الأصناف، الفيديوهات، الكوبونات، الإعدادات، شريط الأخبار والإشعارات).<br>
+                        <strong>طريقة العمل:</strong> اضغط الزر التالي لتحميل ملف <b>store-data.xlsx</b> بكل بيانات المتجر (المنتجات، الأصناف، الفيديوهات، أكواد تشغيل الفيديوهات، الكوبونات، الإعدادات، شريط الأخبار والإشعارات).<br>
                         ثم عدّل عليه في Excel وارفعه على GitHub (بنفس الاسم <b>store-data.xlsx</b>) ليظهر التعديل للزوار تلقائياً.
                     </div>
+                </div>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div><strong>أكواد الفيديو المدفوع للتجربة فقط:</strong> تُدار من ورقة <b>Codes</b> وتفتح كل الفيديوهات المدفوعة على الجهاز نفسه. ملف Excel منشور للزوار، لذا يمكنهم رؤية الأكواد وتجاوز التحقق؛ لا تستخدمها لتحصيل أموال أو لحماية محتوى مدفوع.</div>
                 </div>
                 <button class="btn btn-success" style="background:#217346; font-size:1rem; padding:12px 25px;" onclick="exportStoreToExcel()">
                     <i class="fas fa-file-excel"></i> تصدير ملف Excel كامل
@@ -3223,11 +3223,6 @@
         }
 
         // --- إدارة الأكاديمية ---
-        function toggleVideoPass() {
-            const type = document.getElementById('video-type').value;
-            document.getElementById('video-pass-group').style.display = type === 'locked' ? 'block' : 'none';
-        }
-        
         function handleFileSelect(input, targetId) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -3242,7 +3237,6 @@
             const id = document.getElementById('video-id').value;
             const title = document.getElementById('video-title').value;
             const url = document.getElementById('video-url').value;
-            const pass = document.getElementById('video-pass').value;
             const duration = document.getElementById('video-duration').value;
             const attachment = document.getElementById('video-attachment').value;
             
@@ -3257,7 +3251,6 @@
                 duration: duration,
                 attachments: attachment ? [{name: 'تحميل الملفات', url: attachment}] : [],
                 image: document.getElementById('video-img-base64').value,
-                password: pass ? simpleHash(pass) : (id ? (academyVideos.find(v=>v.id==id)||{}).password : ''),
                 likes: id ? (academyVideos.find(v=>v.id==id)||{}).likes : 0,
                 dislikes: id ? (academyVideos.find(v=>v.id==id)||{}).dislikes : 0,
                 comments: id ? (academyVideos.find(v=>v.id==id)||{}).comments : []
@@ -3291,7 +3284,7 @@
                     <td><img src="${v.image || ''}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;"></td>
                     <td>${v.title}</td>
                     <td>${v.category}</td>
-                    <td>${v.type === 'locked' ? '🔒' : '🔓'}</td>
+                    <td>${v.type === 'locked' ? '🔒 مدفوع' : '🔓 مجاني'}</td>
                     <td>
                         <button class="btn btn-info btn-small" onclick="manageComments(${v.id})"><i class="fas fa-comments"></i> التعليقات ${commentBadge}</button>
                         <button class="btn btn-primary btn-small" onclick="editVideo(${v.id})"><i class="fas fa-edit"></i></button>
@@ -3312,8 +3305,6 @@
             document.getElementById('video-attachment').value = (v.attachments && v.attachments[0]) ? v.attachments[0].url : '';
             document.getElementById('video-type').value = v.type;
             document.getElementById('video-img-base64').value = v.image || '';
-            document.getElementById('video-pass').value = ''; // لا نظهر الهاش
-            toggleVideoPass();
             window.scrollTo(0,0);
         }
 
@@ -3331,9 +3322,7 @@
             document.getElementById('video-url').value = '';
             document.getElementById('video-duration').value = '';
             document.getElementById('video-attachment').value = '';
-            document.getElementById('video-pass').value = '';
             document.getElementById('video-img-base64').value = '';
-            toggleVideoPass();
         }
 
         // إدارة أقسام الأكاديمية

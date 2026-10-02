@@ -200,14 +200,33 @@ async function fetchStoreFromExcel() {
             title: r['العنوان'] || '',
             url: r['الرابط'] || '',
             category: r['الصنف'] || 'عام',
-            type: r['النوع'] || 'free',
+            type: ['locked', 'paid', 'مدفوع', 'مشفر'].includes(String(r['النوع'] || '').trim().toLowerCase()) ? 'locked' : 'free',
             duration: r['المدة'] || '',
             image: getFirstValue(r, ['رابط الصورة', 'الصورة', 'thumbnail', 'image']),
-            password: '',
             likes: 0,
             dislikes: 0,
             comments: []
         })).filter(v => v.title);
+
+        // ---- أكواد فتح المحتوى المدفوع (تجريبية ومحلية) ----
+        const codeRows = wb.Sheets['Codes'] ? sheetToObjects(wb.Sheets['Codes']) : [];
+        if (wb.Sheets['Codes']) {
+            validateSheetColumns(wb.Sheets['Codes'], 'Codes', [
+                ['الكود', 'code'],
+                ['مدة الصلاحية (يوم)', 'المدة بالأيام', 'duration_days']
+            ]);
+        }
+        data.accessCodes = codeRows.map(row => {
+            const rawActiveValue = getFirstValue(row, ['فعال', 'نشط', 'active']);
+            const activeValue = String(rawActiveValue === undefined || rawActiveValue === null || rawActiveValue === ''
+                ? 'نعم'
+                : rawActiveValue).trim().toLowerCase();
+            return {
+                code: String(getFirstValue(row, ['الكود', 'code']) || '').trim(),
+                durationDays: Math.floor(parseNum(getFirstValue(row, ['مدة الصلاحية (يوم)', 'المدة بالأيام', 'duration_days']))),
+                active: !['لا', 'no', 'false', '0', 'غير فعال', 'معطل'].includes(activeValue)
+            };
+        }).filter(item => item.code && item.durationDays > 0);
 
         // ---- الكوبونات ----
         const coupRows = sheetToObjects(wb.Sheets['Coupons']);
@@ -287,6 +306,7 @@ function applyStoreData(data) {
     if (data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
     if (data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
     if (data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
+    if (data.accessCodes) localStorage.setItem('academyAccessCodes', JSON.stringify(data.accessCodes));
     if (data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
     if (data.statuses) localStorage.setItem('storeStatuses', JSON.stringify(data.statuses));
     if (data.ticker !== undefined) localStorage.setItem('tickerText', data.ticker);
@@ -306,6 +326,7 @@ function buildStoreWorkbook() {
     const products = JSON.parse(localStorage.getItem('storeProducts')) || [];
     const categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
     const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const accessCodes = JSON.parse(localStorage.getItem('academyAccessCodes')) || [];
     const coupons = JSON.parse(localStorage.getItem('storeCoupons')) || [];
     const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
     const ticker = localStorage.getItem('tickerText') || '';
@@ -352,6 +373,18 @@ function buildStoreWorkbook() {
         'الصورة': v.image || ''
     }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(vidRows), 'Videos');
+
+    // الأكواد التجريبية لفتح كل الفيديوهات المدفوعة على الجهاز نفسه.
+    const codeRows = accessCodes.map(item => ({
+        'الكود': item.code,
+        'مدة الصلاحية (يوم)': item.durationDays,
+        'فعال': item.active === false ? 'لا' : 'نعم'
+    }));
+    const codeHeaders = ['الكود', 'مدة الصلاحية (يوم)', 'فعال'];
+    const codesSheet = codeRows.length
+        ? XLSX.utils.json_to_sheet(codeRows, {header: codeHeaders})
+        : XLSX.utils.aoa_to_sheet([codeHeaders]);
+    XLSX.utils.book_append_sheet(wb, codesSheet, 'Codes');
 
     // الكوبونات
     const coupRows = coupons.map(c => ({
