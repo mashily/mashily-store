@@ -1160,7 +1160,7 @@ function updateCartUI() {
     let finalTotal = total - discountAmount;
     if(finalTotal < 0) finalTotal = 0;
 
-    if(badge) badge.innerText = cart.reduce((s,i)=>s+i.qty, 0);
+    if(badge) badge.innerText = new Set(cart.map(item => String(item.id ?? item.name))).size;
     
     // تحديث منطقة السعر
     const totalArea = document.getElementById('cart-total-area');

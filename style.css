@@ -892,6 +892,10 @@ header {
 
 /* تجاوب مع الموبايل */
 @media (max-width: 768px) {
+    header {
+        position: static;
+    }
+
     .modal-body-grid { grid-template-columns: 1fr; overflow-y: auto; display: block; }
     .modal-gallery-section { padding: 10px; border-left: none; border-bottom: 1px solid var(--border); }
     .gallery-container { height: 280px; }
@@ -1724,7 +1728,8 @@ body {
     }
 
     .categories-wrapper {
-        position: relative !important;
+        position: static !important;
+        top: auto !important;
     }
 
     #product-cats,
