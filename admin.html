@@ -264,6 +264,33 @@
         }
         .icon-btn:hover { background: var(--border); }
 
+        .admin-install-card {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #dce9e0;
+            border-radius: 14px;
+            background: #f7fbf8;
+            text-align: center;
+        }
+        #admin-install-qr {
+            width: 280px;
+            max-width: 100%;
+            min-height: 280px;
+            margin: 16px auto;
+        }
+        #admin-install-qr canvas,
+        #admin-install-qr img {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+        }
+        .admin-install-url {
+            direction: ltr;
+            overflow-wrap: anywhere;
+            color: #44534a;
+        }
+
         .tab-content {
             display: none;
             animation: fadeIn 0.5s;
@@ -1599,6 +1626,17 @@
         <!-- النسخ الاحتياطي -->
         <div id="backup" class="tab-content">
             <h2><i class="fas fa-database"></i> النسخ الاحتياطي</h2>
+
+            <div class="admin-install-card">
+                <h3><i class="fas fa-qrcode"></i> رمز QR لتثبيت التطبيق</h3>
+                <p>اطبع الرمز وعلّقه؛ عند مسحه يفتح رابط المتجر الرسمي على الهاتف.</p>
+                <div id="admin-install-qr" role="img" aria-label="رمز QR لفتح متجر مشالى"></div>
+                <p class="admin-install-url">https://mashily.github.io/mashily-store/</p>
+                <button type="button" class="btn btn-success" onclick="printAdminInstallQr()">
+                    <i class="fas fa-print"></i> طباعة رمز QR
+                </button>
+                <p style="font-size:.9rem; color:#58675e; margin-bottom:0;">بعد فتح الرابط، يثبّت الزائر التطبيق من المتصفح؛ لا يحتاج إلى ملف APK.</p>
+            </div>
             
             <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i>
@@ -2035,6 +2073,7 @@
         // تهيئة الصفحة
         document.addEventListener('DOMContentLoaded', function() {
             loadFromLocalStorage();
+            renderAdminInstallQr();
             updateStats();
             loadProducts();
             loadReviewsTable();
@@ -3022,6 +3061,71 @@
             
             XLSX.writeFile(wb, "products_backup.xlsx");
             showAlert('تم تصدير المنتجات إلى Excel بنجاح', 'success');
+        }
+
+        function renderAdminInstallQr() {
+            const container = document.getElementById('admin-install-qr');
+            if (!container || typeof QRCode === 'undefined') return;
+            container.innerHTML = '';
+            new QRCode(container, {
+                text: 'https://mashily.github.io/mashily-store/',
+                width: 280,
+                height: 280,
+                colorDark: '#142019',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        function printAdminInstallQr() {
+            const container = document.getElementById('admin-install-qr');
+            const canvas = container && container.querySelector('canvas');
+            if (!canvas) {
+                showAlert('تعذر تجهيز رمز QR للطباعة. أعد تحميل لوحة الإدارة وحاول مجدداً.', 'error');
+                return;
+            }
+
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                showAlert('يرجى السماح بالنوافذ المنبثقة للطباعة ثم المحاولة مجدداً.', 'error');
+                return;
+            }
+
+            const qrImage = canvas.toDataURL('image/png');
+            const logoUrl = new URL('logo.png', window.location.href).href;
+            printWindow.document.open();
+            printWindow.document.write(`<!doctype html>
+                <html lang="ar" dir="rtl">
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <title>رمز QR لتثبيت تطبيق متجر مشالى</title>
+                    <style>
+                        * { box-sizing: border-box; }
+                        body { margin: 0; padding: 15mm; color: #17251c; font-family: Tahoma, Arial, sans-serif; text-align: center; }
+                        main { width: 100%; max-width: 160mm; margin: 0 auto; padding: 12mm; border: 1px solid #ddd; border-radius: 6mm; }
+                        img.brand { width: 55mm; height: 28mm; object-fit: contain; }
+                        img.qr { display: block; width: 90mm; height: 90mm; margin: 8mm auto; image-rendering: pixelated; }
+                        h1 { margin: 4mm 0; color: #24794b; font-size: 22pt; }
+                        p { line-height: 1.8; font-size: 12pt; }
+                        .url { direction: ltr; overflow-wrap: anywhere; font-size: 10pt; }
+                        @page { margin: 12mm; }
+                    </style>
+                </head>
+                <body>
+                    <main>
+                        <img class="brand" src="${logoUrl}" alt="شعار متجر مشالى">
+                        <h1>تطبيق متجر مشالى</h1>
+                        <p>امسح رمز QR بكاميرا هاتفك لفتح المتجر، ثم أضِفه إلى الشاشة الرئيسية كتطبيق.</p>
+                        <img class="qr" src="${qrImage}" alt="رمز QR لفتح متجر مشالى">
+                        <p class="url">https://mashily.github.io/mashily-store/</p>
+                        <p>Android: افتح الرابط في Chrome أو Edge واختر تثبيت التطبيق.<br>iPhone: افتح الرابط في Safari، ثم مشاركة ← إضافة إلى الشاشة الرئيسية.</p>
+                    </main>
+                </body>
+                </html>`);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 300);
         }
 
         async function exportWhatsAppCatalog(button) {
