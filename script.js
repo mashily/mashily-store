@@ -2225,6 +2225,42 @@ window.addEventListener('load', init);
 // متغير لتتبع الفيديو الحالي المفتوح
 let currentAcademyVideoId = null;
 let currentAcademyCategory = 'الكل'; // لتتبع القسم الحالي
+let currentAcademyLibraryFilter = 'all';
+let academyYouTubePlayer = null;
+let academyYouTubeProgressTimer = null;
+let academyPlayerSession = 0;
+
+const ACADEMY_PROGRESS_KEY = 'academyVideoProgress';
+const ACADEMY_FAVORITES_KEY = 'academyVideoFavorites';
+const ACADEMY_COMPLETED_KEY = 'academyCompletedVideos';
+
+function getAcademyProgress() {
+    return JSON.parse(localStorage.getItem(ACADEMY_PROGRESS_KEY) || '{}');
+}
+
+function getAcademyFavorites() {
+    return JSON.parse(localStorage.getItem(ACADEMY_FAVORITES_KEY) || '[]').map(String);
+}
+
+function getAcademyCompletedVideos() {
+    return JSON.parse(localStorage.getItem(ACADEMY_COMPLETED_KEY) || '[]').map(String);
+}
+
+function escapeAcademyHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]);
+}
+
+function toggleAcademyFavorite(id) {
+    const key = String(id);
+    const favorites = getAcademyFavorites();
+    const nextFavorites = favorites.includes(key)
+        ? favorites.filter(favoriteId => favoriteId !== key)
+        : [...favorites, key];
+    localStorage.setItem(ACADEMY_FAVORITES_KEY, JSON.stringify(nextFavorites));
+    applyAcademyFilters();
+}
 
 // --- نظام النقاط والمستويات ---
 const ACADEMY_LEVELS = {
@@ -2353,40 +2389,79 @@ function renderVideos(list) {
     if(!grid) return;
 
     if(list.length === 0) {
+        const emptyMessage = currentAcademyLibraryFilter === 'favorites'
+            ? 'لم تضف فيديوهات إلى المفضلة بعد'
+            : currentAcademyLibraryFilter === 'continue'
+                ? 'لا توجد فيديوهات متبقية للمتابعة'
+                : currentAcademyLibraryFilter === 'completed'
+                    ? 'لم تكمل مشاهدة أي فيديو بعد'
+                    : 'ترقبوا المزيد من المحتوى قريباً!';
         grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-light);">
             <i class="fas fa-video-slash fa-3x" style="margin-bottom:15px; opacity:0.5;"></i>
-            <h3>لا توجد دروس حالياً</h3>
-            <p>ترقبوا المزيد من المحتوى قريباً!</p>
+            <h3>${currentAcademyLibraryFilter === 'all' ? 'لا توجد دروس حالياً' : 'لا توجد نتائج'}</h3>
+            <p>${emptyMessage}</p>
         </div>`;
         return;
     }
 
+    const progressByVideo = getAcademyProgress();
+    const favorites = new Set(getAcademyFavorites());
+    const completedVideos = new Set(getAcademyCompletedVideos());
     grid.innerHTML = list.map(v => {
         const isLocked = v.type === 'locked';
-        const durationHTML = v.duration ? `<span class="video-duration">${v.duration}</span>` : '';
+        const durationHTML = v.duration ? `<span class="video-duration">${escapeAcademyHtml(v.duration)}</span>` : '';
+        const id = String(v.id);
+        const encodedId = encodeURIComponent(id);
+        const completed = completedVideos.has(id);
+        const progress = progressByVideo[id];
+        const percent = completed ? 100 : (progress && Number.isFinite(Number(progress.percent))
+            ? Math.max(0, Math.min(99, Math.round(Number(progress.percent))))
+            : 0);
+        const isFavorite = favorites.has(id);
+        const thumbnail = String(v.image || '').trim();
+        const resumeButton = percent > 0 && !completed
+            ? `<button class="video-btn video-resume-btn" type="button" data-video-action="resume" data-video-id="${encodedId}"><i class="fas fa-play"></i> متابعة المشاهدة (${percent}٪)</button>`
+            : `<button class="video-btn" type="button" data-video-action="play" data-video-id="${encodedId}">${isLocked ? '<i class="fas fa-key"></i> أدخل الكود للمشاهدة' : '<i class="fas fa-play-circle"></i> مشاهدة الآن'}</button>`;
         return `
-        <div class="video-card ${isLocked ? 'locked' : ''}" onclick="playVideo(${v.id})">
+        <div class="video-card ${isLocked ? 'locked' : ''}" data-video-id="${encodedId}">
             <div class="video-thumbnail">
-                <img src="${v.image || 'https://img.freepik.com/free-vector/online-tutorials-concept_52683-37480.jpg'}" alt="${v.title}">
+                <img src="${escapeAcademyHtml(thumbnail || 'https://img.freepik.com/free-vector/online-tutorials-concept_52683-37480.jpg')}" alt="${escapeAcademyHtml(v.title)}" loading="lazy">
                 ${durationHTML}
+                <button class="video-favorite-btn ${isFavorite ? 'active' : ''}" type="button" data-video-action="favorite" data-video-id="${encodedId}" aria-label="${isFavorite ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}" aria-pressed="${isFavorite}">
+                    <i class="${isFavorite ? 'fas' : 'far'} fa-heart"></i>
+                </button>
+                ${completed ? '<span class="video-completed-badge"><i class="fas fa-check-circle"></i> تمت المشاهدة</span>' : ''}
+                ${percent > 0 ? `<div class="video-card-progress" role="progressbar" aria-label="نسبة المشاهدة" aria-valuenow="${percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${percent}%"></span></div>` : ''}
                 <div class="play-icon-overlay"><i class="fas ${isLocked ? 'fa-lock' : 'fa-play'}"></i></div>
             </div>
             <div class="video-content">
                 <div class="video-meta">
-                    <span class="video-cat">${v.category}</span>
-                    <span style="font-size:0.7rem; opacity:0.7;"><i class="far fa-eye"></i> ${v.views || 0}</span>
+                    <span class="video-cat">${escapeAcademyHtml(v.category || 'عام')}</span>
+                    <span style="font-size:0.7rem; opacity:0.7;"><i class="far fa-eye"></i> ${escapeAcademyHtml(v.views || 0)}</span>
                     <span class="video-status" style="color:${isLocked ? '#e74c3c' : '#27ae60'}">
                         <i class="fas ${isLocked ? 'fa-lock' : 'fa-unlock'}"></i> ${isLocked ? 'مشفر' : 'مجاني'}
                     </span>
                 </div>
-                <h3 class="video-title">${v.title}</h3>
-                <button class="video-btn">
-                    ${isLocked ? '<i class="fas fa-key"></i> أدخل الكود للمشاهدة' : '<i class="fas fa-play-circle"></i> مشاهدة الآن'}
-                </button>
+                <h3 class="video-title">${escapeAcademyHtml(v.title)}</h3>
+                ${resumeButton}
             </div>
         </div>
         `;
     }).join('');
+
+    grid.querySelectorAll('.video-card').forEach(card => {
+        card.addEventListener('click', event => {
+            const actionButton = event.target.closest('[data-video-action]');
+            const id = decodeURIComponent(card.dataset.videoId || '');
+            if (actionButton) {
+                event.stopPropagation();
+                if (actionButton.dataset.videoAction === 'favorite') toggleAcademyFavorite(id);
+                else playVideo(id, actionButton.dataset.videoAction === 'resume');
+                return;
+            }
+            playVideo(id);
+        });
+    });
 }
 
 function filterAcademy(cat, btn) {
@@ -2411,20 +2486,38 @@ function sortAcademyVideos() {
 // دالة مركزية لتطبيق كل الفلاتر (بحث + قسم + ترتيب)
 function applyAcademyFilters() {
     let videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
-    const term = document.getElementById('academy-search').value.toLowerCase();
-    const sortType = document.getElementById('academy-sort').value;
+    const searchInput = document.getElementById('academy-search');
+    const sortInput = document.getElementById('academy-sort');
+    const libraryFilter = document.getElementById('academy-library-filter');
+    const term = searchInput ? searchInput.value.toLowerCase() : '';
+    const sortType = sortInput ? sortInput.value : 'newest';
+    currentAcademyLibraryFilter = libraryFilter ? libraryFilter.value : 'all';
 
     // 1. فلترة القسم
     if (currentAcademyCategory !== 'الكل') {
         videos = videos.filter(v => v.category === currentAcademyCategory);
     }
 
-    // 2. فلترة البحث
-    if (term) {
-        videos = videos.filter(v => v.title.toLowerCase().includes(term));
+    // 2. فلترة مكتبة المستخدم
+    if (currentAcademyLibraryFilter === 'favorites') {
+        const favorites = new Set(getAcademyFavorites());
+        videos = videos.filter(v => favorites.has(String(v.id)));
+    } else if (currentAcademyLibraryFilter === 'continue') {
+        const progress = getAcademyProgress();
+        const completed = new Set(getAcademyCompletedVideos());
+        videos = videos.filter(v => Number(progress[String(v.id)] && progress[String(v.id)].currentTime) > 0
+            && !completed.has(String(v.id)));
+    } else if (currentAcademyLibraryFilter === 'completed') {
+        const completed = new Set(getAcademyCompletedVideos());
+        videos = videos.filter(v => completed.has(String(v.id)));
     }
 
-    // 3. الترتيب
+    // 3. فلترة البحث
+    if (term) {
+        videos = videos.filter(v => String(v.title || '').toLowerCase().includes(term));
+    }
+
+    // 4. الترتيب
     videos.sort((a, b) => {
         if (sortType === 'newest') return b.id - a.id; // الأحدث (بناءً على ID/Timestamp)
         if (sortType === 'oldest') return a.id - b.id;
@@ -2436,26 +2529,104 @@ function applyAcademyFilters() {
     renderVideos(videos);
 }
 
-function playVideo(id) {
-    const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
-    const videoIndex = videos.findIndex(v => v.id === id);
-    if(videoIndex === -1) return;
+function saveAcademyVideoProgress(id, currentTime, duration) {
+    const key = String(id);
+    if (getAcademyCompletedVideos().includes(key)) return;
+    const time = Number(currentTime);
+    const length = Number(duration);
+    if (!Number.isFinite(time) || !Number.isFinite(length) || time < 1 || length <= 0) return;
+    const progress = getAcademyProgress();
+    progress[key] = {
+        currentTime: Math.min(time, length),
+        duration: length,
+        percent: Math.min(99, Math.max(0, Math.round((time / length) * 100))),
+        updatedAt: Date.now()
+    };
+    localStorage.setItem(ACADEMY_PROGRESS_KEY, JSON.stringify(progress));
+}
 
-    // زيادة عدد المشاهدات
-    videos[videoIndex].views = (videos[videoIndex].views || 0) + 1;
-    localStorage.setItem('academyVideos', JSON.stringify(videos));
-    
-    const video = videos[videoIndex];
+function completeAcademyVideo(id) {
+    const key = String(id);
+    const completedVideos = getAcademyCompletedVideos();
+    if (completedVideos.includes(key)) return;
+    localStorage.setItem(ACADEMY_COMPLETED_KEY, JSON.stringify([...completedVideos, key]));
+    const progress = getAcademyProgress();
+    delete progress[key];
+    localStorage.setItem(ACADEMY_PROGRESS_KEY, JSON.stringify(progress));
 
-    // --- نظام النقاط: إضافة نقاط عند المشاهدة لأول مرة ---
-    const user = getAcademyUser();
-    if (!user.watchedVideos.includes(id)) {
-        addPoints(ACADEMY_POINTS.WATCH, 'مشاهدة درس جديد');
+    let user = getAcademyUser();
+    if (!Array.isArray(user.watchedVideos)) user.watchedVideos = [];
+    const alreadyAwarded = user.watchedVideos.some(videoId => String(videoId) === key);
+    if (!alreadyAwarded) {
+        addPoints(ACADEMY_POINTS.WATCH, 'إكمال مشاهدة درس');
+        user = getAcademyUser();
         user.watchedVideos.push(id);
         saveAcademyUser(user);
     }
+    showAcademyNotification('✅ تم تسجيل الفيديو كمكتمل', 'success');
+    applyAcademyFilters();
+}
 
-    currentAcademyVideoId = id; // حفظ المعرف الحالي
+function saveActiveAcademyVideoProgress() {
+    if (!currentAcademyVideoId) return;
+    const video = document.getElementById('active-academy-video');
+    if (video) {
+        saveAcademyVideoProgress(currentAcademyVideoId, video.currentTime, video.duration);
+        return;
+    }
+    if (academyYouTubePlayer && typeof academyYouTubePlayer.getCurrentTime === 'function') {
+        saveAcademyVideoProgress(
+            currentAcademyVideoId,
+            academyYouTubePlayer.getCurrentTime(),
+            academyYouTubePlayer.getDuration()
+        );
+    }
+}
+
+function stopAcademyPlayerTracking() {
+    if (academyYouTubeProgressTimer) {
+        clearInterval(academyYouTubeProgressTimer);
+        academyYouTubeProgressTimer = null;
+    }
+    if (academyYouTubePlayer && typeof academyYouTubePlayer.destroy === 'function') {
+        academyYouTubePlayer.destroy();
+    }
+    academyYouTubePlayer = null;
+    academyPlayerSession++;
+}
+
+function loadAcademyYouTubeApi() {
+    if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
+    if (window.academyYouTubeApiPromise) return window.academyYouTubeApiPromise;
+
+    window.academyYouTubeApiPromise = new Promise((resolve, reject) => {
+        const previousCallback = window.onYouTubeIframeAPIReady;
+        const timeout = setTimeout(() => reject(new Error('انتهت مهلة تحميل مشغل YouTube.')), 15000);
+        window.onYouTubeIframeAPIReady = () => {
+            if (typeof previousCallback === 'function') previousCallback();
+            clearTimeout(timeout);
+            resolve(window.YT);
+        };
+        const script = document.createElement('script');
+        script.src = 'https://www.youtube.com/iframe_api';
+        script.onerror = () => {
+            clearTimeout(timeout);
+            reject(new Error('تعذر تحميل مشغل YouTube.'));
+        };
+        document.head.appendChild(script);
+    }).catch(error => {
+        window.academyYouTubeApiPromise = null;
+        throw error;
+    });
+    return window.academyYouTubeApiPromise;
+}
+
+function playVideo(id, resumePlayback = false) {
+    const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const videoIndex = videos.findIndex(v => String(v.id) === String(id));
+    if(videoIndex === -1) return;
+
+    const video = videos[videoIndex];
 
     if(video.type === 'locked') {
         const userPass = prompt("🔒 هذا المحتوى خاص ومشفر. الرجاء إدخال كود التفعيل:");
@@ -2465,6 +2636,15 @@ function playVideo(id) {
         }
     }
 
+    saveActiveAcademyVideoProgress();
+    stopAcademyPlayerTracking();
+    videos[videoIndex].views = (videos[videoIndex].views || 0) + 1;
+    localStorage.setItem('academyVideos', JSON.stringify(videos));
+    currentAcademyVideoId = video.id;
+    const savedProgress = getAcademyProgress()[String(video.id)];
+    const shouldResume = Boolean(resumePlayback && savedProgress && savedProgress.currentTime > 0
+        && !getAcademyCompletedVideos().includes(String(video.id)));
+
     const modal = document.getElementById('video-player-modal');
     const container = document.getElementById('video-frame-container');
     const fullscreenButton = document.getElementById('academy-fullscreen-btn');
@@ -2472,6 +2652,7 @@ function playVideo(id) {
     const progressBar = document.getElementById('video-progress-bar');
     const attachmentsContainer = document.getElementById('video-attachments-container');
     const notice = document.getElementById('academy-player-notice');
+    const playerSession = academyPlayerSession;
     
     // إعادة تعيين الشريط
     if(progressBar) progressBar.style.width = '0%';
@@ -2487,10 +2668,10 @@ function playVideo(id) {
     if (videoSource.type === 'youtube') {
         const separator = videoSource.src.includes('?') ? '&' : '?';
         const youtubeOrigin = `${separator}autoplay=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
-        embedCode = `<iframe title="فيديو تعليمي" src="${videoSource.src}${youtubeOrigin}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen></iframe>`;
+        embedCode = `<iframe id="active-academy-youtube" title="فيديو تعليمي" src="${videoSource.src}${youtubeOrigin}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen></iframe>`;
     } else if (videoSource.type === 'file' || videoSource.type === 'link') {
         embedCode = `<video id="active-academy-video" controls autoplay playsinline preload="metadata" style="width:100%; height:100%;"><source src="${videoSource.src}">المتصفح لا يدعم الفيديو.</video>`;
-        if(progressContainer) progressContainer.style.display = 'block';
+        if(progressContainer && videoSource.type === 'file') progressContainer.style.display = 'block';
     } else {
         embedCode = `<div class="video-unavailable-message">${videoSource.type === 'invalid' ? 'رابط الفيديو غير صالح.' : 'هذا النوع من روابط الفيديو غير مدعوم للمشاهدة داخل الصفحة.'}</div>`;
     }
@@ -2503,6 +2684,27 @@ function playVideo(id) {
     // تفعيل شريط التقدم للفيديوهات المباشرة
     const videoPlayer = document.getElementById('active-academy-video');
     if(videoPlayer) {
+        if (videoSource.type === 'file' && progressContainer) progressContainer.style.display = 'block';
+        let lastProgressSaveAt = 0;
+        videoPlayer.addEventListener('loadedmetadata', () => {
+            if (shouldResume && Number.isFinite(videoPlayer.duration)) {
+                const resumeAt = Math.min(savedProgress.currentTime, Math.max(0, videoPlayer.duration - 2));
+                if (resumeAt > 0) videoPlayer.currentTime = resumeAt;
+            }
+        }, {once: true});
+        videoPlayer.addEventListener('timeupdate', () => {
+            if (videoSource.type === 'file') {
+                if (Date.now() - lastProgressSaveAt >= 5000) {
+                    saveAcademyVideoProgress(video.id, videoPlayer.currentTime, videoPlayer.duration);
+                    lastProgressSaveAt = Date.now();
+                }
+                if (Number.isFinite(videoPlayer.duration) && videoPlayer.duration > 0 && progressBar) {
+                    progressBar.style.width = `${Math.min(100, (videoPlayer.currentTime / videoPlayer.duration) * 100)}%`;
+                }
+            }
+        });
+        videoPlayer.addEventListener('pause', () => saveAcademyVideoProgress(video.id, videoPlayer.currentTime, videoPlayer.duration));
+        videoPlayer.addEventListener('ended', () => completeAcademyVideo(video.id));
         videoPlayer.play().catch(error => {
             console.info('التشغيل التلقائي للفيديو غير متاح؛ استخدم زر التشغيل في المشغل.', error);
             if (notice) {
@@ -2513,11 +2715,34 @@ function playVideo(id) {
         videoPlayer.addEventListener('webkitbeginfullscreen', updateAcademyFullscreenButton);
         videoPlayer.addEventListener('webkitendfullscreen', updateAcademyFullscreenButton);
     }
-    if(videoPlayer && progressBar) {
-        videoPlayer.addEventListener('timeupdate', () => {
-            if (Number.isFinite(videoPlayer.duration) && videoPlayer.duration > 0) {
-                const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
-                progressBar.style.width = `${percent}%`;
+    const youtubeFrame = document.getElementById('active-academy-youtube');
+    if (youtubeFrame && videoSource.type === 'youtube') {
+        loadAcademyYouTubeApi().then(YT => {
+            if (playerSession !== academyPlayerSession || !youtubeFrame.isConnected) return;
+            academyYouTubePlayer = new YT.Player(youtubeFrame, {
+                events: {
+                    onReady: event => {
+                        if (shouldResume) {
+                            const duration = event.target.getDuration();
+                            const resumeAt = Math.min(savedProgress.currentTime, Math.max(0, duration - 2));
+                            if (resumeAt > 0) event.target.seekTo(resumeAt, true);
+                        }
+                        academyYouTubeProgressTimer = setInterval(saveActiveAcademyVideoProgress, 5000);
+                    },
+                    onStateChange: event => {
+                        if (window.YT && event.data === window.YT.PlayerState.ENDED) {
+                            completeAcademyVideo(video.id);
+                        } else if (window.YT && event.data === window.YT.PlayerState.PAUSED) {
+                            saveActiveAcademyVideoProgress();
+                        }
+                    }
+                }
+            });
+        }).catch(error => {
+            console.warn('تعذر تفعيل متابعة تقدم فيديو YouTube.', error);
+            if (notice) {
+                notice.textContent = 'قد لا تتوفر متابعة موضع فيديو YouTube حالياً؛ يمكنك مشاهدة الفيديو كالمعتاد.';
+                notice.hidden = false;
             }
         });
     }
@@ -2949,6 +3174,8 @@ function submitReply(commentId) {
 }
 
 function closeVideoModal() {
+    saveActiveAcademyVideoProgress();
+    stopAcademyPlayerTracking();
     const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement;
     if (fullscreenElement) {
         const exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen;
@@ -2967,4 +3194,6 @@ function closeVideoModal() {
     } else {
         container.innerHTML = '';
     }
+    currentAcademyVideoId = null;
+    applyAcademyFilters();
 }

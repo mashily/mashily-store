@@ -961,10 +961,13 @@ header {
 .search-box i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
 
 .academy-sort-container {
-    max-width: 200px;
+    display: grid;
+    gap: 8px;
+    max-width: 320px;
     margin: 0 auto 15px auto;
 }
-#academy-sort {
+#academy-sort,
+#academy-library-filter {
     width: 100%;
     padding: 8px 15px;
     border-radius: 25px;
@@ -976,7 +979,8 @@ header {
     outline: none;
     font-size: 0.9rem;
 }
-#academy-sort:focus { border-color: var(--primary); }
+#academy-sort:focus,
+#academy-library-filter:focus { border-color: var(--primary); }
 
 .video-grid {
     display: grid;
@@ -1013,6 +1017,53 @@ header {
     object-fit: cover; transition: transform 0.5s ease;
 }
 .video-card:hover .video-thumbnail img { transform: scale(1.1); }
+
+.video-favorite-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 3;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.65);
+    color: white;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+.video-favorite-btn.active { color: #ff4d6d; }
+.video-favorite-btn:focus-visible,
+.video-resume-btn:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+.video-completed-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    padding: 4px 7px;
+    border-radius: 20px;
+    background: rgba(22, 163, 74, 0.95);
+    color: white;
+    font-size: 0.68rem;
+    font-weight: bold;
+}
+
+.video-card-progress {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.45);
+}
+.video-card-progress span {
+    display: block;
+    height: 100%;
+    background: #e11d48;
+    transition: width 0.3s ease;
+}
 
 /* شارة مدة الفيديو */
 .video-duration {
@@ -1055,6 +1106,7 @@ header {
     display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .video-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+.video-resume-btn { background: rgba(230, 126, 34, 0.12); color: var(--primary); }
 
 /* Locked Video Style */
 .video-card.locked .video-thumbnail img { filter: blur(3px) grayscale(80%); }

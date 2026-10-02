@@ -202,7 +202,7 @@ async function fetchStoreFromExcel() {
             category: r['الصنف'] || 'عام',
             type: r['النوع'] || 'free',
             duration: r['المدة'] || '',
-            image: r['الصورة'] || '',
+            image: getFirstValue(r, ['رابط الصورة', 'الصورة', 'thumbnail', 'image']),
             password: '',
             likes: 0,
             dislikes: 0,
