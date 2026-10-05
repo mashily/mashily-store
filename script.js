@@ -244,14 +244,14 @@ async function initializeStore() {
         }
     }
 
-    // ترحيل الثيم الافتراضي القديم إلى الداكن مرة واحدة، مع حفظ اختيارات الزائر الصريحة.
+    // استبدال الافتراضي الداكن السابق بالفاتح مرة واحدة مع حفظ اختيار الزائر الصريح.
     let savedTheme = localStorage.getItem('theme');
-    if (localStorage.getItem('mashily_theme_default_migrated') !== '1') {
+    if (localStorage.getItem('mashily_theme_light_default_migrated') !== '1') {
         if (!localStorage.getItem('mashily_theme_user_selected') && (!savedTheme || savedTheme === 'dark')) {
             savedTheme = 'light';
             localStorage.setItem('theme', savedTheme);
         }
-        localStorage.setItem('mashily_theme_default_migrated', '1');
+        localStorage.setItem('mashily_theme_light_default_migrated', '1');
     }
     savedTheme = savedTheme || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
