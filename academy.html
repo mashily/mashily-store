@@ -8,7 +8,7 @@
     <meta name="author" content="Mashily Store">
     <link rel="canonical" href="https://mashily.github.io/mashily-store/academy.html">
     <link rel="manifest" href="manifest.json">
-    <meta id="academy-theme-color" name="theme-color" content="#2e8b57">
+    <meta id="academy-theme-color" name="theme-color" content="#f7f9f8">
     <meta id="academy-application-name" name="application-name" content="مشالى">
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
@@ -41,6 +41,7 @@
         </div>
         <!-- قائمة الثيمات (مخفية) -->
         <div id="theme-menu" style="position:absolute; top:50px; left:20px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px; display:none; z-index:2000; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <button onclick="setTheme('dark')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-moon"></i> داكن هادئ</button>
             <button onclick="setTheme('light')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-sun"></i> فاتح</button>
             <button onclick="setTheme('neon')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-bolt"></i> نيون</button>
             <button onclick="setTheme('gold')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-crown"></i> ذهبي</button>
@@ -50,27 +51,27 @@
     <!-- القسم الترحيبي (Hero Section) -->
     <div class="academy-hero">
         <div class="hero-content">
-            <div class="hero-icon"><i class="fas fa-graduation-cap"></i></div>
-            <h1 id="academy-page-name">أكاديمية مشالى التعليمية</h1>
-            <p id="academy-page-description">منصتك الأولى لتعلم صيانة الإلكترونيات، البرمجة، وأحدث التقنيات. محتوى حصري ومميز بانتظارك.</p>
-            <div class="hero-stats">
-                <span><i class="fas fa-video"></i> +50 درس</span>
-                <span><i class="fas fa-users"></i> +1000 طالب</span>
-                <span><i class="fas fa-certificate"></i> شهادات معتمدة</span>
-            </div>
+        <h1 class="academy-brand-mark"><img id="academy-page-icon" src="academy-video-icon.svg" alt="" aria-hidden="true"><span id="academy-page-name">أكاديمية مشالى التعليمية</span></h1>
+        <p id="academy-page-description">تعلّم خطوة بخطوة عبر دروس مصوّرة، وابحث عن الموضوع الذي تحتاجه أو تابع من حيث توقفت.</p>
+        <div class="hero-stats">
+            <span id="academy-video-count"><i class="fas fa-video"></i> جاري تحميل الدروس</span>
+            <span id="academy-category-count"><i class="fas fa-layer-group"></i> جاري تحميل الأقسام</span>
         </div>
+        <a class="academy-hero-action" href="#academy-library" aria-controls="academy-grid"><i class="fas fa-play"></i> اكتشف الدروس</a>
+    </div>
     </div>
 
     <!-- أدوات البحث والفلترة -->
+    <section class="academy-library" id="academy-library" aria-labelledby="academy-library-title">
     <div class="academy-controls">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="academy-search" placeholder="ابحث عن درس معين..." onkeyup="searchAcademy()">
-        </div>
+    <label class="search-box" for="academy-search">
+        <i class="fas fa-search" aria-hidden="true"></i>
+        <input type="search" id="academy-search" placeholder="ابحث باسم الدرس أو القسم..." oninput="searchAcademy()">
+    </label>
         
         <!-- قائمة الترتيب -->
         <div class="academy-sort-container">
-            <select id="academy-sort" onchange="sortAcademyVideos()">
+            <select id="academy-sort" onchange="sortAcademyVideos()" aria-label="ترتيب الدروس">
                 <option value="newest">📅 الأحدث أولاً</option>
                 <option value="oldest">📅 الأقدم أولاً</option>
                 <option value="most_viewed">🔥 الأكثر مشاهدة</option>
@@ -84,16 +85,21 @@
             </select>
         </div>
 
-        <div id="academy-cats" class="cat-nav-scroll" style="justify-content: center;">
+        <div id="academy-cats" class="cat-nav-scroll" aria-label="أقسام الدروس">
             <!-- سيتم ملء الأقسام هنا بالجافاسكريبت -->
         </div>
     </div>
 
     <!-- شبكة الفيديوهات -->
-    <main class="video-grid" id="academy-grid">
+    <div class="academy-library-heading">
+        <h2 id="academy-library-title">مكتبة الدروس</h2>
+        <span id="academy-results-count" role="status" aria-live="polite"></span>
+    </div>
+    <main class="video-grid" id="academy-grid" aria-label="دروس الأكاديمية">
         <!-- سيتم عرض الفيديوهات هنا -->
         <div class="loader" style="grid-column: 1/-1; margin: 50px auto;"></div>
     </main>
+    </section>
 
     <!-- مشغل الفيديو المنبثق -->
     <div id="video-player-modal" class="video-modal-overlay" onclick="if(event.target === this) closeVideoModal()">
@@ -160,8 +166,10 @@
     <script src="excel-loader.js"></script>
     <script src="script.js"></script>
     <script>
-        // تشغيل الأكاديمية عند التحميل
-        window.addEventListener('load', initAcademyPage);
+        window.addEventListener('load', async () => {
+            await init();
+            initAcademyPage();
+        });
     </script>
 </body>
 </html>
