@@ -51,7 +51,7 @@ function applySiteBranding(settings) {
         'site-brand-name': brandName,
         'site-tagline': settings.site_tagline || 'للإلكترونيات والفيديوهات التعليمية',
         'store-academy-name': academyName,
-        'store-hero-academy-label': academyName,
+        'academy-header-name': academyName,
         'academy-store-name': `متجر ${brandName}`,
         'academy-page-name': academyName,
         'academy-page-description': academyDescription,
@@ -81,48 +81,6 @@ function applySiteBranding(settings) {
     if (academyPageIcon) {
         const academyIconUrl = getCampaignUrl(settings.academy_logo_image || 'academy-video-icon.svg');
         if (academyIconUrl) academyPageIcon.src = academyIconUrl;
-    }
-    const storeHeroText = {
-        'store-hero-kicker': settings.store_hero_kicker,
-        'store-hero-title': settings.store_hero_title,
-        'store-hero-highlight': settings.store_hero_highlight,
-        'store-hero-description': settings.store_hero_description
-    };
-    Object.entries(storeHeroText).forEach(([id, value]) => {
-        const element = document.getElementById(id);
-        if (element && value !== undefined && value !== null && String(value).trim()) {
-            element.textContent = String(value).trim();
-        }
-    });
-    const storeHero = document.querySelector('.store-hero');
-    if (storeHero) {
-        const heroStyles = [
-            ['store_hero_kicker_color', '--store-hero-kicker-color', 'color'],
-            ['store_hero_title_color', '--store-hero-title-color', 'color'],
-            ['store_hero_highlight_color', '--store-hero-highlight-color', 'color'],
-            ['store_hero_description_color', '--store-hero-description-color', 'color'],
-            ['store_hero_kicker_size', '--store-hero-kicker-size', 'size'],
-            ['store_hero_title_size', '--store-hero-title-size', 'size'],
-            ['store_hero_description_size', '--store-hero-description-size', 'size']
-        ];
-        heroStyles.forEach(([setting, property, type]) => {
-            const value = String(settings[setting] || '').trim();
-            if (type === 'color' && /^#[0-9a-f]{6}$/i.test(value)) {
-                storeHero.style.setProperty(property, value);
-            } else if (type === 'size' && /^\d+(?:\.\d+)?$/.test(value)) {
-                storeHero.style.setProperty(property, `${Math.min(64, Math.max(12, Number(value)))}px`);
-            }
-            const whatsappLink = document.getElementById('store-hero-whatsapp-link');
-            if (whatsappLink) {
-                const whatsappNumber = String(settings.whatsapp || '201551831308').replace(/\D/g, '');
-                if (/^\d{8,15}$/.test(whatsappNumber)) {
-                    whatsappLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`أريد تصفح المتجر: ${getStoreUrl()}`)}`;
-                } else {
-                    whatsappLink.removeAttribute('href');
-                    console.error('رقم واتساب المتجر غير صالح في إعدادات Excel.');
-                }
-            }
-        });
     }
     const academyHero = document.querySelector('.academy-hero');
     const academyDescriptionColor = String(settings.academy_description_color || '').trim();
@@ -552,7 +510,7 @@ function launchCampaignCelebration(durationSeconds, decorations = ['🎈', '❤�
 function toggleThemeMenu(event) {
     event.stopPropagation();
     const menu = document.getElementById('theme-menu');
-    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    menu.style.display = menu.style.display === 'none' ? 'grid' : 'none';
 }
 
 function setTheme(themeName, event) {
@@ -658,6 +616,7 @@ function createProductCard(p) {
 // --- وظائف نافذة تفاصيل المنتج (Modal & Gallery) ---
 let currentGalleryIndex = 0;
 let currentProductImages = [];
+let productModalHistoryState = false;
 
 function openProductDetails(id) {
     const product = products.find(p => p.id === id);
@@ -798,13 +757,29 @@ function openProductDetails(id) {
         };
     }
 
-    // إظهار النافذة
-    document.getElementById('product-details-modal').style.display = 'flex';
+    // Add a history entry so the mobile back button closes details before leaving the store.
+    const modal = document.getElementById('product-details-modal');
+    if (modal.style.display !== 'flex') {
+        history.pushState({...history.state, mashilyProductModal: product.id}, '', location.href);
+        productModalHistoryState = true;
+    }
+    modal.style.display = 'flex';
 }
 
-function closeProductModal() {
-    document.getElementById('product-details-modal').style.display = 'none';
+function closeProductModal(fromHistory = false) {
+    const modal = document.getElementById('product-details-modal');
+    if (!modal || modal.style.display === 'none') return;
+    modal.style.display = 'none';
+    if (productModalHistoryState) {
+        productModalHistoryState = false;
+        if (!fromHistory) history.back();
+    }
 }
+
+window.addEventListener('popstate', () => {
+    const modal = document.getElementById('product-details-modal');
+    if (modal && modal.style.display !== 'none') closeProductModal(true);
+});
 
 function updateGallery() {
     const item = currentProductImages[currentGalleryIndex];

@@ -25,27 +25,39 @@
 </head>
 <body>
     <!-- الهيدر -->
-    <header>
-        <div class="header-top academy-header-top" style="padding: 10px 20px;">
-            <a href="index.html" class="logo" aria-label="متجر مشالى">
-                <img src="logo.png" alt="شعار متجر مشالى" style="display: block; width: min(140px, 38vw); height: 48px; object-fit: contain;">
+    <header class="market-header">
+        <div class="market-header-main">
+            <a class="market-brand" href="index.html" aria-label="متجر مشالى">
+                <img src="logo.png" alt="شعار متجر مشالى">
             </a>
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <a href="index.html" style="text-decoration: none; color: var(--text); font-weight: bold; font-size: 0.9rem;">
-                    <i class="fas fa-store"></i> المتجر
-                </a>
-                <button onclick="toggleThemeMenu(event)" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:var(--primary);">
-                    <i id="theme-icon" class="fas fa-moon"></i>
+            <a class="market-academy-link" href="#academy-library" aria-label="أكاديمية مشالى التعليمية">
+                <img class="academy-video-icon" src="academy-video-icon.svg" alt="" aria-hidden="true">
+                <span id="academy-header-name">أكاديمية مشالى التعليمية</span>
+            </a>
+            <label class="market-search" for="academy-search">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input type="search" id="academy-search" placeholder="ابحث باسم الدرس أو القسم..." oninput="searchAcademy()" aria-label="البحث في الدروس">
+            </label>
+            <button id="site-tagline" class="market-admin-link" type="button" onclick="triggerAdmin()">للإلكترونيات والفيديوهات التعليمية</button>
+            <div class="market-actions">
+                <div class="market-theme-wrap">
+                    <button class="market-icon-button" type="button" onclick="toggleThemeMenu(event)" aria-label="تغيير المظهر"><i id="theme-icon" class="fas fa-moon"></i></button>
+                    <div id="theme-menu" class="market-theme-menu">
+                        <button onclick="setTheme('dark', event)" title="داكن هادئ"><i class="fas fa-moon"></i></button>
+                        <button onclick="setTheme('light', event)" title="فاتح"><i class="fas fa-sun"></i></button>
+                        <button onclick="setTheme('neon', event)" title="نيون"><i class="fas fa-bolt"></i></button>
+                        <button onclick="setTheme('gold', event)" title="ذهبي"><i class="fas fa-crown"></i></button>
+                    </div>
+                </div>
+                <button class="market-icon-button" type="button" onclick="document.getElementById('academy-library-filter').value='favorites'; applyAcademyFilters();" aria-label="دروس المفضلة">
+                    <i class="fas fa-heart"></i>
                 </button>
+                <a class="market-icon-button" href="index.html" aria-label="العودة إلى المتجر"><i class="fas fa-shopping-basket"></i></a>
             </div>
         </div>
-        <!-- قائمة الثيمات (مخفية) -->
-        <div id="theme-menu" style="position:absolute; top:50px; left:20px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px; display:none; z-index:2000; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-            <button onclick="setTheme('dark')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-moon"></i> داكن هادئ</button>
-            <button onclick="setTheme('light')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-sun"></i> فاتح</button>
-            <button onclick="setTheme('neon')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-bolt"></i> نيون</button>
-            <button onclick="setTheme('gold')" style="display:block; width:100%; padding:8px; text-align:right; background:none; border:none; cursor:pointer; color:var(--text);"><i class="fas fa-crown"></i> ذهبي</button>
-        </div>
+        <nav class="market-category-bar" aria-label="أقسام الأكاديمية">
+            <div id="academy-cats" class="cat-nav-scroll"></div>
+        </nav>
     </header>
 
     <!-- القسم الترحيبي (Hero Section) -->
@@ -64,11 +76,6 @@
     <!-- أدوات البحث والفلترة -->
     <section class="academy-library" id="academy-library" aria-labelledby="academy-library-title">
     <div class="academy-controls">
-    <label class="search-box" for="academy-search">
-        <i class="fas fa-search" aria-hidden="true"></i>
-        <input type="search" id="academy-search" placeholder="ابحث باسم الدرس أو القسم..." oninput="searchAcademy()">
-    </label>
-        
         <!-- قائمة الترتيب -->
         <div class="academy-sort-container">
             <select id="academy-sort" onchange="sortAcademyVideos()" aria-label="ترتيب الدروس">
@@ -85,9 +92,6 @@
             </select>
         </div>
 
-        <div id="academy-cats" class="cat-nav-scroll" aria-label="أقسام الدروس">
-            <!-- سيتم ملء الأقسام هنا بالجافاسكريبت -->
-        </div>
     </div>
 
     <!-- شبكة الفيديوهات -->
