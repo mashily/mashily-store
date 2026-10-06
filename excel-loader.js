@@ -284,7 +284,7 @@ async function fetchStoreFromExcel() {
                 buttonUrl: String(getFirstValue(row, ['رابط الزر', 'buttonUrl']) || '').trim(),
                 starts: getFirstValue(row, ['يبدأ في', 'بداية العرض', 'starts']),
                 ends: getFirstValue(row, ['ينتهي في', 'نهاية العرض', 'ends']),
-                duration: getPositiveSeconds(row, ['مدة الظهور (ثانية)', 'مدة العرض (ثانية)', 'duration'], 8),
+                duration: getPositiveSeconds(row, ['مدة الظهور (ثانية)', 'مدة العرض (ثانية)', 'duration'], 6),
                 celebration: isMessageActive({فعال: getFirstValue(row, ['تأثير احتفالي', 'celebration'])}),
                 celebrationDuration: getPositiveSeconds(row, ['مدة التأثير (ثانية)', 'celebrationDuration'], 2),
                 decorations: parseSplit(getFirstValue(row, ['رموز التأثير (|)', 'رموز التأثير', 'decorations']))
@@ -407,8 +407,22 @@ function buildStoreWorkbook() {
         { 'المفتاح': 'site_tagline', 'القيمة': settings.site_tagline || 'للإلكترونيات والفيديوهات التعليمية', 'الوصف': 'العبارة المختصرة أسفل شعار المتجر' },
         { 'المفتاح': 'site_description', 'القيمة': settings.site_description || 'متجر إلكترونيات وفيديوهات تعليمية', 'الوصف': 'وصف الموقع للمتصفح والمشاركة' },
         { 'المفتاح': 'academy_name', 'القيمة': settings.academy_name || 'أكاديمية مشالى التعليمية', 'الوصف': 'اسم صفحة الأكاديمية' },
-        { 'المفتاح': 'academy_description', 'القيمة': settings.academy_description || 'منصتك لتعلم صيانة الإلكترونيات والبرمجة وأحدث التقنيات.', 'الوصف': 'الوصف التعريفي للأكاديمية' },
-        { 'المفتاح': 'theme_color', 'القيمة': settings.theme_color || '#2e8b57', 'الوصف': 'لون المتصفح وشريط التطبيق بصيغة HEX' },
+        { 'المفتاح': 'academy_description', 'القيمة': settings.academy_description || 'تعلّم خطوة بخطوة عبر دروس مصوّرة، وابحث عن الموضوع الذي تحتاجه أو تابع من حيث توقفت.', 'الوصف': 'الوصف التعريفي للأكاديمية' },
+        { 'المفتاح': 'academy_logo_image', 'القيمة': settings.academy_logo_image || 'academy-video-icon.svg', 'الوصف': 'مسار صورة رمز فيديو الأكاديمية بجوار الاسم' },
+        { 'المفتاح': 'academy_description_color', 'القيمة': settings.academy_description_color || '', 'الوصف': 'لون وصف الأكاديمية بصيغة HEX؛ اتركه فارغاً لاستخدام لون الثيم' },
+        { 'المفتاح': 'academy_description_size', 'القيمة': settings.academy_description_size || '16', 'الوصف': 'حجم خط وصف الأكاديمية بالبكسل' },
+        { 'المفتاح': 'store_hero_kicker', 'القيمة': settings.store_hero_kicker || 'أهلاً بك في متجر مشالى', 'الوصف': 'عبارة الترحيب أعلى مقدمة المتجر' },
+        { 'المفتاح': 'store_hero_title', 'القيمة': settings.store_hero_title || 'اختياراتك التقنية', 'الوصف': 'العنوان الرئيسي لمقدمة المتجر' },
+        { 'المفتاح': 'store_hero_highlight', 'القيمة': settings.store_hero_highlight || 'بخطوات أسهل', 'الوصف': 'السطر المميز أسفل عنوان مقدمة المتجر' },
+        { 'المفتاح': 'store_hero_description', 'القيمة': settings.store_hero_description || 'تصفّح المنتجات والأقسام، قارن التفاصيل والأسعار، ثم أرسل طلبك مباشرة عبر واتساب.', 'الوصف': 'النص التعريفي أسفل عنوان المتجر' },
+        { 'المفتاح': 'store_hero_kicker_color', 'القيمة': settings.store_hero_kicker_color || '', 'الوصف': 'لون عبارة الترحيب بصيغة HEX؛ اتركه فارغاً لاستخدام لون الثيم' },
+        { 'المفتاح': 'store_hero_title_color', 'القيمة': settings.store_hero_title_color || '', 'الوصف': 'لون عنوان المتجر بصيغة HEX؛ اتركه فارغاً لاستخدام لون الثيم' },
+        { 'المفتاح': 'store_hero_highlight_color', 'القيمة': settings.store_hero_highlight_color || '', 'الوصف': 'لون السطر المميز بصيغة HEX؛ اتركه فارغاً لاستخدام لون الثيم' },
+        { 'المفتاح': 'store_hero_description_color', 'القيمة': settings.store_hero_description_color || '', 'الوصف': 'لون النص التعريفي بصيغة HEX؛ اتركه فارغاً لاستخدام لون الثيم' },
+        { 'المفتاح': 'store_hero_kicker_size', 'القيمة': settings.store_hero_kicker_size || '14', 'الوصف': 'حجم عبارة الترحيب بالبكسل' },
+        { 'المفتاح': 'store_hero_title_size', 'القيمة': settings.store_hero_title_size || '45', 'الوصف': 'حجم عنوان المتجر بالبكسل (من 12 إلى 64)' },
+        { 'المفتاح': 'store_hero_description_size', 'القيمة': settings.store_hero_description_size || '16', 'الوصف': 'حجم النص التعريفي بالبكسل' },
+        { 'المفتاح': 'theme_color', 'القيمة': settings.theme_color || '#f7f9f8', 'الوصف': 'لون المتصفح وشريط التطبيق بصيغة HEX' },
         { 'المفتاح': 'vodafone', 'القيمة': settings.vodafone || '', 'الوصف': 'رقم فودافون كاش للتحويل' },
         { 'المفتاح': 'instapay', 'القيمة': settings.instapay || '', 'الوصف': 'اسم مستخدم انستاباي' },
         { 'المفتاح': 'qr', 'القيمة': settings.qr || '', 'الوصف': 'رابط صورة QR كود انستاباي (اختياري)' },
@@ -458,7 +472,7 @@ function buildStoreWorkbook() {
         'رابط الزر': popup.buttonUrl || '',
         'يبدأ في': popup.starts || '',
         'ينتهي في': popup.ends || '',
-        'مدة الظهور (ثانية)': popup.duration || 8,
+        'مدة الظهور (ثانية)': popup.duration || 6,
         'تأثير احتفالي': popup.celebration ? 'نعم' : 'لا',
         'مدة التأثير (ثانية)': popup.celebrationDuration || 2,
         'رموز التأثير (|)': (popup.decorations || []).join('|')
@@ -493,7 +507,7 @@ function getSiteManifestBase64() {
     const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
     const themeColor = /^#[0-9a-f]{6}$/i.test(String(settings.theme_color || ''))
         ? settings.theme_color
-        : '#2e8b57';
+        : '#f7f9f8';
     const manifest = {
         name: settings.app_name || settings.site_name || 'متجر مشالى | الإلكترونيات',
         short_name: settings.short_name || settings.brand_name || 'مشالى',

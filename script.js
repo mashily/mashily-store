@@ -2,8 +2,10 @@ let products = [];
 let cart = JSON.parse(localStorage.getItem('MASHILY_CART')) || [];
 let currentCategory = 'الكل';
 let currentSort = 'default';
+let currentProductSearch = '';
 let appliedCoupon = null;
 let selectedPaymentMethod = 'cash';
+let storeInitializationPromise = null;
 const DEFAULT_STORE_URL = 'https://mashily.github.io/mashily-store/';
 
 function getStoreUrl() {
@@ -40,7 +42,7 @@ function applySiteBranding(settings) {
     const siteName = settings.site_name || `متجر ${brandName} | الإلكترونيات`;
     const academyName = settings.academy_name || `أكاديمية ${brandName} التعليمية`;
     const siteDescription = settings.site_description || 'متجر إلكترونيات وفيديوهات تعليمية';
-    const academyDescription = settings.academy_description || 'منصتك لتعلم صيانة الإلكترونيات والبرمجة وأحدث التقنيات.';
+    const academyDescription = settings.academy_description || 'تعلّم خطوة بخطوة عبر دروس مصوّرة، وابحث عن الموضوع الذي تحتاجه أو تابع من حيث توقفت.';
     const pageIsAcademy = Boolean(document.getElementById('academy-grid'));
     const pageTitle = pageIsAcademy ? `${academyName} | ${brandName}` : siteName;
     document.title = pageTitle;
@@ -49,6 +51,7 @@ function applySiteBranding(settings) {
         'site-brand-name': brandName,
         'site-tagline': settings.site_tagline || 'للإلكترونيات والفيديوهات التعليمية',
         'store-academy-name': academyName,
+        'store-hero-academy-label': academyName,
         'academy-store-name': `متجر ${brandName}`,
         'academy-page-name': academyName,
         'academy-page-description': academyDescription,
@@ -74,17 +77,81 @@ function applySiteBranding(settings) {
         const meta = document.getElementById(id);
         if (meta) meta.setAttribute('content', value);
     });
+    const academyPageIcon = document.getElementById('academy-page-icon');
+    if (academyPageIcon) {
+        const academyIconUrl = getCampaignUrl(settings.academy_logo_image || 'academy-video-icon.svg');
+        if (academyIconUrl) academyPageIcon.src = academyIconUrl;
+    }
+    const storeHeroText = {
+        'store-hero-kicker': settings.store_hero_kicker,
+        'store-hero-title': settings.store_hero_title,
+        'store-hero-highlight': settings.store_hero_highlight,
+        'store-hero-description': settings.store_hero_description
+    };
+    Object.entries(storeHeroText).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element && value !== undefined && value !== null && String(value).trim()) {
+            element.textContent = String(value).trim();
+        }
+    });
+    const storeHero = document.querySelector('.store-hero');
+    if (storeHero) {
+        const heroStyles = [
+            ['store_hero_kicker_color', '--store-hero-kicker-color', 'color'],
+            ['store_hero_title_color', '--store-hero-title-color', 'color'],
+            ['store_hero_highlight_color', '--store-hero-highlight-color', 'color'],
+            ['store_hero_description_color', '--store-hero-description-color', 'color'],
+            ['store_hero_kicker_size', '--store-hero-kicker-size', 'size'],
+            ['store_hero_title_size', '--store-hero-title-size', 'size'],
+            ['store_hero_description_size', '--store-hero-description-size', 'size']
+        ];
+        heroStyles.forEach(([setting, property, type]) => {
+            const value = String(settings[setting] || '').trim();
+            if (type === 'color' && /^#[0-9a-f]{6}$/i.test(value)) {
+                storeHero.style.setProperty(property, value);
+            } else if (type === 'size' && /^\d+(?:\.\d+)?$/.test(value)) {
+                storeHero.style.setProperty(property, `${Math.min(64, Math.max(12, Number(value)))}px`);
+            }
+            const whatsappLink = document.getElementById('store-hero-whatsapp-link');
+            if (whatsappLink) {
+                const whatsappNumber = String(settings.whatsapp || '201551831308').replace(/\D/g, '');
+                if (/^\d{8,15}$/.test(whatsappNumber)) {
+                    whatsappLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`أريد تصفح المتجر: ${getStoreUrl()}`)}`;
+                } else {
+                    whatsappLink.removeAttribute('href');
+                    console.error('رقم واتساب المتجر غير صالح في إعدادات Excel.');
+                }
+            }
+        });
+    }
+    const academyHero = document.querySelector('.academy-hero');
+    const academyDescriptionColor = String(settings.academy_description_color || '').trim();
+    const academyDescriptionSize = String(settings.academy_description_size || '').trim();
+    const academyDescriptionElement = document.getElementById('academy-page-description');
+    if (academyDescriptionElement) {
+        if (/^#[0-9a-f]{6}$/i.test(academyDescriptionColor)) {
+            academyDescriptionElement.style.color = academyDescriptionColor;
+        }
+        if (/^\d+(?:\.\d+)?$/.test(academyDescriptionSize)) {
+            academyDescriptionElement.style.fontSize = `${Math.min(36, Math.max(12, Number(academyDescriptionSize)))}px`;
+        }
+    }
     document.querySelectorAll('meta[name="application-name"]').forEach(meta => {
         meta.setAttribute('content', settings.short_name || brandName);
     });
 
     const themeColor = /^#[0-9a-f]{6}$/i.test(String(settings.theme_color || ''))
         ? settings.theme_color
-        : '#2e8b57';
+        : '#f7f9f8';
     document.querySelectorAll('meta[name="theme-color"]').forEach(meta => meta.setAttribute('content', themeColor));
 }
 
-async function init() {
+function init() {
+    if (!storeInitializationPromise) storeInitializationPromise = initializeStore();
+    return storeInitializationPromise;
+}
+
+async function initializeStore() {
     // التحقق مما إذا كان المستخدم مديراً (لتجنب مسح التعديلات المحلية عند التحديث)
     const isAdmin = sessionStorage.getItem('mashily_user');
 
@@ -177,16 +244,21 @@ async function init() {
         }
     }
 
-    // 1. تطبيق الثيم المحفوظ (Light هو الافتراضي)
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    
-    // في المرة الأولى، نتأكد أنه Light
-    if (!localStorage.getItem('theme')) {
-        localStorage.setItem('theme', 'light');
+    // استبدال الافتراضي الداكن السابق بالفاتح مرة واحدة مع حفظ اختيار الزائر الصريح.
+    let savedTheme = localStorage.getItem('theme');
+    if (localStorage.getItem('mashily_theme_light_default_migrated') !== '1') {
+        if (!localStorage.getItem('mashily_theme_user_selected') && (!savedTheme || savedTheme === 'dark')) {
+            savedTheme = 'light';
+            localStorage.setItem('theme', savedTheme);
+        }
+        localStorage.setItem('mashily_theme_light_default_migrated', '1');
     }
+    savedTheme = savedTheme || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (!localStorage.getItem('theme')) localStorage.setItem('theme', savedTheme);
     
     const themeIcons = {
+        'dark': 'fas fa-moon',
         'light': 'fas fa-sun',
         'white': 'fas fa-circle',
         'ocean': 'fas fa-water',
@@ -197,6 +269,7 @@ async function init() {
     };
     
     const themeColors = {
+        'dark': '#9bb8a7',
         'light': '#5a8f7b',
         'white': '#2e8b57',
         'ocean': '#2f6f8f',
@@ -490,8 +563,10 @@ function setTheme(themeName, event) {
     
     document.documentElement.setAttribute('data-theme', themeName);
     localStorage.setItem('theme', themeName);
+    localStorage.setItem('mashily_theme_user_selected', '1');
     
     const icons = {
+        'dark': 'fas fa-moon',
         'light': 'fas fa-sun',
         'white': 'fas fa-circle',
         'ocean': 'fas fa-water',
@@ -502,6 +577,7 @@ function setTheme(themeName, event) {
     };
     
     const colors = {
+        'dark': '#9bb8a7',
         'light': '#5a8f7b',
         'white': '#2e8b57',
         'ocean': '#2f6f8f',
@@ -513,8 +589,8 @@ function setTheme(themeName, event) {
     
     const themeIcon = document.getElementById('theme-icon');
     if(themeIcon) {
-        themeIcon.className = icons[themeName] || 'fas fa-sun';
-        themeIcon.style.color = colors[themeName] || '#5a8f7b';
+        themeIcon.className = icons[themeName] || 'fas fa-moon';
+        themeIcon.style.color = colors[themeName] || '#9bb8a7';
     }
     
     // إغلاق القائمة
@@ -533,8 +609,8 @@ document.addEventListener('click', function(event) {
 });
 
 function toggleDarkMode() {
-    const current = document.documentElement.getAttribute('data-theme') || 'light';
-    const target = current === 'light' ? 'neon' : 'light';
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    const target = current === 'dark' ? 'light' : 'dark';
     setTheme(target);
 }
 
@@ -556,14 +632,14 @@ function createProductCard(p) {
             <i class="fas fa-share-alt"></i>
         </button>
         <div class="img-container" onclick="openProductDetails(${p.id})">
-            ${!isOut ? `<div class="pro-badge ${p.status==='عرض خاص'?'offer':''}">${p.status || 'مميز ✨'}</div>` : ''}
-            ${discountPercent > 0 ? `<div style="position:absolute;bottom:10px;left:10px;background:#e74c3c;color:white;padding:4px 8px;border-radius:6px;font-size:0.75rem;font-weight:bold;">-${discountPercent}%</div>` : ''}
+            ${!isOut && p.status ? `<div class="pro-badge ${p.status==='عرض خاص'?'offer':''}">${p.status}</div>` : ''}
+            ${discountPercent > 0 ? `<div class="product-discount-badge">خصم ${discountPercent}%</div>` : ''}
             <img src="${p.image}" alt="${p.name}">
             ${isOut ? '<div class="out-badge">غير متوفر حالياً ❌</div>' : ''}
             <div class="product-info-overlay">${p.desc || 'منتج أصلي من متجر مشالي'}</div>
         </div>
         <div class="product-details">
-            <h4>${p.name}</h4>
+            <h4><button class="product-title-btn" type="button" onclick="openProductDetails(${p.id})">${p.name}</button></h4>
             <div class="price-tag">
                 ${oldPrice ? `<s style="color:#95a5a6; font-size:0.8rem; margin-left:5px;">${oldPrice}</s>` : ''}
                 ${p.price} ج.م
@@ -899,9 +975,26 @@ document.addEventListener('fullscreenchange', () => {
 function renderProducts(items) {
     const grid = document.getElementById('products-grid');
     if(!grid) return;
-    
-    if(items.length === 0) { grid.innerHTML = "<p style='grid-column:1/-1; text-align:center; padding:50px; opacity:0.5;'>لا توجد منتجات حالياً في هذا القسم</p>"; return; }
-    
+
+    const resultsCount = document.getElementById('store-results-count');
+    if (resultsCount) resultsCount.textContent = `عرض ${items.length} من ${products.length} منتج`;
+
+    if(items.length === 0) {
+        const hasSearch = Boolean(currentProductSearch);
+        grid.innerHTML = `
+            <div class="store-empty-state">
+                <i class="fas ${hasSearch ? 'fa-search' : 'fa-box-open'}" aria-hidden="true"></i>
+                <h3>${hasSearch ? 'لم نعثر على منتجات مطابقة' : 'لا توجد منتجات في هذا القسم حالياً'}</h3>
+                <p>${hasSearch ? 'جرّب كلمة بحث أخرى أو امسح البحث لعرض المنتجات.' : 'اختر قسماً آخر لمتابعة التصفح.'}</p>
+                ${hasSearch
+                    ? '<button type="button" class="store-empty-action" onclick="clearProductSearch()">مسح البحث</button>'
+                    : '<button type="button" class="store-empty-action" data-show-all-products>عرض كل المنتجات</button>'}
+            </div>`;
+        const showAllButton = grid.querySelector('[data-show-all-products]');
+        if (showAllButton) showAllButton.addEventListener('click', () => filterByCategory('الكل'));
+        return;
+    }
+
     grid.innerHTML = items.map(p => createProductCard(p)).join('');
 }
 
@@ -1012,20 +1105,30 @@ function renderCategories() {
 
     // التأكد من وجود قسم "الكل" دائماً في البداية وإزالة أي تكرار له من القائمة الأصلية
     const categories = [{name: 'الكل', icon: 'fas fa-layer-group'}, ...categoriesFromStorage.filter(c => c.name !== 'الكل')];
+    const activeOffersCount = products.filter(product => isProductOfferActive(product)).length;
     
     catContainer.innerHTML = categories.map(cat => {
+        const count = cat.name === 'الكل'
+            ? products.length
+            : products.filter(product => product.category === cat.name).length;
         let btn = `
-        <button class="cat-btn ${currentCategory === cat.name ? 'active' : ''}" 
+        <button type="button" class="cat-btn ${currentCategory === cat.name ? 'active' : ''}" 
+                aria-pressed="${currentCategory === cat.name}"
                 onclick="filterByCategory('${cat.name}')">
-            <i class="${cat.icon}"></i> ${cat.name === 'الكل' ? 'كل الأصناف' : cat.name}
+            <i class="${cat.icon}" aria-hidden="true"></i>
+            <span class="cat-label">${cat.name === 'الكل' ? 'كل الأصناف' : cat.name}</span>
+            <span class="cat-count">${count.toLocaleString('ar-EG')}</span>
         </button>`;
         
         // إضافة زر العروض المؤقتة بعد زر "الكل"
         if(cat.name === 'الكل') {
             btn += `
-            <button class="cat-btn cat-btn-offer ${currentCategory === 'offers' ? 'active' : ''}" 
+            <button type="button" class="cat-btn cat-btn-offer ${currentCategory === 'offers' ? 'active' : ''}" 
+                    aria-pressed="${currentCategory === 'offers'}"
                     onclick="filterByCategory('offers')">
-                <i class="fas fa-fire-alt"></i> عروض مؤقتة
+                <i class="fas fa-clock" aria-hidden="true"></i>
+                <span class="cat-label">عروض مؤقتة</span>
+                <span class="cat-count">${activeOffersCount.toLocaleString('ar-EG')}</span>
             </button>`;
         }
         return btn;
@@ -1035,19 +1138,47 @@ function renderCategories() {
 function filterByCategory(cat) {
     currentCategory = cat;
     renderCategories(); // لتحديث اللون النشط
-    
-    let filtered;
-    if (cat === 'الكل') filtered = products;
-    else if (cat === 'offers') filtered = products.filter(p => isProductOfferActive(p));
-    else filtered = products.filter(p => p.category === cat);
-    
-    // تطبيق الترتيب
-    if(currentSort === 'price_low') {
-        filtered.sort((a, b) => a.price - b.price);
-    } else if(currentSort === 'price_high') {
-        filtered.sort((a, b) => b.price - a.price);
+    applyProductFilters();
+}
+
+function normalizeSearchText(value) {
+    return String(value || '')
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
+        .replace(/[أإآٱ]/g, 'ا')
+        .replace(/ى/g, 'ي')
+        .replace(/ة/g, 'ه')
+        .replace(/[٠-٩]/g, digit => String(digit.charCodeAt(0) - 1632))
+        .replace(/[۰-۹]/g, digit => String(digit.charCodeAt(0) - 1776))
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function getProductSearchText(product) {
+    const values = [
+        product.name, product.category, product.description, product.desc,
+        product.status, product.specs, product.tags
+    ];
+    return normalizeSearchText(values.flatMap(value => Array.isArray(value) ? value : [value]).join(' '));
+}
+
+function applyProductFilters() {
+    let filtered = currentCategory === 'الكل'
+        ? [...products]
+        : currentCategory === 'offers'
+            ? products.filter(product => isProductOfferActive(product))
+            : products.filter(product => product.category === currentCategory);
+
+    if (currentProductSearch) {
+        const query = normalizeSearchText(currentProductSearch);
+        filtered = filtered.filter(product => getProductSearchText(product).includes(query));
     }
-    
+    if (currentSort === 'price_low') filtered.sort((a, b) => Number(a.price) - Number(b.price));
+    else if (currentSort === 'price_high') filtered.sort((a, b) => Number(b.price) - Number(a.price));
+
+    const clearButton = document.getElementById('search-clear-btn');
+    if (clearButton) clearButton.hidden = !currentProductSearch;
     renderProducts(filtered);
 }
 
@@ -1234,12 +1365,17 @@ function toggleCart(s){
 }
 
 // تبديل عرض معلومات فودافون كاش
-function togglePayment(method) {
+function togglePayment(method, selectedButton) {
     selectedPaymentMethod = method;
     const vfInfo = document.getElementById('vodafone-info');
     const ipInfo = document.getElementById('instapay-info');
     if(vfInfo) vfInfo.style.display = method === 'vodafone' ? 'block' : 'none';
     if(ipInfo) ipInfo.style.display = method === 'instapay' ? 'block' : 'none';
+    document.querySelectorAll('.cart-payment-option').forEach(button => {
+        const isSelected = button === selectedButton;
+        button.classList.toggle('active', isSelected);
+        button.setAttribute('aria-pressed', String(isSelected));
+    });
 }
 
 // --- نظام الكوبونات ---
@@ -1315,14 +1451,25 @@ function sendToWhatsApp() {
 
 // --- نظام البحث ---
 function searchProducts() {
-    let t = document.getElementById('search-input').value.toLowerCase();
-    renderProducts(products.filter(p => p.name.toLowerCase().includes(t)));
+    const input = document.getElementById('search-input');
+    currentProductSearch = input ? input.value.trim() : '';
+    applyProductFilters();
+}
+
+function clearProductSearch() {
+    const input = document.getElementById('search-input');
+    if (input) {
+        input.value = '';
+        input.focus();
+    }
+    currentProductSearch = '';
+    applyProductFilters();
 }
 
 // --- نظام الترتيب ---
 function sortProducts(sortType) {
     currentSort = sortType;
-    filterByCategory(currentCategory); // إعادة تطبيق الفلتر مع الترتيب الجديد
+    applyProductFilters();
 }
 
 // --- تأثير التحميل الذكي (Skeletons) ---
@@ -1368,13 +1515,7 @@ function startSocialProof() {
         const savedText = localStorage.getItem('proofText');
         socialProofMessages = savedText
             ? savedText.split(',').map(text => ({ text: text.trim(), duration: 5, interval: 16 })).filter(item => item.text)
-            : [
-                "أحمد من القاهرة اشترى رسيفر سيناتور 🔥",
-                "محمد من المنصورة طلب قطعة واي فاي ⚡",
-                "خالد من طنطا انضم للأكاديمية الآن ✅",
-                "عميل جديد طلب وصلة HDMI أصلية 🔌",
-                "تم شحن طلب جديد إلى الإسكندرية بنجاح 🚚"
-            ].map(text => ({ text, duration: 5, interval: 16 }));
+            : [];
     }
     if (!socialProofMessages.length) return;
 
@@ -1434,9 +1575,6 @@ function shareProduct(id, event) {
 }
 
 // --- الإشعار الترحيبي (يظهر أول مرة فقط) ---
-// بدء العمل عند تحميل الصفحة
-window.onload = init;
-
 // --- الدخول السري للوحة التحكم ---
 let adminClicks = 0;
 function triggerAdmin() {
@@ -2389,17 +2527,17 @@ function initAcademyPage() {
     
     // عرض الأقسام
     const cats = ['الكل', ...new Set(videos.map(v => v.category))];
+    const videoCount = document.getElementById('academy-video-count');
+    if (videoCount) videoCount.innerHTML = `<i class="fas fa-video" aria-hidden="true"></i> ${videos.length.toLocaleString('ar-EG')} درس`;
+    const categoryCount = document.getElementById('academy-category-count');
+    if (categoryCount) categoryCount.innerHTML = `<i class="fas fa-layer-group" aria-hidden="true"></i> ${new Set(videos.map(video => video.category).filter(Boolean)).size.toLocaleString('ar-EG')} قسم`;
     if(catsContainer) {
         catsContainer.innerHTML = cats.map(c => 
             `<button class="cat-btn-chip ${c === 'الكل' ? 'active' : ''}" onclick="filterAcademy('${c}', this)">${c}</button>`
         ).join('');
     }
 
-    // محاكاة وقت التحميل لإظهار التأثير
-    setTimeout(() => {
-        renderVideos(videos);
-        applyAcademyFilters(); // استخدام دالة الفلترة الشاملة بدلاً من العرض المباشر
-    }, 800);
+    applyAcademyFilters();
 }
 
 function addPoints(pointsToAdd, reason) {
@@ -2441,6 +2579,9 @@ function updateAcademyProfileUI() {
 function renderVideos(list) {
     const grid = document.getElementById('academy-grid');
     if(!grid) return;
+
+    const resultsCount = document.getElementById('academy-results-count');
+    if (resultsCount) resultsCount.textContent = `عرض ${list.length.toLocaleString('ar-EG')} درس`;
 
     if(list.length === 0) {
         const emptyMessage = currentAcademyLibraryFilter === 'favorites'
@@ -2493,7 +2634,7 @@ function renderVideos(list) {
                     <span class="video-cat">${escapeAcademyHtml(v.category || 'عام')}</span>
                     <span style="font-size:0.7rem; opacity:0.7;"><i class="far fa-eye"></i> ${escapeAcademyHtml(v.views || 0)}</span>
                     <span class="video-status" style="color:${isLocked ? '#e74c3c' : '#27ae60'}">
-                        <i class="fas ${isLocked ? 'fa-lock' : 'fa-unlock'}"></i> ${isLocked ? 'مشفر' : 'مجاني'}
+                        <i class="fas ${isLocked ? 'fa-lock' : 'fa-unlock'}"></i> ${isLocked ? 'يتطلب كوداً' : 'مجاني'}
                     </span>
                 </div>
                 <h3 class="video-title">${escapeAcademyHtml(v.title)}</h3>
@@ -2543,7 +2684,7 @@ function applyAcademyFilters() {
     const searchInput = document.getElementById('academy-search');
     const sortInput = document.getElementById('academy-sort');
     const libraryFilter = document.getElementById('academy-library-filter');
-    const term = searchInput ? searchInput.value.toLowerCase() : '';
+    const term = searchInput ? normalizeSearchText(searchInput.value) : '';
     const sortType = sortInput ? sortInput.value : 'newest';
     currentAcademyLibraryFilter = libraryFilter ? libraryFilter.value : 'all';
 
@@ -2568,7 +2709,7 @@ function applyAcademyFilters() {
 
     // 3. فلترة البحث
     if (term) {
-        videos = videos.filter(v => String(v.title || '').toLowerCase().includes(term));
+        videos = videos.filter(video => normalizeSearchText(`${video.title || ''} ${video.category || ''}`).includes(term));
     }
 
     // 4. الترتيب
