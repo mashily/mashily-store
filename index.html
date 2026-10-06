@@ -11,17 +11,17 @@
     <meta property="og:url" content="https://mashily.github.io/mashily-store/">
     <meta id="site-og-title" property="og:title" content="متجر مشالى | الإلكترونيات">
     <meta id="site-og-description" property="og:description" content="تصفح أصناف متجر مشالى واطلب مباشرة عبر واتساب.">
-    <meta property="og:image" content="https://mashily.github.io/mashily-store/logo.png">
+    <meta id="site-og-image" property="og:image" content="https://mashily.github.io/mashily-store/logo.png">
     <meta property="og:image:alt" content="متجر مشالى">
     <meta name="twitter:card" content="summary_large_image">
     <meta id="site-twitter-title" name="twitter:title" content="متجر مشالى | الإلكترونيات">
     <meta id="site-twitter-description" name="twitter:description" content="تصفح أصناف متجر مشالى واطلب مباشرة عبر واتساب.">
-    <meta name="twitter:image" content="https://mashily.github.io/mashily-store/logo.png">
+    <meta id="site-twitter-image" name="twitter:image" content="https://mashily.github.io/mashily-store/logo.png">
     <link rel="manifest" href="manifest.json">
     <meta id="site-theme-color" name="theme-color" content="#f7f9f8">
     <meta id="site-application-name" name="application-name" content="مشالى">
-    <link rel="icon" type="image/png" href="logo.png">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link id="site-favicon" rel="icon" type="image/png" href="logo.png">
+    <link id="site-apple-touch-icon" rel="apple-touch-icon" href="icon-192.png">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -62,11 +62,11 @@
     <header class="market-header">
         <div class="market-header-main">
             <a class="market-brand" href="index.html" aria-label="متجر مشالى">
-                <img src="logo.png" alt="شعار متجر مشالى">
+                <img class="store-brand-logo" src="logo.png" alt="شعار متجر مشالى">
             </a>
             <a id="store-academy-link" class="market-academy-link" href="academy.html">
-                <img class="academy-video-icon" src="academy-video-icon.svg" alt="" aria-hidden="true">
-                <span id="store-academy-name">أكاديمية مشالى التعليمية</span>
+                <img id="store-academy-icon" class="academy-video-icon" src="video.png" alt="" aria-hidden="true">
+                <span id="store-academy-name">أكاديمية مشالى للإلكترونيات</span>
             </a>
             <div class="market-search">
                 <i class="fas fa-search" aria-hidden="true"></i>
@@ -79,7 +79,7 @@
                         <option value="price_high">السعر: الأعلى</option>
                     </select>
                 </label>
-            <button id="site-tagline" class="market-admin-link" type="button" onclick="triggerAdmin()">للإلكترونيات والفيديوهات التعليمية</button>
+            </div>
             <div class="market-actions">
                 <div class="market-theme-wrap">
                     <button class="market-icon-button" type="button" onclick="toggleThemeMenu(event)" aria-label="تغيير المظهر"><i id="theme-icon" class="fas fa-moon"></i></button>
@@ -102,10 +102,11 @@
                 </button>
             </div>
         </div>
-        <nav class="market-category-bar" aria-label="أقسام المتجر">
-            <div id="product-cats" aria-label="أقسام المنتجات"></div>
-        </nav>
     </header>
+    <nav class="market-category-bar" aria-label="أقسام المتجر">
+        <div id="product-cats" aria-label="أقسام المنتجات"></div>
+        <button id="site-tagline" class="market-admin-link" type="button" onclick="triggerAdmin()">للإلكترونيات والفيديوهات التعليمية</button>
+    </nav>
 
     <section class="store-catalog" id="store-catalog" aria-labelledby="store-catalog-title">
         <div class="store-catalog-heading">

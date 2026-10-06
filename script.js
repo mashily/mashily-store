@@ -40,7 +40,7 @@ function getProductVideoSource(source) {
 function applySiteBranding(settings) {
     const brandName = settings.brand_name || 'مشالى';
     const siteName = settings.site_name || `متجر ${brandName} | الإلكترونيات`;
-    const academyName = settings.academy_name || `أكاديمية ${brandName} التعليمية`;
+    const academyName = settings.academy_name || `أكاديمية ${brandName} للإلكترونيات`;
     const siteDescription = settings.site_description || 'متجر إلكترونيات وفيديوهات تعليمية';
     const academyDescription = settings.academy_description || 'تعلّم خطوة بخطوة عبر دروس مصوّرة، وابحث عن الموضوع الذي تحتاجه أو تابع من حيث توقفت.';
     const pageIsAcademy = Boolean(document.getElementById('academy-grid'));
@@ -61,6 +61,8 @@ function applySiteBranding(settings) {
         const element = document.getElementById(id);
         if (element && value) element.textContent = value;
     });
+    const academyHeaderLink = document.getElementById('academy-header-link');
+    if (academyHeaderLink) academyHeaderLink.setAttribute('aria-label', academyName);
 
     const description = pageIsAcademy ? academyDescription : siteDescription;
     const metaValues = {
@@ -77,10 +79,25 @@ function applySiteBranding(settings) {
         const meta = document.getElementById(id);
         if (meta) meta.setAttribute('content', value);
     });
-    const academyPageIcon = document.getElementById('academy-page-icon');
-    if (academyPageIcon) {
-        const academyIconUrl = getCampaignUrl(settings.academy_logo_image || 'academy-video-icon.svg');
-        if (academyIconUrl) academyPageIcon.src = academyIconUrl;
+    const academyIconUrl = getCampaignUrl(settings.academy_logo_image || 'video.png');
+    ['academy-page-icon', 'store-academy-icon', 'academy-header-icon'].forEach(id => {
+        const academyIcon = document.getElementById(id);
+        if (academyIcon && academyIconUrl) academyIcon.src = academyIconUrl;
+    });
+    const brandLogoUrl = getCampaignUrl(settings.brand_logo_image || 'logo.png');
+    if (brandLogoUrl) {
+        document.querySelectorAll('.store-brand-logo').forEach(logo => {
+            logo.src = brandLogoUrl;
+            logo.alt = `شعار ${brandName}`;
+        });
+        ['site-favicon', 'site-apple-touch-icon', 'academy-favicon', 'academy-apple-touch-icon'].forEach(id => {
+            const icon = document.getElementById(id);
+            if (icon) icon.href = brandLogoUrl;
+        });
+        ['site-og-image', 'site-twitter-image', 'academy-og-image'].forEach(id => {
+            const image = document.getElementById(id);
+            if (image) image.setAttribute('content', brandLogoUrl);
+        });
     }
     const academyHero = document.querySelector('.academy-hero');
     const academyDescriptionColor = String(settings.academy_description_color || '').trim();

@@ -10,14 +10,14 @@
     <link rel="manifest" href="manifest.json">
     <meta id="academy-theme-color" name="theme-color" content="#f7f9f8">
     <meta id="academy-application-name" name="application-name" content="مشالى">
-    <link rel="icon" type="image/png" href="logo.png">
-    <link rel="apple-touch-icon" href="logo.png">
+    <link id="academy-favicon" rel="icon" type="image/png" href="logo.png">
+    <link id="academy-apple-touch-icon" rel="apple-touch-icon" href="logo.png">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ar_AR">
     <meta property="og:url" content="https://mashily.github.io/mashily-store/academy.html">
     <meta id="academy-og-title" property="og:title" content="أكاديمية مشالى | تعلم واحترف">
     <meta id="academy-og-description" property="og:description" content="أكاديمية مشالى التعليمية - دروس صيانة الإلكترونيات والبرمجة.">
-    <meta property="og:image" content="https://mashily.github.io/mashily-store/logo.png">
+    <meta id="academy-og-image" property="og:image" content="https://mashily.github.io/mashily-store/logo.png">
     <meta name="twitter:card" content="summary_large_image">
     <title>أكاديمية مشالى | تعلم واحترف</title>
     <link rel="stylesheet" href="style.css">
@@ -28,17 +28,16 @@
     <header class="market-header">
         <div class="market-header-main">
             <a class="market-brand" href="index.html" aria-label="متجر مشالى">
-                <img src="logo.png" alt="شعار متجر مشالى">
+                <img class="store-brand-logo" src="logo.png" alt="شعار متجر مشالى">
             </a>
-            <a class="market-academy-link" href="#academy-library" aria-label="أكاديمية مشالى التعليمية">
-                <img class="academy-video-icon" src="academy-video-icon.svg" alt="" aria-hidden="true">
-                <span id="academy-header-name">أكاديمية مشالى التعليمية</span>
+            <a id="academy-header-link" class="market-academy-link" href="#academy-library" aria-label="أكاديمية مشالى للإلكترونيات">
+                <img id="academy-header-icon" class="academy-video-icon" src="video.png" alt="" aria-hidden="true">
+                <span id="academy-header-name">أكاديمية مشالى للإلكترونيات</span>
             </a>
             <label class="market-search" for="academy-search">
                 <i class="fas fa-search" aria-hidden="true"></i>
                 <input type="search" id="academy-search" placeholder="ابحث باسم الدرس أو القسم..." oninput="searchAcademy()" aria-label="البحث في الدروس">
             </label>
-            <button id="site-tagline" class="market-admin-link" type="button" onclick="triggerAdmin()">للإلكترونيات والفيديوهات التعليمية</button>
             <div class="market-actions">
                 <div class="market-theme-wrap">
                     <button class="market-icon-button" type="button" onclick="toggleThemeMenu(event)" aria-label="تغيير المظهر"><i id="theme-icon" class="fas fa-moon"></i></button>
@@ -55,15 +54,16 @@
                 <a class="market-icon-button" href="index.html" aria-label="العودة إلى المتجر"><i class="fas fa-shopping-basket"></i></a>
             </div>
         </div>
-        <nav class="market-category-bar" aria-label="أقسام الأكاديمية">
-            <div id="academy-cats" class="cat-nav-scroll"></div>
-        </nav>
     </header>
+    <nav class="market-category-bar" aria-label="أقسام الأكاديمية">
+        <div id="academy-cats" class="cat-nav-scroll"></div>
+        <button id="site-tagline" class="market-admin-link" type="button" onclick="triggerAdmin()">للإلكترونيات والفيديوهات التعليمية</button>
+    </nav>
 
     <!-- القسم الترحيبي (Hero Section) -->
     <div class="academy-hero">
         <div class="hero-content">
-        <h1 class="academy-brand-mark"><img id="academy-page-icon" src="academy-video-icon.svg" alt="" aria-hidden="true"><span id="academy-page-name">أكاديمية مشالى التعليمية</span></h1>
+        <h1 class="academy-brand-mark"><img id="academy-page-icon" src="video.png" alt="" aria-hidden="true"><span id="academy-page-name">أكاديمية مشالى للإلكترونيات</span></h1>
         <p id="academy-page-description">تعلّم خطوة بخطوة عبر دروس مصوّرة، وابحث عن الموضوع الذي تحتاجه أو تابع من حيث توقفت.</p>
         <div class="hero-stats">
             <span id="academy-video-count"><i class="fas fa-video"></i> جاري تحميل الدروس</span>
