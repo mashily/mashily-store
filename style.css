@@ -2289,6 +2289,28 @@ html { color-scheme: light; }
 .market-search input::-webkit-search-cancel-button { display: none; }
 .market-search button { border: 0; background: transparent; color: var(--text-light); cursor: pointer; }
 .market-search button[hidden] { display: none; }
+.market-sort {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 5px;
+    min-height: 30px;
+    padding-right: 10px;
+    border-right: 1px solid var(--border);
+    color: var(--text-light);
+    font-size: .76rem;
+    white-space: nowrap;
+}
+.market-sort select {
+    max-width: 122px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
 .market-admin-link {
     padding: 7px 0;
     border: 0;
@@ -2420,6 +2442,8 @@ html { color-scheme: light; }
     .market-actions { gap: 1px; }
     .market-icon-button { width: 35px; height: 38px; font-size: 1rem; }
     .market-search { grid-area: 2 / 1 / 3 / 4; }
+    .market-sort { gap: 3px; padding-right: 6px; font-size: .68rem; }
+    .market-sort select { max-width: 92px; font-size: .68rem; }
     .market-admin-link { font-size: .69rem; }
     .academy-controls .academy-sort-container { width: 100%; }
     .academy-sort-container select { min-width: 0; flex: 1; }

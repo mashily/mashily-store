@@ -68,11 +68,17 @@
                 <img class="academy-video-icon" src="academy-video-icon.svg" alt="" aria-hidden="true">
                 <span id="store-academy-name">أكاديمية مشالى التعليمية</span>
             </a>
-            <label class="market-search" for="search-input">
+            <div class="market-search">
                 <i class="fas fa-search" aria-hidden="true"></i>
                 <input type="search" id="search-input" oninput="searchProducts()" placeholder="ابحث باسم المنتج أو القسم أو المواصفات" autocomplete="off" aria-label="البحث في المنتجات">
                 <button type="button" id="search-clear-btn" onclick="clearProductSearch()" aria-label="مسح البحث" hidden><i class="fas fa-times"></i></button>
-            </label>
+                <label class="market-sort" for="product-sort">ترتيب
+                    <select id="product-sort" onchange="sortProducts(this.value)" aria-label="ترتيب المنتجات">
+                        <option value="default">افتراضي</option>
+                        <option value="price_low">السعر: الأقل</option>
+                        <option value="price_high">السعر: الأعلى</option>
+                    </select>
+                </label>
             <button id="site-tagline" class="market-admin-link" type="button" onclick="triggerAdmin()">للإلكترونيات والفيديوهات التعليمية</button>
             <div class="market-actions">
                 <div class="market-theme-wrap">
@@ -102,19 +108,8 @@
     </header>
 
     <section class="store-catalog" id="store-catalog" aria-labelledby="store-catalog-title">
-        <div class="store-catalog-toolbar">
-            <label class="store-sort-control" for="product-sort">
-                <span>ترتيب حسب</span>
-                <select id="product-sort" onchange="sortProducts(this.value)">
-                    <option value="default">الترتيب الافتراضي</option>
-                    <option value="price_low">السعر: الأقل أولاً</option>
-                    <option value="price_high">السعر: الأعلى أولاً</option>
-                </select>
-            </label>
-        </div>
         <div class="store-catalog-heading">
             <div>
-                <span class="store-hero-eyebrow">تسوّق على راحتك</span>
                 <h2 id="store-catalog-title">منتجات المتجر</h2>
             </div>
             <span id="store-results-count" class="store-results-count" role="status" aria-live="polite"></span>

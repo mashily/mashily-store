@@ -952,7 +952,7 @@ function renderProducts(items) {
     if(!grid) return;
 
     const resultsCount = document.getElementById('store-results-count');
-    if (resultsCount) resultsCount.textContent = `عرض ${items.length} من ${products.length} منتج`;
+    if (resultsCount) resultsCount.textContent = `${items.length} من ${products.length} منتج`;
 
     if(items.length === 0) {
         const hasSearch = Boolean(currentProductSearch);
