@@ -599,7 +599,7 @@ function createProductCard(p) {
     const discountPercent = oldPrice ? Math.round(((oldPrice - p.price) / oldPrice) * 100) : 0;
     
     return `
-    <div class="product-card ${isOut ? 'product-unavailable' : ''}" onmouseleave="hideAllInfos()">
+    <div class="product-card ${isOut ? 'product-unavailable' : ''}" onclick="if(!event.target.closest('button,a,input,select,textarea')) openProductDetails(${p.id})" onmouseleave="hideAllInfos()">
         <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${p.id}, event)" title="${isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
             <i class="fas fa-heart"></i>
         </button>
@@ -2518,14 +2518,18 @@ function initAcademyPage() {
     const catsContainer = document.getElementById('academy-cats');
     
     // عرض الأقسام
-    const cats = ['الكل', ...new Set(videos.map(v => v.category))];
-    const videoCount = document.getElementById('academy-video-count');
-    if (videoCount) videoCount.innerHTML = `<i class="fas fa-video" aria-hidden="true"></i> ${videos.length.toLocaleString('ar-EG')} درس`;
-    const categoryCount = document.getElementById('academy-category-count');
-    if (categoryCount) categoryCount.innerHTML = `<i class="fas fa-layer-group" aria-hidden="true"></i> ${new Set(videos.map(video => video.category).filter(Boolean)).size.toLocaleString('ar-EG')} قسم`;
+    const categories = [...new Set(videos.map(video => String(video.category || '').trim()).filter(Boolean))];
+    const cats = ['الكل', ...categories];
+    const allVideosFilter = document.querySelector('#academy-library-filter option[value="all"]');
+    if (allVideosFilter) allVideosFilter.textContent = `كل الفيديوهات (${videos.length.toLocaleString('ar-EG')})`;
     if(catsContainer) {
-        catsContainer.innerHTML = cats.map(c => 
-            `<button class="cat-btn-chip ${c === 'الكل' ? 'active' : ''}" onclick="filterAcademy('${c}', this)">${c}</button>`
+        catsContainer.innerHTML = cats.map(category => {
+            const count = category === 'الكل'
+                ? videos.length
+                : videos.filter(video => String(video.category || '').trim() === category).length;
+            const label = category === 'الكل' ? 'كل الفيديوهات' : category;
+            return `<button type="button" class="cat-btn-chip ${category === 'الكل' ? 'active' : ''}" aria-pressed="${category === 'الكل'}" onclick="filterAcademy('${category}', this)"><span>${label}</span><span class="cat-count">${count.toLocaleString('ar-EG')}</span></button>`;
+        }
         ).join('');
     }
 
@@ -2573,7 +2577,7 @@ function renderVideos(list) {
     if(!grid) return;
 
     const resultsCount = document.getElementById('academy-results-count');
-    if (resultsCount) resultsCount.textContent = `عرض ${list.length.toLocaleString('ar-EG')} درس`;
+    if (resultsCount) resultsCount.textContent = `${list.length.toLocaleString('ar-EG')} فيديو`;
 
     if(list.length === 0) {
         const emptyMessage = currentAcademyLibraryFilter === 'favorites'
@@ -2652,12 +2656,12 @@ function renderVideos(list) {
 }
 
 function filterAcademy(cat, btn) {
-    document.querySelectorAll('.cat-btn-chip').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.cat-btn-chip').forEach(button => {
+        button.classList.remove('active');
+        button.setAttribute('aria-pressed', 'false');
+    });
     btn.classList.add('active');
-
-    const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
-    const filtered = cat === 'الكل' ? videos : videos.filter(v => v.category === cat);
-    renderVideos(filtered);
+    btn.setAttribute('aria-pressed', 'true');
     currentAcademyCategory = cat;
     applyAcademyFilters();
 }

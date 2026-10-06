@@ -54,55 +54,34 @@
                 <a class="market-icon-button" href="index.html" aria-label="العودة إلى المتجر"><i class="fas fa-shopping-basket"></i></a>
             </div>
         </div>
+        <div class="academy-controls">
+            <div class="academy-sort-container">
+                <select id="academy-sort" onchange="sortAcademyVideos()" aria-label="ترتيب الدروس">
+                    <option value="newest">الأحدث أولاً</option>
+                    <option value="oldest">الأقدم أولاً</option>
+                    <option value="most_viewed">الأكثر مشاهدة</option>
+                    <option value="most_liked">الأكثر إعجاباً</option>
+                </select>
+                <select id="academy-library-filter" onchange="applyAcademyFilters()" aria-label="تصفية فيديوهات الأكاديمية">
+                    <option value="all">كل الفيديوهات</option>
+                    <option value="favorites">المفضلة</option>
+                    <option value="continue">أكمل المشاهدة</option>
+                    <option value="completed">تمت مشاهدتها</option>
+                </select>
+            </div>
+        </div>
     </header>
     <nav class="market-category-bar" aria-label="أقسام الأكاديمية">
         <div id="academy-cats" class="cat-nav-scroll"></div>
         <button id="site-tagline" class="market-admin-link" type="button" onclick="triggerAdmin()">للإلكترونيات والفيديوهات التعليمية</button>
     </nav>
 
-    <!-- القسم الترحيبي (Hero Section) -->
-    <div class="academy-hero">
-        <div class="hero-content">
-        <h1 class="academy-brand-mark"><img id="academy-page-icon" src="video.png" alt="" aria-hidden="true"><span id="academy-page-name">أكاديمية مشالى للإلكترونيات</span></h1>
-        <p id="academy-page-description">تعلّم خطوة بخطوة عبر دروس مصوّرة، وابحث عن الموضوع الذي تحتاجه أو تابع من حيث توقفت.</p>
-        <div class="hero-stats">
-            <span id="academy-video-count"><i class="fas fa-video"></i> جاري تحميل الدروس</span>
-            <span id="academy-category-count"><i class="fas fa-layer-group"></i> جاري تحميل الأقسام</span>
-        </div>
-        <a class="academy-hero-action" href="#academy-library" aria-controls="academy-grid"><i class="fas fa-play"></i> اكتشف الدروس</a>
-    </div>
-    </div>
-
-    <!-- أدوات البحث والفلترة -->
     <section class="academy-library" id="academy-library" aria-labelledby="academy-library-title">
-    <div class="academy-controls">
-        <!-- قائمة الترتيب -->
-        <div class="academy-sort-container">
-            <select id="academy-sort" onchange="sortAcademyVideos()" aria-label="ترتيب الدروس">
-                <option value="newest">📅 الأحدث أولاً</option>
-                <option value="oldest">📅 الأقدم أولاً</option>
-                <option value="most_viewed">🔥 الأكثر مشاهدة</option>
-                <option value="most_liked">👍 الأكثر إعجاباً</option>
-            </select>
-            <select id="academy-library-filter" onchange="applyAcademyFilters()" aria-label="تصفية فيديوهات الأكاديمية">
-                <option value="all">كل الفيديوهات</option>
-                <option value="favorites">❤️ المفضلة</option>
-                <option value="continue">▶️ أكمل المشاهدة</option>
-                <option value="completed">✅ تمت مشاهدتها</option>
-            </select>
-        </div>
-
-    </div>
-
-    <!-- شبكة الفيديوهات -->
-    <div class="academy-library-heading">
-        <h2 id="academy-library-title">مكتبة الدروس</h2>
-        <span id="academy-results-count" role="status" aria-live="polite"></span>
-    </div>
-    <main class="video-grid" id="academy-grid" aria-label="دروس الأكاديمية">
-        <!-- سيتم عرض الفيديوهات هنا -->
-        <div class="loader" style="grid-column: 1/-1; margin: 50px auto;"></div>
-    </main>
+        <h2 id="academy-library-title" class="visually-hidden">دروس الأكاديمية</h2>
+        <span id="academy-results-count" class="academy-results-count" role="status" aria-live="polite"></span>
+        <main class="video-grid" id="academy-grid" aria-label="دروس الأكاديمية">
+            <div class="loader" style="grid-column: 1/-1; margin: 50px auto;"></div>
+        </main>
     </section>
 
     <!-- مشغل الفيديو المنبثق -->
