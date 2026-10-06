@@ -18,7 +18,7 @@
     <meta id="site-twitter-description" name="twitter:description" content="تصفح أصناف متجر مشالى واطلب مباشرة عبر واتساب.">
     <meta name="twitter:image" content="https://mashily.github.io/mashily-store/logo.png">
     <link rel="manifest" href="manifest.json">
-    <meta id="site-theme-color" name="theme-color" content="#f7f9f8">
+    <meta id="site-theme-color" name="theme-color" content="#2e8b57">
     <meta id="site-application-name" name="application-name" content="مشالى">
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -72,21 +72,26 @@
 
         <a id="store-academy-link" href="academy.html" style="text-decoration: none; background: var(--card); padding: 5px 15px; border-radius: 50px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid var(--border); transition: transform 0.2s; display: flex; align-items: center; gap: 5px;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             <h2 style="color:var(--primary); margin:0; font-size: 1rem; font-weight: 900; display: flex; align-items: center; gap: 5px;">
-                <img class="academy-video-icon" src="academy-video-icon.svg" alt="" aria-hidden="true">
-                <span id="store-academy-name">أكاديمية مشالى التعليمية</span>
+                <i class="fas fa-graduation-cap"></i> <span id="store-academy-name">أكاديمية مشالى</span>
             </h2>
         </a>
 
-        <div id="store-header-controls" style="display: flex; align-items: center; gap: 25px;">
+        <div id="store-header-controls" style="display: flex; align-items: center; gap: 25px;"> <div class="store-search-controls" style="max-width: 140px;">
+                <select onchange="sortProducts(this.value)" style="width: 100%; padding: 5px; border-radius: 15px; border: 1px solid var(--border); font-size: 0.75rem; outline: none; margin-bottom: 5px; background: var(--card); color: var(--text); cursor: pointer;">
+                    <option value="default">ترتيب افتراضي</option>
+                    <option value="price_low">السعر: الأقل أولاً</option>
+                    <option value="price_high">السعر: الأعلى أولاً</option>
+                </select>
+                <input type="text" id="search-input" onkeyup="searchProducts()" placeholder="ابحث.." 
+                       style="width: 100%; padding: 7px 12px; border-radius: 20px; border: 1px solid var(--border); font-size: 0.8rem; outline: none; background: var(--card); color: var(--text);">
+            </div>
+            
             <div style="display: flex; gap: 15px; align-items: center; margin-right: 5px;">
                 <div style="position:relative;">
                     <button onclick="toggleThemeMenu(event)" onmouseover="this.style.background='rgba(0,0,0,0.1)'" onmouseout="this.style.background='none'" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:var(--primary); padding:8px; border-radius:50%; transition:all 0.3s; display:flex; align-items:center; justify-content:center; width:40px; height:40px;">
                         <i id="theme-icon" class="fas fa-moon" style="transition:all 0.3s;"></i>
                     </button>
                     <div id="theme-menu" style="position:absolute; top:45px; right:0; background:var(--card); border:2px solid var(--primary); border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.3); padding:8px; min-width:auto; display:none; z-index:10000;">
-                        <button onclick="setTheme('dark', event)" style="width:45px; height:45px; padding:0; margin:3px; background:#171a1c; color:#9bb8a7; border:2px solid #9bb8a7; border-radius:8px; cursor:pointer; font-size:1.2rem; font-weight:bold; display:flex; align-items:center; gap:0; justify-content:center; transition:all 0.3s;" title="داكن هادئ">
-                            <i class="fas fa-moon"></i>
-                        </button>
                         <button onclick="setTheme('light', event)" style="width:45px; height:45px; padding:0; margin:3px; background:linear-gradient(135deg, #FFFFFF, #F5F5F5); color:#333; border:2px solid #ddd; border-radius:8px; cursor:pointer; font-size:1.2rem; font-weight:bold; display:flex; align-items:center; gap:0; justify-content:center; transition:all 0.3s;" title="Light Theme">
                             <i class="fas fa-sun"></i>
                         </button>
@@ -119,6 +124,10 @@
                     <span id="cart-badge" style="position: absolute; top: -8px; right: -8px; background: var(--primary); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 50%;">0</span>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="categories-wrapper" style="background: var(--bg); padding: 10px 0; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;">
+        <div id="product-cats" style="display: flex; gap: 10px; overflow-x: auto; padding: 5px 15px; scrollbar-width: none; -ms-overflow-style: none;">
         </div>
     </div>
     <style>
@@ -166,55 +175,11 @@
     </style>
 </header>
 
-    <section class="store-hero" aria-labelledby="store-hero-title store-hero-highlight">
-        <div class="store-hero-copy">
-            <span class="store-hero-eyebrow"><i class="fas fa-sparkles"></i> <span id="store-hero-kicker">أهلاً بك في متجر مشالى</span></span>
-            <h1 id="store-hero-title">اختياراتك التقنية</h1>
-            <span class="store-hero-highlight" id="store-hero-highlight">بخطوات أسهل</span>
-            <p id="store-hero-description">تصفّح المنتجات والأقسام، قارن التفاصيل والأسعار، ثم أرسل طلبك مباشرة عبر واتساب.</p>
-            <div class="store-hero-actions">
-                <a class="store-hero-primary" href="#store-catalog"><i class="fas fa-arrow-down"></i> تصفح المنتجات</a>
-                <a class="store-hero-secondary" href="academy.html"><img class="academy-video-icon" src="academy-video-icon.svg" alt="" aria-hidden="true"> <span id="store-hero-academy-label">أكاديمية مشالى التعليمية</span></a>
-                <a class="store-hero-whatsapp-cta" id="store-hero-whatsapp-link" href="https://wa.me/201551831308" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp" aria-hidden="true"></i> اطلب بسهولة عبر واتساب</a>
-            </div>
-        </div>
-        <div class="store-hero-art" aria-hidden="true">
-            <div class="store-hero-orbit"><i class="fas fa-microchip"></i></div>
-        </div>
-    </section>
-
-    <section class="store-catalog" id="store-catalog" aria-labelledby="store-catalog-title">
-        <div class="store-catalog-toolbar">
-            <label class="store-search-box" for="search-input">
-                <i class="fas fa-search" aria-hidden="true"></i>
-                <input type="search" id="search-input" oninput="searchProducts()" placeholder="ابحث باسم المنتج أو القسم أو المواصفات" autocomplete="off" aria-label="البحث في المنتجات">
-                <button type="button" id="search-clear-btn" onclick="clearProductSearch()" aria-label="مسح البحث" hidden><i class="fas fa-times"></i></button>
-            </label>
-            <label class="store-sort-control" for="product-sort">
-                <span>ترتيب حسب</span>
-                <select id="product-sort" onchange="sortProducts(this.value)">
-                    <option value="default">الترتيب الافتراضي</option>
-                    <option value="price_low">السعر: الأقل أولاً</option>
-                    <option value="price_high">السعر: الأعلى أولاً</option>
-                </select>
-            </label>
-        </div>
-        <div class="categories-wrapper">
-            <div id="product-cats" aria-label="أقسام المنتجات"></div>
-        </div>
-        <div class="store-catalog-heading">
-            <div>
-                <span class="store-hero-eyebrow">تسوّق على راحتك</span>
-                <h2 id="store-catalog-title">منتجات المتجر</h2>
-            </div>
-            <span id="store-results-count" class="store-results-count" role="status" aria-live="polite"></span>
-        </div>
-        <main class="products-grid" id="products-grid" aria-label="منتجات المتجر"></main>
-    </section>
-
     <div class="news-ticker">
         <div class="ticker-content" id="ticker-text">🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥</div>
     </div>
+
+    <main class="products-grid" id="products-grid"></main>
 
     <div id="cart-sidebar" class="cart-sidebar" style="width: 350px; background: var(--card); display:flex; flex-direction:column;">
         <!-- رأس السلة -->
@@ -231,16 +196,18 @@
             
             <!-- طريقة الدفع -->
             <div style="margin-bottom:10px;">
-                <p style="margin:0 0 7px; font-size:.8rem; color:var(--text-light);">طريقة الدفع المفضلة</p>
-                <div class="cart-payment-options">
-                    <button class="cart-payment-option active" type="button" aria-pressed="true" onclick="togglePayment('cash', this)">
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:4px;">
+                    <button onclick="togglePayment('cash')" style="background:var(--primary); color:white; border:none; padding:6px 4px; border-radius:4px; cursor:pointer; font-size:0.7rem; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:1px;">
                         <i class="fas fa-money-bill" style="font-size:0.8rem;"></i> نقداً
                     </button>
-                    <button class="cart-payment-option" type="button" aria-pressed="false" onclick="togglePayment('vodafone', this)">
+                    <button onclick="togglePayment('vodafone')" style="background:var(--primary); color:white; border:none; padding:6px 4px; border-radius:4px; cursor:pointer; font-size:0.7rem; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:1px;">
                         <i class="fas fa-mobile-alt" style="font-size:0.8rem;"></i> فودافون
                     </button>
-                    <button class="cart-payment-option" type="button" aria-pressed="false" onclick="togglePayment('instapay', this)">
+                    <button onclick="togglePayment('instapay')" style="background:var(--primary); color:white; border:none; padding:6px 4px; border-radius:4px; cursor:pointer; font-size:0.7rem; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:1px;">
                         <i class="fas fa-university" style="font-size:0.8rem;"></i> Instapay
+                    </button>
+                    <button onclick="sendToWhatsApp()" style="background:#25d366; color:white; border:none; padding:6px 4px; border-radius:4px; cursor:pointer; font-size:0.7rem; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:1px;">
+                        <i class="fab fa-whatsapp" style="font-size:0.8rem;"></i> واتس
                     </button>
                 </div>
             </div>
@@ -282,13 +249,9 @@
                 </div>
             </div>
 
-            <button class="cart-checkout-btn" type="button" onclick="sendToWhatsApp()">
-                <i class="fab fa-whatsapp"></i> تأكيد الطلب عبر واتساب
-            </button>
-
             <!-- زر تفريغ السلة -->
-            <button class="cart-clear-btn" type="button" onclick="clearCart()">
-                <i class="fas fa-trash-alt"></i> إفراغ السلة
+            <button onclick="clearCart()" style="width:100%; background:#e74c3c; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer; font-weight:bold; font-size:0.85rem; display:flex; align-items:center; justify-content:center; gap:5px;">
+                <i class="fas fa-trash-alt"></i>   تفريغ
             </button>
 
 </div>
