@@ -99,6 +99,17 @@ function applySiteBranding(settings) {
             if (image) image.setAttribute('content', brandLogoUrl);
         });
     }
+    const appIcon192Url = getCampaignUrl(settings.app_icon_192 || 'icon-192.png');
+    const appSplashUrl = getCampaignUrl(settings.app_splash_image || settings.brand_logo_image || 'logo.png');
+    ['site-apple-touch-icon', 'academy-apple-touch-icon'].forEach(id => {
+        const icon = document.getElementById(id);
+        if (icon && appIcon192Url) icon.href = appIcon192Url;
+    });
+    const splashImage = document.getElementById('app-splash-image');
+    if (splashImage && appSplashUrl) {
+        splashImage.src = appSplashUrl;
+        splashImage.alt = `شعار ${brandName}`;
+    }
     const academyHero = document.querySelector('.academy-hero');
     const academyDescriptionColor = String(settings.academy_description_color || '').trim();
     const academyDescriptionSize = String(settings.academy_description_size || '').trim();
@@ -119,6 +130,8 @@ function applySiteBranding(settings) {
         ? settings.theme_color
         : '#f7f9f8';
     document.querySelectorAll('meta[name="theme-color"]').forEach(meta => meta.setAttribute('content', themeColor));
+    const splash = document.getElementById('app-splash');
+    if (splash) splash.style.setProperty('--app-splash-color', themeColor);
 }
 
 function init() {
@@ -127,6 +140,7 @@ function init() {
 }
 
 async function initializeStore() {
+    window.setTimeout(hideAppSplash, 8000);
     // التحقق مما إذا كان المستخدم مديراً (لتجنب مسح التعديلات المحلية عند التحديث)
     const isAdmin = sessionStorage.getItem('mashily_user');
 
@@ -305,6 +319,7 @@ async function initializeStore() {
     showSkeletons();
     setTimeout(() => {
         renderProducts(products);
+        hideAppSplash();
     }, 700);
 
     updateCartUI();
@@ -337,6 +352,13 @@ function getCampaignPage() {
     if (document.getElementById('academy-grid')) return 'academy';
     if (document.getElementById('products-grid')) return 'store';
     return '';
+}
+
+function hideAppSplash() {
+    const splash = document.getElementById('app-splash');
+    if (!splash || splash.classList.contains('is-hidden')) return;
+    splash.classList.add('is-hidden');
+    window.setTimeout(() => splash.remove(), 350);
 }
 
 function getCampaignUrl(value) {

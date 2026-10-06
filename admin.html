@@ -3889,7 +3889,7 @@
                 if (manifestB64) {
                     ok = await pushFile('manifest.json', manifestB64) && ok;
                 }
-                if(ok) { alert('تم النشر بنجاح! 🚀 تم تحديث بيانات المتجر واسم تطبيق الهاتف. قد تحتاج بعض الأجهزة إلى إعادة تثبيت التطبيق لتحديث الاسم.'); document.getElementById('publish-modal').style.display='none'; }
+                if(ok) { alert('تم النشر بنجاح! 🚀 تم تحديث بيانات المتجر وإعدادات اسم التطبيق وأيقونته. قد تحتاج إلى إعادة تثبيت التطبيق لتحديث الأيقونة على الهاتف.'); document.getElementById('publish-modal').style.display='none'; }
                 else alert('فشل النشر');
             } catch(e) { alert('خطأ: ' + e.message); }
         }

@@ -402,6 +402,9 @@ function buildStoreWorkbook() {
         { 'المفتاح': 'website', 'القيمة': settings.website || 'https://mashily.github.io/mashily-store/', 'الوصف': 'رابط المتجر على الإنترنت (لمعاينة واتساب والمشاركة)' },
         { 'المفتاح': 'brand_name', 'القيمة': settings.brand_name || 'مشالى', 'الوصف': 'اسم العلامة التجارية الظاهر في رأس الموقع' },
         { 'المفتاح': 'brand_logo_image', 'القيمة': settings.brand_logo_image || 'logo.png', 'الوصف': 'مسار صورة شعار المتجر؛ اكتب اسم الملف أو رابطه وارفع ملف الصورة إلى GitHub' },
+        { 'المفتاح': 'app_icon_192', 'القيمة': settings.app_icon_192 || 'icon-192.png', 'الوصف': 'مسار أيقونة التطبيق المربعة بحجم 192×192؛ حدّث الصورة وارفعها للمستودع' },
+        { 'المفتاح': 'app_icon_512', 'القيمة': settings.app_icon_512 || 'icon-512.png', 'الوصف': 'مسار أيقونة التطبيق المربعة بحجم 512×512؛ تستخدم أيضاً لشاشة بدء Android' },
+        { 'المفتاح': 'app_splash_image', 'القيمة': settings.app_splash_image || settings.brand_logo_image || 'logo.png', 'الوصف': 'مسار الصورة التي تظهر أثناء تحميل التطبيق؛ ارفع الصورة إلى المستودع' },
         { 'المفتاح': 'site_name', 'القيمة': settings.site_name || 'متجر مشالى | الإلكترونيات', 'الوصف': 'اسم الموقع وعنوان صفحة المتجر' },
         { 'المفتاح': 'app_name', 'القيمة': settings.app_name || settings.site_name || 'متجر مشالى | الإلكترونيات', 'الوصف': 'الاسم الكامل لتطبيق الهاتف المثبت' },
         { 'المفتاح': 'short_name', 'القيمة': settings.short_name || 'مشالى', 'الوصف': 'الاسم المختصر لأيقونة التطبيق المثبت' },
@@ -520,8 +523,8 @@ function getSiteManifestBase64() {
         theme_color: themeColor,
         orientation: 'portrait-primary',
         icons: [
-            { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-            { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' }
+            { src: settings.app_icon_192 || 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: settings.app_icon_512 || 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' }
         ]
     };
     return btoa(unescape(encodeURIComponent(JSON.stringify(manifest, null, 2))));

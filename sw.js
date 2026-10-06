@@ -2,7 +2,7 @@
    sw.js - Service Worker لتطبيق متجر مشالى (PWA)
    يخزن الملفات الأساسية مؤقتاً ليعمل التطبيق أونلاين/أوفلاين
    ============================================================ */
-const CACHE_NAME = 'mashily-store-v20';
+const CACHE_NAME = 'mashily-store-v21';
 const CORE_ASSETS = [
   './',
   './index.html',
