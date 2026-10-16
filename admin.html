@@ -660,6 +660,7 @@
             .sidebar.active { transform: translateX(0); }
             .menu-toggle { display: block; }
             .form-row { grid-template-columns: 1fr; }
+            .grid-layout { grid-template-columns: minmax(0, 1fr) !important; }
         }
         
         /* اللودر */
@@ -892,7 +893,7 @@
             
             <div class="quick-actions">
                 <h3><i class="fas fa-bolt"></i> إجراءات سريعة</h3>
-                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px;">
                     <button class="btn btn-primary" onclick="switchTab('add-product')">
                         <i class="fas fa-plus"></i> إضافة منتج جديد
                     </button>
@@ -1693,30 +1694,12 @@
                     <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
                 </div>
                 
-                <h3 style="margin-top: 30px;"><i class="fas fa-sync-alt"></i> مزامنة مع المتجر</h3>
-                <p>سحب البيانات من متجرك الحالي (script.js)</p>
-                <button class="btn btn-primary" onclick="syncFromStore()">
-                    <i class="fas fa-sync"></i> مزامنة البيانات
-                </button>
-                
-                <h3 style="margin-top: 30px;"><i class="fas fa-code"></i> تحديث ملف المتجر</h3>
-                <p>نسخ البيانات الجديدة إلى ملف script.js الخاص بالمتجر</p>
-                <button class="btn btn-success" onclick="updateStoreFile()">
-                    <i class="fas fa-code"></i> تحديث ملف المتجر
-                </button>
-                
                 <h3 style="margin-top: 30px;"><i class="fab fa-github"></i> النشر التلقائي (GitHub)</h3>
-                <p>نشر التحديثات مباشرة إلى ملف db.json على GitHub</p>
+                <p>ينشر ملف Excel، المصدر الأساسي للمتجر، مع ملف db.json الاحتياطي وإعدادات التطبيق.</p>
                 <button class="btn btn-primary" style="background:#24292e;" onclick="showPublishModal()">
                     <i class="fas fa-cloud-upload-alt"></i> نشر التحديثات
                 </button>
 
-                <div id="code-output" style="margin-top: 15px; display: none;">
-                    <textarea id="generated-code" style="width: 100%; height: 200px; font-family: monospace; padding: 10px;"></textarea>
-                    <button class="btn" onclick="copyCode()" style="margin-top: 10px;">
-                        <i class="fas fa-copy"></i> نسخ الكود
-                    </button>
-                </div>
             </div>
         </div>
         
@@ -1780,7 +1763,7 @@
                         3. اختر القسم المناسب للمنتج<br>
                         4. أضف علامات (tags) إذا لزم الأمر<br>
                         5. اضغط على "حفظ المنتج"<br>
-                        6. انتقل إلى "تحديث ملف المتجر" لنسخ البيانات
+                        6. نزّل ملف Excel الكامل من "النسخ الاحتياطي" لتحديث بيانات المتجر المنشورة
                     </div>
                 </div>
                 
@@ -1792,7 +1775,7 @@
                         3. اضغط على زر "تعديل"<br>
                         4. عدل البيانات المطلوبة<br>
                         5. اضغط على "حفظ التعديلات"<br>
-                        6. لا تنس تحديث ملف المتجر
+                        6. نزّل ملف Excel الكامل وارفعه إلى GitHub كي تظهر التعديلات على المتجر
                     </div>
                 </div>
                 
@@ -1823,30 +1806,28 @@
                     <div class="help-content">
                         • احفظ نسخة احتياطية أسبوعياً<br>
                         • استخدم "تصدير كل شيء" لنسخ جميع البيانات<br>
-                        • استخدم "مزامنة البيانات" لجلب البيانات من متجرك<br>
-                        • استخدم "تحديث ملف المتجر" لنسخ البيانات إلى script.js
+                        • ارفع أحدث ملف <b>store-data.xlsx</b> إلى GitHub لتحديث بيانات المتجر المنشورة<br>
+                        • استخدم "تصدير ملف Excel كامل" لحفظ نسخة بيانات المتجر المنشورة
                     </div>
                 </div>
                 
                 <div class="help-item">
                     <h3 class="help-title"><i class="fas fa-code"></i> دمج مع المتجر</h3>
                     <div class="help-content">
-                        بعد إضافة أو تعديل المنتجات:<br>
+                        لنشر تعديلات المتجر:<br>
                         1. انتقل إلى قسم "النسخ الاحتياطي"<br>
-                        2. اضغط على "تحديث ملف المتجر"<br>
-                        3. انسخ الكود المولد<br>
-                        4. افتح ملف <code>script.js</code> في متجرك<br>
-                        5. استبدل بيانات المنتجات والتقييمات<br>
-                        6. احفظ الملف واختبر المتجر
+                        2. اضغط على "تصدير ملف Excel كامل" لتنزيل <code>store-data.xlsx</code><br>
+                        3. ارفع الملف بالاسم نفسه إلى GitHub<br>
+                        4. انتظر تحديث الموقع، ثم أعد تحميل المتجر
                     </div>
                 </div>
             </div>
         </div>
         
         <div class="admin-footer">
-            <p>© 2024 لوحة تحكم متجر مشالى للالكترونيات | الإصدار 1.0</p>
+            <p>© <span id="admin-current-year"></span> لوحة تحكم متجر مشالى للإلكترونيات</p>
             <p style="margin-top: 5px; font-size: 0.8rem;">
-                <i class="fas fa-shield-alt"></i> البيانات محفوظة محلياً على جهازك
+                <i class="fas fa-info-circle"></i> التعديلات محفوظة في هذا المتصفح؛ صدّر ملف Excel أو انشر التحديثات ليشاهدها الزوار.
             </p>
         </div>
         </main>
@@ -2080,6 +2061,7 @@
         
         // تهيئة الصفحة
         document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('admin-current-year').textContent = new Date().getFullYear();
             loadFromLocalStorage();
             renderAdminInstallQr();
             updateStats();
@@ -3253,44 +3235,6 @@
             reader.readAsText(file);
         }
         
-        // مزامنة من المتجر
-        async function syncFromStore() {
-            if (confirm('سيتم استبدال البيانات المحلية ببيانات السيرفر (db.json). هل أنت متأكد؟')) {
-                const btn = event.target; // الزر الذي تم ضغطه
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري المزامنة...';
-                btn.disabled = true;
-
-                try {
-                    // محاولة جلب ملف db.json
-                    const response = await fetch('db.json?v=' + new Date().getTime());
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        
-                        // تحديث البيانات المحلية
-                        if(data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
-                        if(data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
-                        if(data.academyCats) localStorage.setItem('academyCategories', JSON.stringify(data.academyCats));
-                        if(data.statuses) localStorage.setItem('storeStatuses', JSON.stringify(data.statuses));
-                        if(data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
-                        if(data.ticker) localStorage.setItem('tickerText', data.ticker);
-                        if(data.proof) localStorage.setItem('proofText', data.proof);
-                        if(data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
-                        
-                        showAlert('تمت المزامنة بنجاح! سيتم إعادة تحميل الصفحة.', 'success');
-                        setTimeout(() => location.reload(), 1500);
-                    } else {
-                        throw new Error('لم يتم العثور على ملف db.json أو لم يتم نشره بعد.');
-                    }
-                } catch (e) {
-                    showAlert('فشل المزامنة: ' + e.message, 'error');
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }
-            }
-        }
-        
         // --- إدارة الإعدادات ---
         function loadSettings() {
             const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
@@ -3944,32 +3888,6 @@
             document.getElementById('sidebar').classList.toggle('active');
         }
 
-        // تحديث ملف المتجر
-        function updateStoreFile() {
-            const output = document.getElementById('code-output');
-            const codeTextarea = document.getElementById('generated-code');
-            
-            // توليد كود JavaScript
-            const productsCode = `const productsData = ${JSON.stringify(products, null, 2)};`;
-            const reviewsCode = `const productReviews = ${JSON.stringify(reviews, null, 2)};`;
-            
-            const fullCode = `// ===== بيانات المنتجات =====\n${productsCode}\n\n// ===== نظام التقييمات =====\n${reviewsCode}`;
-            
-            codeTextarea.value = fullCode;
-            output.style.display = 'block';
-            output.scrollIntoView({ behavior: 'smooth' });
-            
-            showAlert('تم توليد كود البيانات', 'success');
-        }
-        
-        // نسخ الكود
-        function copyCode() {
-            const codeTextarea = document.getElementById('generated-code');
-            codeTextarea.select();
-            document.execCommand('copy');
-            showAlert('تم نسخ الكود إلى الحافظة', 'success');
-        }
-        
         // حفظ البيانات محلياً
         function saveToLocalStorage() {
             localStorage.setItem('storeProducts', JSON.stringify(products));

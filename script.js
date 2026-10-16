@@ -49,7 +49,6 @@ function applySiteBranding(settings) {
 
     const textValues = {
         'site-brand-name': brandName,
-        'site-tagline': settings.site_tagline || 'للإلكترونيات والفيديوهات التعليمية',
         'store-academy-name': academyName,
         'academy-header-name': academyName,
         'academy-store-name': `متجر ${brandName}`,
@@ -1670,12 +1669,17 @@ function shareProduct(id, event) {
 // --- الإشعار الترحيبي (يظهر أول مرة فقط) ---
 // --- الدخول السري للوحة التحكم ---
 let adminClicks = 0;
-function triggerAdmin() {
+let adminClickResetTimer = null;
+function triggerAdmin(event) {
+    if (event) event.preventDefault();
+    clearTimeout(adminClickResetTimer);
     adminClicks++;
-    if(adminClicks === 5) {
+    if (adminClicks >= 5) {
+        adminClicks = 0;
         window.location.href = 'admin.html';
+        return;
     }
-    setTimeout(() => { adminClicks = 0; }, 1000); // إعادة التصفير إذا توقف النقر
+    adminClickResetTimer = setTimeout(() => { adminClicks = 0; }, 2000);
 }
 
 // ===== نظام الفاتورة =====
