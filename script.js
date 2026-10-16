@@ -177,7 +177,13 @@ async function initializeStore() {
 
     // تحميل البيانات للمتغيرات
     products = JSON.parse(localStorage.getItem('storeProducts')) || [];
-    applySiteBranding(JSON.parse(localStorage.getItem('storeSettings')) || {});
+    const storeSettings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    const cartAutoCloseSetting = String(storeSettings.cart_auto_close_seconds ?? '').trim();
+    const parsedCartAutoClose = Number(cartAutoCloseSetting);
+    cartAutoCloseSeconds = cartAutoCloseSetting && Number.isFinite(parsedCartAutoClose)
+        ? Math.min(30, Math.max(0, parsedCartAutoClose))
+        : 3;
+    applySiteBranding(storeSettings);
     startSocialProof();
 
     // --- إضافة منتج تجريبي (للتجربة) ---
@@ -206,6 +212,10 @@ async function initializeStore() {
     // تحميل إعدادات الدفع المخصصة
     const settings = JSON.parse(localStorage.getItem('storeSettings'));
     if(settings) {
+        const bankNameEl = document.getElementById('bank-name-display');
+        const bankAccountEl = document.getElementById('bank-account-display');
+        if(bankNameEl) bankNameEl.innerText = settings.bank_name || '—';
+        if(bankAccountEl) bankAccountEl.innerText = settings.bank_account || '—';
         if(settings.vodafone) {
             const vfEl = document.getElementById('vf-number-display');
             if(vfEl) vfEl.innerText = settings.vodafone;
@@ -316,6 +326,7 @@ async function initializeStore() {
 
     // 3. عرض الأقسام والمنتجات مع تأثير التحميل
     renderCategories();
+    setupProductCategoryScrolling();
     showSkeletons();
     setTimeout(() => {
         renderProducts(products);
@@ -638,8 +649,8 @@ function createProductCard(p) {
         <div class="product-details">
             <h4><button class="product-title-btn" type="button" onclick="openProductDetails(${p.id})">${p.name}</button></h4>
             <div class="price-tag">
-                ${oldPrice ? `<s style="color:#95a5a6; font-size:0.8rem; margin-left:5px;">${oldPrice}</s>` : ''}
-                ${p.price} ج.م
+                ${oldPrice && Number(oldPrice) > Number(p.price) ? `<span class="old-price"><span>قبل الخصم</span><s>${oldPrice} ج.م</s></span>` : ''}
+                <span class="sale-price">${p.price} <small>ج.م</small></span>
             </div>
             ${renderProductRating(p)}
             ${hasTimer ? `<div class="countdown-timer" data-ends="${parseOfferDate(p.offerEnds, true)}">جاري التحميل...</div>` : ''}
@@ -656,6 +667,8 @@ function createProductCard(p) {
 let currentGalleryIndex = 0;
 let currentProductImages = [];
 let productModalHistoryState = false;
+let cartAutoCloseTimer = null;
+let cartAutoCloseSeconds = 3;
 
 function openProductDetails(id) {
     const product = products.find(p => p.id === id);
@@ -1281,10 +1294,47 @@ function removeFromWishlist(productId) {
 // --- وظائف السلة ---
 function addToCart(id) {
     let p = products.find(x => x.id === id);
+    if (!p) return;
     let f = cart.find(x => x.id === id);
     if(f) f.qty++; else cart.push({...p, qty: 1});
     updateCartUI();
     toggleCart(true);
+    scheduleCartAutoClose();
+}
+
+function scheduleCartAutoClose() {
+    if (cartAutoCloseTimer) window.clearTimeout(cartAutoCloseTimer);
+    if (cartAutoCloseSeconds <= 0) return;
+    cartAutoCloseTimer = window.setTimeout(() => {
+        cartAutoCloseTimer = null;
+        toggleCart(false);
+    }, cartAutoCloseSeconds * 1000);
+}
+
+function cancelCartAutoClose() {
+    if (!cartAutoCloseTimer) return;
+    window.clearTimeout(cartAutoCloseTimer);
+    cartAutoCloseTimer = null;
+}
+
+function scrollProductCategories(direction) {
+    const categories = document.getElementById('product-cats');
+    if (!categories) return;
+    const distance = Math.max(240, Math.round(categories.clientWidth * 0.7));
+    categories.scrollBy({left: -direction * distance, behavior: 'smooth'});
+}
+
+function setupProductCategoryScrolling() {
+    const categories = document.getElementById('product-cats');
+    if (!categories || categories.dataset.wheelScrolling === 'true') return;
+    categories.dataset.wheelScrolling = 'true';
+    categories.addEventListener('wheel', event => {
+        if (categories.scrollWidth <= categories.clientWidth) return;
+        if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+            event.preventDefault();
+            categories.scrollBy({left: -event.deltaY, behavior: 'auto'});
+        }
+    }, {passive: false});
 }
 
 function updateCartUI() {
@@ -1374,23 +1424,48 @@ function clearCart() {
 function toggleCart(s){ 
     const c = document.getElementById('cart-sidebar');
     const o = document.getElementById('overlay');
-    if(s) { c.classList.add('active'); o.classList.add('active'); }
-    else { c.classList.remove('active'); o.classList.remove('active'); }
+    if (!c || !o) return;
+    if(s) {
+        if (c.classList.contains('active')) cancelCartAutoClose();
+        c.classList.add('active');
+        o.classList.add('active');
+    }
+    else {
+        cancelCartAutoClose();
+        c.classList.remove('active');
+        o.classList.remove('active');
+    }
+
 }
 
-// تبديل عرض معلومات فودافون كاش
 function togglePayment(method, selectedButton) {
+    const details = {
+        cash: document.getElementById('bank-info'),
+        vodafone: document.getElementById('vodafone-info'),
+        instapay: document.getElementById('instapay-info')
+    };
+    const wasExpanded = selectedButton.getAttribute('aria-expanded') === 'true';
+    const shouldExpand = selectedPaymentMethod !== method || !wasExpanded;
     selectedPaymentMethod = method;
-    const vfInfo = document.getElementById('vodafone-info');
-    const ipInfo = document.getElementById('instapay-info');
-    if(vfInfo) vfInfo.style.display = method === 'vodafone' ? 'block' : 'none';
-    if(ipInfo) ipInfo.style.display = method === 'instapay' ? 'block' : 'none';
+    Object.entries(details).forEach(([key, element]) => {
+        if (element) {
+            const isVisible = key === method && shouldExpand;
+            element.hidden = !isVisible;
+            element.style.display = isVisible ? 'block' : 'none';
+        }
+    });
     document.querySelectorAll('.cart-payment-option').forEach(button => {
         const isSelected = button === selectedButton;
         button.classList.toggle('active', isSelected);
         button.setAttribute('aria-pressed', String(isSelected));
+        button.setAttribute('aria-expanded', String(isSelected && shouldExpand));
     });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const cartSidebar = document.getElementById('cart-sidebar');
+    if (cartSidebar) cartSidebar.addEventListener('pointerdown', cancelCartAutoClose);
+});
 
 // --- نظام الكوبونات ---
 function applyCoupon() {
@@ -1440,7 +1515,11 @@ function sendToWhatsApp() {
     
     // معرفة طريقة الدفع المختارة
     const paymentMethod = selectedPaymentMethod;
-    let paymentText = 'الدفع عند الاستلام';
+    let paymentText = 'تحويل بنكي';
+    if (paymentMethod === 'cash') {
+        const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+        paymentText = `تحويل بنكي${settings.bank_name ? ` - ${settings.bank_name}` : ''}${settings.bank_account ? ` - رقم الحساب: ${settings.bank_account}` : ''}`;
+    }
     if (paymentMethod === 'vodafone') paymentText = 'فودافون كاش (يرجى مراجعة التحويل)';
     else if (paymentMethod === 'instapay') paymentText = 'InstaPay (يرجى مراجعة التحويل)';
 

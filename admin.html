@@ -1738,6 +1738,14 @@
                         <input type="text" id="setting-instapay" placeholder="username@instapay">
                     </div>
                     <div class="form-group">
+                        <label>اسم البنك للتحويل</label>
+                        <input type="text" id="setting-bank-name" placeholder="اسم البنك">
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الحساب البنكي</label>
+                        <input type="text" id="setting-bank-account" placeholder="رقم الحساب">
+                    </div>
+                    <div class="form-group">
                         <label>رابط صورة الباركود (QR Code)</label>
                         <input type="url" id="setting-qr" placeholder="رابط الصورة المباشر...">
                         <small>قم برفع صورة الباركود على موقع رفع صور وانسخ الرابط المباشر هنا.</small>
@@ -3288,6 +3296,8 @@
             const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
             document.getElementById('setting-vodafone').value = settings.vodafone || '';
             document.getElementById('setting-instapay').value = settings.instapay || '';
+            document.getElementById('setting-bank-name').value = settings.bank_name || '';
+            document.getElementById('setting-bank-account').value = settings.bank_account || '';
             document.getElementById('setting-qr').value = settings.qr || '';
         }
 
@@ -3297,6 +3307,8 @@
             Object.assign(settings, {
                 vodafone: document.getElementById('setting-vodafone').value,
                 instapay: document.getElementById('setting-instapay').value,
+                bank_name: document.getElementById('setting-bank-name').value,
+                bank_account: document.getElementById('setting-bank-account').value,
                 qr: document.getElementById('setting-qr').value
             });
             localStorage.setItem('storeSettings', JSON.stringify(settings));

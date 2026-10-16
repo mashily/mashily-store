@@ -101,14 +101,20 @@
                 <button class="market-icon-button market-badge-button" type="button" onclick="showWishlist()" aria-label="المفضلة">
                     <i class="fas fa-heart"></i><span id="wishlist-badge" class="market-badge" style="display:none;">0</span>
                 </button>
-                <button class="market-icon-button market-badge-button" type="button" onclick="toggleCart(true)" aria-label="سلة المشتريات">
-                    <i class="fas fa-shopping-basket"></i><span id="cart-badge" class="market-badge">0</span>
+                <button class="market-icon-button market-badge-button market-cart-button" type="button" onclick="toggleCart(true)" aria-label="سلة المشتريات">
+                    <i class="fas fa-shopping-basket"></i><span class="market-cart-label">السلة</span><span id="cart-badge" class="market-badge">0</span>
                 </button>
             </div>
         </div>
     </header>
     <nav class="market-category-bar" aria-label="أقسام المتجر">
+        <button class="category-scroll-button category-scroll-previous" type="button" onclick="scrollProductCategories(-1)" aria-label="تحريك الأقسام إلى اليمين" title="تحريك الأقسام إلى اليمين">
+            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+        </button>
         <div id="product-cats" aria-label="أقسام المنتجات"></div>
+        <button class="category-scroll-button category-scroll-next" type="button" onclick="scrollProductCategories(1)" aria-label="تحريك الأقسام إلى اليسار" title="تحريك الأقسام إلى اليسار">
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+        </button>
         <button id="site-tagline" class="market-admin-link" type="button" onclick="triggerAdmin()">للإلكترونيات والفيديوهات التعليمية</button>
     </nav>
 
@@ -143,19 +149,24 @@
             <div style="margin-bottom:10px;">
                 <p style="margin:0 0 7px; font-size:.8rem; color:var(--text-light);">طريقة الدفع المفضلة</p>
                 <div class="cart-payment-options">
-                    <button class="cart-payment-option active" type="button" aria-pressed="true" onclick="togglePayment('cash', this)">
-                        <i class="fas fa-money-bill" style="font-size:0.8rem;"></i> نقداً
+                    <button class="cart-payment-option active" type="button" aria-pressed="true" aria-expanded="false" onclick="togglePayment('cash', this)">
+                        <i class="fas fa-university" style="font-size:0.8rem;"></i> تحويل بنكي
                     </button>
-                    <button class="cart-payment-option" type="button" aria-pressed="false" onclick="togglePayment('vodafone', this)">
+                    <button class="cart-payment-option" type="button" aria-pressed="false" aria-expanded="false" onclick="togglePayment('vodafone', this)">
                         <i class="fas fa-mobile-alt" style="font-size:0.8rem;"></i> فودافون
                     </button>
-                    <button class="cart-payment-option" type="button" aria-pressed="false" onclick="togglePayment('instapay', this)">
+                    <button class="cart-payment-option" type="button" aria-pressed="false" aria-expanded="false" onclick="togglePayment('instapay', this)">
                         <i class="fas fa-university" style="font-size:0.8rem;"></i> Instapay
                     </button>
                 </div>
             </div>
 
             <!-- معلومات الدفع -->
+            <div id="bank-info" class="cart-payment-details" hidden>
+                <p>التحويل البنكي:</p>
+                <b>اسم البنك: <span id="bank-name-display">—</span></b>
+                <b>رقم الحساب: <span id="bank-account-display">—</span></b>
+            </div>
             <div id="vodafone-info" style="display:none; background:#fff5f5; border:1px solid var(--primary); color:#c0392b; padding:8px; border-radius:6px; font-size:0.8rem; text-align:center; margin-bottom:10px;">
                 <p style="margin:0 0 3px 0; font-weight:bold; font-size:0.75rem;">رقم فودافون:</p>
                 <b id="vf-number-display" style="font-size:0.9rem; display:block; letter-spacing:1px;">01551831308</b>
