@@ -6,6 +6,9 @@ let currentProductSearch = '';
 let appliedCoupon = null;
 let selectedPaymentMethod = 'cash';
 let storeInitializationPromise = null;
+let storeToastTimer = null;
+let storeEntrancePending = true;
+let offersLayoutRevision = 0;
 const DEFAULT_STORE_URL = 'https://mashily.github.io/mashily-store/';
 
 function getStoreUrl() {
@@ -326,9 +329,11 @@ async function initializeStore() {
     // 3. عرض الأقسام والمنتجات مع تأثير التحميل
     renderCategories();
     setupProductCategoryScrolling();
+    setupOffersCarousel();
     showSkeletons();
     setTimeout(() => {
         renderProducts(products);
+        renderOffersCatalog();
         hideAppSplash();
     }, 700);
 
@@ -622,23 +627,24 @@ function toggleDarkMode() {
 }
 
 // دالة مساعدة لإنشاء كارت المنتج (لإعادة الاستخدام)
-function createProductCard(p) {
+function createProductCard(p, index = 0, animateEntrance = false) {
     const isOut = p.stock === 'out';
     const hasTimer = isProductOfferActive(p);
-    const wishlist = JSON.parse(localStorage.getItem('MASHILY_WISHLIST')) || [];
-    const isInWishlist = wishlist.some(item => item.id === p.id);
+    const cartQuantity = getProductCartQuantity(p.id);
     const oldPrice = p.originalPrice || p.oldPrice;
     const discountPercent = oldPrice ? Math.round(((oldPrice - p.price) / oldPrice) * 100) : 0;
+    const hasDiscount = Number(oldPrice) > Number(p.price);
     
     return `
-    <div class="product-card ${isOut ? 'product-unavailable' : ''}" onclick="if(!event.target.closest('button,a,input,select,textarea')) openProductDetails(${p.id})" onmouseleave="hideAllInfos()">
-        <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${p.id}, event)" title="${isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
-            <i class="fas fa-heart"></i>
-        </button>
+    <div class="product-card ${isOut ? 'product-unavailable' : ''} ${animateEntrance ? 'store-entrance' : ''}" ${animateEntrance ? `style="--entrance-index:${Math.min(index, 11)}"` : ''} onclick="if(!event.target.closest('button,a,input,select,textarea')) openProductDetails(${p.id})" onmouseleave="hideAllInfos()">
         <button class="share-btn" onclick="shareProduct(${p.id}, event)" title="مشاركة المنتج">
             <i class="fas fa-share-alt"></i>
         </button>
         <div class="img-container" onclick="openProductDetails(${p.id})">
+            <button class="product-cart-overlay" type="button" data-product-id="${escapeAcademyHtml(p.id)}" ${isOut ? 'disabled' : ''} onclick="addToCart(${p.id}, 1, event, true)" aria-label="إضافة ${escapeAcademyHtml(p.name)} إلى السلة وفتحها" title="${isOut ? 'غير متوفر' : 'أضف للسلة وافتحها'}">
+                <i class="fas fa-cart-plus" aria-hidden="true"></i>
+                <span class="product-cart-quantity ${cartQuantity ? '' : 'is-empty'}" aria-live="polite">${cartQuantity || ''}</span>
+            </button>
             ${!isOut && p.status ? `<div class="pro-badge ${p.status==='عرض خاص'?'offer':''}">${p.status}</div>` : ''}
             ${discountPercent > 0 ? `<div class="product-discount-badge">خصم ${discountPercent}%</div>` : ''}
             <img src="${p.image}" alt="${p.name}">
@@ -646,17 +652,13 @@ function createProductCard(p) {
             <div class="product-info-overlay">${p.desc || 'منتج أصلي من متجر مشالي'}</div>
         </div>
         <div class="product-details">
+            ${renderProductRating(p)}
             <h4><button class="product-title-btn" type="button" onclick="openProductDetails(${p.id})">${p.name}</button></h4>
             <div class="price-tag">
-                ${oldPrice && Number(oldPrice) > Number(p.price) ? `<span class="old-price"><span>قبل الخصم</span><s>${oldPrice} ج.م</s></span>` : ''}
                 <span class="sale-price">${p.price} <small>ج.م</small></span>
+                ${hasDiscount ? `<span class="old-price"><span>السعر قبل الخصم</span><s>${oldPrice} ج.م</s></span>` : ''}
             </div>
-            ${renderProductRating(p)}
             ${hasTimer ? `<div class="countdown-timer" data-ends="${parseOfferDate(p.offerEnds, true)}">جاري التحميل...</div>` : ''}
-            <button class="qty-btn" ${isOut ? 'disabled' : ''} style="background:${isOut?'#95a5a6':'var(--primary)'}" 
-                ${isOut ? '' : `onclick="addToCart(${p.id})"`}>
-                ${isOut ? 'غير متوفر' : 'إضافة للسلة'}
-            </button>
         </div>
     </div>
     `;
@@ -1021,7 +1023,8 @@ function renderProducts(items) {
         return;
     }
 
-    grid.innerHTML = items.map(p => createProductCard(p)).join('');
+    grid.innerHTML = items.map((p, index) => createProductCard(p, index, storeEntrancePending)).join('');
+    storeEntrancePending = false;
 }
 
 function parseOfferDate(value, isEndDate) {
@@ -1119,6 +1122,10 @@ function hideAllInfos() {
 }
 
 // --- وظائف الأقسام ---
+function normalizeStoreCategory(value) {
+    return String(value == null ? '' : value).trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+}
+
 function renderCategories() {
     const catContainer = document.getElementById('product-cats');
     if(!catContainer) return;
@@ -1130,35 +1137,202 @@ function renderCategories() {
         : rawCats;
 
     // التأكد من وجود قسم "الكل" دائماً في البداية وإزالة أي تكرار له من القائمة الأصلية
-    const categories = [{name: 'الكل', icon: 'fas fa-layer-group'}, ...categoriesFromStorage.filter(c => c.name !== 'الكل')];
-    const activeOffersCount = products.filter(product => isProductOfferActive(product)).length;
+    const categories = [
+        {name: 'الكل', icon: 'fas fa-layer-group', image: 'category-images/all.svg'},
+        {name: 'offers', label: 'عروض مؤقتة', icon: 'fas fa-clock', image: 'category-images/offers.svg'},
+        ...categoriesFromStorage.filter(c => c.name !== 'الكل' && c.name !== 'offers')
+    ];
+    const activeOffersCount = getDiscountedProducts().length;
     
-    catContainer.innerHTML = categories.map(cat => {
-        const count = cat.name === 'الكل'
-            ? products.length
-            : products.filter(product => product.category === cat.name).length;
-        let btn = `
-        <button type="button" class="cat-btn ${currentCategory === cat.name ? 'active' : ''}" 
+    catContainer.innerHTML = categories.map((cat, index) => {
+        const isOffers = cat.name === 'offers';
+        const count = isOffers
+            ? activeOffersCount
+            : cat.name === 'الكل'
+                ? products.length
+                : products.filter(product => normalizeStoreCategory(product.category) === normalizeStoreCategory(cat.name)).length;
+        const label = cat.label || (cat.name === 'الكل' ? 'كل الأصناف' : cat.name);
+        const image = getCategoryImageSource(cat.image, cat.icon);
+        return `
+        <button type="button" class="cat-btn ${currentCategory === cat.name ? 'active' : ''} ${storeEntrancePending ? 'store-entrance' : ''}" 
+                ${storeEntrancePending ? `style="--entrance-index:${Math.min(index, 9)}"` : ''}
                 aria-pressed="${currentCategory === cat.name}"
-                onclick="filterByCategory('${cat.name}')">
-            <i class="${cat.icon}" aria-hidden="true"></i>
-            <span class="cat-label">${cat.name === 'الكل' ? 'كل الأصناف' : cat.name}</span>
+                data-category="${escapeAcademyHtml(cat.name)}"
+                aria-label="${escapeAcademyHtml(label)}">
+            <img class="category-image" src="${escapeAcademyHtml(image)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='category-images/default.svg'">
+            <span class="cat-label">${escapeAcademyHtml(label)}</span>
             <span class="cat-count">${count.toLocaleString('ar-EG')}</span>
         </button>`;
-        
-        // إضافة زر العروض المؤقتة بعد زر "الكل"
-        if(cat.name === 'الكل') {
-            btn += `
-            <button type="button" class="cat-btn cat-btn-offer ${currentCategory === 'offers' ? 'active' : ''}" 
-                    aria-pressed="${currentCategory === 'offers'}"
-                    onclick="filterByCategory('offers')">
-                <i class="fas fa-clock" aria-hidden="true"></i>
-                <span class="cat-label">عروض مؤقتة</span>
-                <span class="cat-count">${activeOffersCount.toLocaleString('ar-EG')}</span>
-            </button>`;
-        }
-        return btn;
     }).join('');
+    if (catContainer.dataset.clickHandler !== 'true') {
+        catContainer.dataset.clickHandler = 'true';
+        catContainer.addEventListener('click', event => {
+            const button = event.target.closest('[data-category]');
+            if (button && catContainer.contains(button)) filterByCategory(button.dataset.category);
+        });
+    }
+}
+
+function getCategoryImageSource(image, icon = '') {
+    let path = String(image || '').trim().replace(/\\/g, '/').replace(/^(?:\.\/)+/, '');
+    if (!path) {
+        const iconName = String(icon).toLowerCase();
+        if (iconName.includes('desktop')) path = 'category-images/computer.svg';
+        else if (iconName.includes('mobile')) path = 'category-images/mobile.svg';
+        else if (iconName.includes('print')) path = 'category-images/printer.svg';
+        else if (iconName.includes('camera')) path = 'category-images/camera.svg';
+        else if (iconName.includes('paperclip')) path = 'category-images/stationery.svg';
+        else if (iconName.includes('battery')) path = 'category-images/accessories.svg';
+        else if (iconName.includes('plug')) path = 'category-images/electronics.svg';
+        else path = 'category-images/default.svg';
+    }
+    if (/^(?:[a-z]+:|\/)/i.test(path) || path.split('/').includes('..')) {
+        return 'category-images/default.svg';
+    }
+    if (!path.includes('/')) path = `category-images/${path}`;
+    return path.split('/').map(encodeURIComponent).join('/');
+}
+
+function isProductDiscounted(product) {
+    const oldPrice = Number(product.originalPrice || product.oldPrice);
+    const currentPrice = Number(product.price);
+    return Number.isFinite(oldPrice) && Number.isFinite(currentPrice) && oldPrice > currentPrice;
+}
+
+function getDiscountedProducts() {
+    return products.filter(product => {
+        if (product.stock === 'out' || !isProductDiscounted(product)) return false;
+        const hasOfferDates = Boolean(product.offerStarts || product.offerEnds);
+        return !hasOfferDates || isProductOfferActive(product);
+    });
+}
+
+function setupOffersCarousel() {
+    const viewport = document.getElementById('offers-products-viewport');
+    const track = document.getElementById('offers-products-track');
+    if (!viewport || !track || viewport.dataset.dragHandler === 'true') return;
+    viewport.dataset.dragHandler = 'true';
+
+    let dragState = null;
+    let suppressClickUntil = 0;
+    viewport.addEventListener('pointerdown', event => {
+        if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
+        const animation = track.getAnimations()[0];
+        const firstGroup = track.firstElementChild;
+        if (!animation || !firstGroup || !track.children[1]) return;
+        const groupWidth = track.scrollWidth / 2;
+        const durationMs = parseFloat(getComputedStyle(track).animationDuration) * 1000;
+        if (!groupWidth || !Number.isFinite(durationMs) || durationMs <= 0) return;
+        animation.pause();
+        dragState = {
+            pointerId: event.pointerId,
+            startX: event.clientX,
+            startTime: Number(animation.currentTime) || 0,
+            groupWidth,
+            durationMs,
+            animation,
+            moved: false
+        };
+        viewport.classList.add('is-dragging');
+        viewport.setPointerCapture(event.pointerId);
+    });
+    viewport.addEventListener('pointermove', event => {
+        if (!dragState || dragState.pointerId !== event.pointerId) return;
+        const distance = event.clientX - dragState.startX;
+        if (Math.abs(distance) > 5) dragState.moved = true;
+        if (!dragState.moved) return;
+        const cycleTime = ((dragState.startTime - distance * dragState.durationMs / dragState.groupWidth) % dragState.durationMs + dragState.durationMs) % dragState.durationMs;
+        dragState.animation.currentTime = cycleTime;
+    });
+    const finishDrag = event => {
+        if (!dragState || (event && dragState.pointerId !== event.pointerId)) return;
+        const state = dragState;
+        dragState = null;
+        viewport.classList.remove('is-dragging');
+        if (state.moved) suppressClickUntil = performance.now() + 350;
+        state.animation.play();
+    };
+    viewport.addEventListener('pointerup', finishDrag);
+    viewport.addEventListener('pointercancel', finishDrag);
+    viewport.addEventListener('lostpointercapture', finishDrag);
+    viewport.addEventListener('click', event => {
+        if (performance.now() >= suppressClickUntil) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+    }, true);
+    window.addEventListener('resize', () => requestAnimationFrame(updateOffersTrackGeometry), {passive: true});
+}
+
+function updateOffersTrackGeometry() {
+    const viewport = document.getElementById('offers-products-viewport');
+    const track = document.getElementById('offers-products-track');
+    const firstStoreCard = document.querySelector('#products-grid .product-card');
+    const firstGroup = track && track.firstElementChild;
+    if (!viewport || !track || !firstGroup || !firstStoreCard) return;
+
+    const revision = ++offersLayoutRevision;
+    track.style.setProperty('--offer-card-width', `${firstStoreCard.offsetWidth}px`);
+    while (track.children.length > 1) track.lastElementChild.remove();
+    track.style.removeProperty('--offers-duration');
+
+    requestAnimationFrame(() => {
+        if (revision !== offersLayoutRevision || !track.isConnected) return;
+        const groupWidth = firstGroup.getBoundingClientRect().width;
+        if (!groupWidth) return;
+        const copiesPerCycle = Math.max(1, Math.ceil(viewport.clientWidth / groupWidth));
+        const cycleCount = copiesPerCycle * 2;
+        for (let index = 1; index < cycleCount; index++) {
+            const copy = firstGroup.cloneNode(true);
+            copy.setAttribute('aria-hidden', 'true');
+            copy.setAttribute('inert', '');
+            copy.querySelectorAll('button').forEach(button => button.tabIndex = -1);
+            track.appendChild(copy);
+        }
+        track.style.setProperty('--offers-duration', `${Math.max(1, groupWidth * copiesPerCycle / 50)}s`);
+    });
+}
+
+function renderOffersCatalog() {
+    const section = document.getElementById('offers-catalog');
+    const count = document.getElementById('offers-results-count');
+    const track = document.getElementById('offers-products-track');
+    if (!section || !track) return;
+
+    const discountedProducts = getDiscountedProducts();
+    section.hidden = discountedProducts.length === 0;
+    if (count) count.textContent = `${discountedProducts.length.toLocaleString('ar-EG')} منتج`;
+    if (!discountedProducts.length) {
+        track.replaceChildren();
+        return;
+    }
+
+    track.innerHTML = `<div class="offers-products-group">${discountedProducts.map(product => createProductCard(product)).join('')}</div>`;
+    requestAnimationFrame(updateOffersTrackGeometry);
+}
+
+function getProductCartQuantity(productId) {
+    const item = cart.find(entry => String(entry.id) === String(productId));
+    return item ? Number(item.qty) || 0 : 0;
+}
+
+function updateProductCartQuantity(productId) {
+    const quantity = getProductCartQuantity(productId);
+    document.querySelectorAll('.product-cart-overlay').forEach(button => {
+        if (button.dataset.productId !== String(productId)) return;
+        const badge = button.querySelector('.product-cart-quantity');
+        if (!badge) return;
+        badge.textContent = quantity || '';
+        badge.classList.toggle('is-empty', quantity === 0);
+    });
+}
+
+function showStoreToast(message) {
+    const toast = document.getElementById('store-toast');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('is-visible');
+    window.clearTimeout(storeToastTimer);
+    storeToastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 2200);
 }
 
 function filterByCategory(cat) {
@@ -1193,8 +1367,8 @@ function applyProductFilters() {
     let filtered = currentCategory === 'الكل'
         ? [...products]
         : currentCategory === 'offers'
-            ? products.filter(product => isProductOfferActive(product))
-            : products.filter(product => product.category === currentCategory);
+            ? getDiscountedProducts()
+            : products.filter(product => normalizeStoreCategory(product.category) === normalizeStoreCategory(currentCategory));
 
     if (currentProductSearch) {
         const query = normalizeSearchText(currentProductSearch);
@@ -1291,14 +1465,24 @@ function removeFromWishlist(productId) {
 }
 
 // --- وظائف السلة ---
-function addToCart(id) {
-    let p = products.find(x => x.id === id);
+function addToCart(id, quantity = 1, clickEvent = null, openCartAfterAdd = false) {
+    if (clickEvent) {
+        clickEvent.preventDefault();
+        clickEvent.stopPropagation();
+    }
+    const p = products.find(x => String(x.id) === String(id));
     if (!p) return;
-    let f = cart.find(x => x.id === id);
-    if(f) f.qty++; else cart.push({...p, qty: 1});
+    const amount = Math.max(1, Math.floor(Number(quantity) || 1));
+    const item = cart.find(x => String(x.id) === String(id));
+    if(item) item.qty = (Number(item.qty) || 0) + amount;
+    else cart.push({...p, qty: amount});
     updateCartUI();
-    toggleCart(true);
-    scheduleCartAutoClose();
+    updateProductCartQuantity(p.id);
+    showStoreToast(`${p.name} — تمت إضافة ${amount.toLocaleString('ar-EG')} ${amount === 1 ? 'قطعة' : 'قطع'} للسلة`);
+    if (openCartAfterAdd) {
+        toggleCart(true);
+        scheduleCartAutoClose();
+    }
 }
 
 function scheduleCartAutoClose() {
@@ -1354,7 +1538,7 @@ function updateCartUI() {
     let finalTotal = total - discountAmount;
     if(finalTotal < 0) finalTotal = 0;
 
-    if(badge) badge.innerText = new Set(cart.map(item => String(item.id ?? item.name))).size;
+    if(badge) badge.innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
     
     // تحديث منطقة السعر
     const totalArea = document.getElementById('cart-total-area');
@@ -1463,7 +1647,12 @@ function togglePayment(method, selectedButton) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const cartSidebar = document.getElementById('cart-sidebar');
-    if (cartSidebar) cartSidebar.addEventListener('pointerdown', cancelCartAutoClose);
+    if (!cartSidebar) return;
+    const refreshAutoClose = () => {
+        if (cartAutoCloseTimer) scheduleCartAutoClose();
+    };
+    cartSidebar.addEventListener('pointerdown', refreshAutoClose);
+    cartSidebar.addEventListener('keydown', refreshAutoClose);
 });
 
 // --- نظام الكوبونات ---
@@ -1650,7 +1839,10 @@ setInterval(() => {
             el.innerHTML = `🔥 باقي ${d}ي ${h}س ${m}د ${s}ث`;
         }
     });
-    if (expiredOfferVisible && currentCategory === 'offers') filterByCategory('offers');
+    if (expiredOfferVisible) {
+        renderOffersCatalog();
+        if (currentCategory === 'offers') filterByCategory('offers');
+    }
 }, 1000);
 
 // --- مشاركة المنتج ---

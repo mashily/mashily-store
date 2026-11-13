@@ -190,7 +190,11 @@ async function fetchStoreFromExcel() {
         // ---- الأصناف ----
         const catRows = sheetToObjects(wb.Sheets['Categories']);
         data.categories = catRows
-            .map(r => ({ name: r['الاسم'], icon: r['الأيقونة'] || 'fas fa-tag' }))
+            .map(r => ({
+                name: String(getFirstValue(r, ['الاسم', 'name', 'category']) || '').trim(),
+                icon: getFirstValue(r, ['الأيقونة', 'icon']) || 'fas fa-tag',
+                image: String(getFirstValue(r, ['الصورة', 'image', 'image_path']) || '').trim()
+            }))
             .filter(c => c.name);
 
         // ---- الفيديوهات ----
@@ -359,7 +363,11 @@ function buildStoreWorkbook() {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(prodRows), 'Products');
 
     // الأصناف
-    const catRows = categories.map(c => ({ 'الاسم': c.name, 'الأيقونة': c.icon || 'fas fa-tag' }));
+    const catRows = categories.map(c => ({
+        'الاسم': c.name,
+        'الأيقونة': c.icon || 'fas fa-tag',
+        'الصورة': c.image || ''
+    }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(catRows), 'Categories');
 
     // الفيديوهات
@@ -521,6 +529,8 @@ function getSiteManifestBase64() {
         start_url: './index.html',
         scope: './',
         display: 'standalone',
+        display_override: ['standalone', 'minimal-ui'],
+        launch_handler: {client_mode: 'navigate-existing'},
         background_color: themeColor,
         theme_color: themeColor,
         orientation: 'portrait-primary',

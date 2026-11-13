@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>متجر مشالى | الإلكترونيات</title>
     <meta id="site-meta-description" name="description" content="متجر مشالى للإلكترونيات والفيديوهات التعليمية — تصفح الأصناف واطلب مباشرة عبر واتساب.">
     <link rel="canonical" href="https://mashily.github.io/mashily-store/">
@@ -117,6 +117,16 @@
         </button>
     </nav>
 
+    <section id="offers-catalog" class="offers-catalog" aria-labelledby="offers-catalog-title" hidden>
+        <div class="store-catalog-heading">
+            <h2 id="offers-catalog-title">عروض المتجر</h2>
+            <span id="offers-results-count" class="store-results-count"></span>
+        </div>
+        <div id="offers-products-viewport" class="offers-products-viewport" aria-label="المنتجات المخفضة">
+            <div id="offers-products-track" class="offers-products-track"></div>
+        </div>
+    </section>
+
     <section class="store-catalog" id="store-catalog" aria-labelledby="store-catalog-title">
         <div class="store-catalog-heading">
             <div>
@@ -130,6 +140,7 @@
     <div class="news-ticker">
         <div class="ticker-content" id="ticker-text">🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥</div>
     </div>
+    <div id="store-toast" class="store-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <div id="cart-sidebar" class="cart-sidebar" style="width: 350px; background: var(--card); display:flex; flex-direction:column;">
         <!-- رأس السلة -->

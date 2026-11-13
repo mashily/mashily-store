@@ -1074,7 +1074,7 @@
                                 <span class="tag">خصم 20%</span>
                             </label>
                         </div>
-                        <div style="display:flex; gap:5px; margin-bottom:10px;">
+                        <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">
                             <input type="text" id="new-tag-input" placeholder="أضف علامة جديدة..." style="flex:1;">
                             <button type="button" class="btn btn-success btn-small" onclick="addNewTag()">+</button>
                         </div>
@@ -1567,11 +1567,13 @@
             <div class="grid-layout" style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:20px;">
                 <div class="form-container">
                     <h3>📂 أقسام المتجر</h3>
-                    <div style="display:flex; gap:5px; margin-bottom:10px;">
+                    <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">
                         <input id="new-store-cat" placeholder="اسم القسم">
                         <input id="new-store-icon" placeholder="أيقونة (fas fa-tag)">
+                        <input id="new-store-image" placeholder="الصورة: category-images/example.svg">
                         <button class="btn btn-success" onclick="addStoreCat()">+</button>
                     </div>
+                    <small>ضع ملف الصورة داخل مجلد <b>category-images</b> في GitHub، واكتب اسمه في عمود «الصورة» بورقة Categories في Excel. يمكنك تغيير اسم القسم وملفه هناك.</small>
                     <ul id="store-cat-list" style="list-style:none; padding:0; max-height:200px; overflow-y:auto;"></ul>
                 </div>
 
@@ -3430,7 +3432,7 @@
 
             document.getElementById('store-cat-list').innerHTML = storeCategories.map((c, i) => `
                 <li style="padding:5px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-                    <span><i class="${c.icon}"></i> ${c.name}</span>
+                    <span><i class="${c.icon}"></i> ${c.name}<small style="display:block; opacity:.72;">${c.image || 'category-images/default.svg'}</small></span>
                     ${c.name !== 'الكل' ? `<i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="delStoreCat(${i})"></i>` : ''}
                 </li>`).join('');
 
@@ -3455,10 +3457,13 @@
         function addStoreCat() {
             const name = document.getElementById('new-store-cat').value;
             const icon = document.getElementById('new-store-icon').value || 'fas fa-tag';
+            const image = document.getElementById('new-store-image').value.trim();
             if(name) {
-                storeCategories.push({name, icon});
+                storeCategories.push({name, icon, image});
                 localStorage.setItem('storeCategories', JSON.stringify(storeCategories));
                 document.getElementById('new-store-cat').value = '';
+                document.getElementById('new-store-icon').value = '';
+                document.getElementById('new-store-image').value = '';
                 renderGeneralSettings();
             }
         }

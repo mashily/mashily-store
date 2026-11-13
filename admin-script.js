@@ -106,6 +106,7 @@ function downloadProductsExcel() {
         const categoriesData = categories.map(c => ({
             name: c.name,
             icon: c.icon,
+            image: c.image || '',
             description: c.description
         }));
         const categoriesWs = XLSX.utils.json_to_sheet(categoriesData);
@@ -203,9 +204,10 @@ function normalizeProduct(p) {
 
 function normalizeCategory(c) {
     return {
-        name: c.name || '',
-        icon: c.icon || 'fas fa-tag',
-        description: c.description || ''
+        name: c.name || c['الاسم'] || '',
+        icon: c.icon || c['الأيقونة'] || 'fas fa-tag',
+        image: c.image || c['الصورة'] || c.image_path || '',
+        description: c.description || c['الوصف'] || ''
     };
 }
 
