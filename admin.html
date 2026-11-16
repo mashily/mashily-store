@@ -1570,10 +1570,10 @@
                     <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">
                         <input id="new-store-cat" placeholder="اسم القسم">
                         <input id="new-store-icon" placeholder="أيقونة (fas fa-tag)">
-                        <input id="new-store-image" placeholder="الصورة: category-images/example.svg">
+                        <input id="new-store-image" list="category-image-options" placeholder="صورة الصنف: category-images/example.svg">
                         <button class="btn btn-success" onclick="addStoreCat()">+</button>
                     </div>
-                    <small>ضع ملف الصورة داخل مجلد <b>category-images</b> في GitHub، واكتب اسمه في عمود «الصورة» بورقة Categories في Excel. يمكنك تغيير اسم القسم وملفه هناك.</small>
+                    <small>ضع ملف الصورة داخل مجلد <b>category-images</b>، واكتب مساره في عمود «صورة الصنف» بورقة Categories في Excel. يمكنك اختيار صورة مقترحة أو كتابة مسار صورة أخرى.</small>
                     <ul id="store-cat-list" style="list-style:none; padding:0; max-height:200px; overflow-y:auto;"></ul>
                 </div>
 
@@ -3114,6 +3114,17 @@
                         <p class="url">https://mashily.github.io/mashily-store/</p>
                         <p>Android: افتح الرابط في Chrome أو Edge واختر تثبيت التطبيق.<br>iPhone: افتح الرابط في Safari، ثم مشاركة ← إضافة إلى الشاشة الرئيسية.</p>
                     </main>
+                    <datalist id="category-image-options">
+                        <option value="category-images/default.svg">
+                        <option value="category-images/electronics.svg">
+                        <option value="category-images/computer.svg">
+                        <option value="category-images/mobile.svg">
+                        <option value="category-images/stationery.svg">
+                        <option value="category-images/printer.svg">
+                        <option value="category-images/camera.svg">
+                        <option value="category-images/accessories.svg">
+                        <option value="category-images/other.svg">
+                    </datalist>
                 </body>
                 </html>`);
             printWindow.document.close();

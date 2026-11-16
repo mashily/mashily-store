@@ -7,6 +7,7 @@ let appliedCoupon = null;
 let selectedPaymentMethod = 'cash';
 let storeInitializationPromise = null;
 let storeToastTimer = null;
+let storeTickerTimer = null;
 let storeEntrancePending = true;
 let offersLayoutRevision = 0;
 const DEFAULT_STORE_URL = 'https://mashily.github.io/mashily-store/';
@@ -102,7 +103,11 @@ function applySiteBranding(settings) {
         });
     }
     const appIcon192Url = getCampaignUrl(settings.app_icon_192 || 'icon-192.png');
-    const appSplashUrl = getCampaignUrl(settings.app_splash_image || settings.brand_logo_image || 'logo.png');
+    const configuredSplashImage = String(settings.app_splash_image || settings.brand_logo_image || '').trim();
+    const defaultSplashImage = !configuredSplashImage || ['logo.png', './logo.png'].includes(configuredSplashImage.toLowerCase())
+        ? 'logo-splash.png'
+        : configuredSplashImage;
+    const appSplashUrl = getCampaignUrl(defaultSplashImage);
     ['site-apple-touch-icon', 'academy-apple-touch-icon'].forEach(id => {
         const icon = document.getElementById(id);
         if (icon && appIcon192Url) icon.href = appIcon192Url;
@@ -141,41 +146,140 @@ function init() {
     return storeInitializationPromise;
 }
 
+function refreshStoreData() {
+    return (async () => {
+        let excelLoaded = false;
+        if (typeof fetchStoreFromExcel === 'function') {
+            try {
+                const excelData = await fetchStoreFromExcel();
+                if (excelData) {
+                    applyStoreData(excelData);
+                    excelLoaded = true;
+                    console.log('✅ تم تحميل البيانات من ملف Excel');
+                }
+            } catch (error) {
+                console.warn('تعذر تحديث البيانات من ملف Excel، سيتم تجربة المصدر الاحتياطي.', error);
+            }
+        }
+        if (excelLoaded) return true;
+
+        try {
+            const response = await fetch('db.json?v=' + new Date().getTime());
+            if (!response.ok) return false;
+            const data = await response.json();
+            if(data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
+            if(data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
+            if(data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
+            if(data.ticker) localStorage.setItem('tickerText', data.ticker);
+            if(data.proof) localStorage.setItem('proofText', data.proof);
+            if(data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
+            return true;
+        } catch (error) {
+            console.log('وضع الأوفلاين أو لم يتم رفع ملف db.json بعد');
+            return false;
+        }
+    })();
+}
+
+function applyPaymentSettings(settings) {
+    const bankNameEl = document.getElementById('bank-name-display');
+    const bankAccountEl = document.getElementById('bank-account-display');
+    if(bankNameEl) bankNameEl.innerText = settings.bank_name || '—';
+    if(bankAccountEl) bankAccountEl.innerText = settings.bank_account || '—';
+    if(settings.vodafone) {
+        const vfEl = document.getElementById('vf-number-display');
+        if(vfEl) vfEl.innerText = settings.vodafone;
+    }
+    if(settings.instapay) {
+        const ipEl = document.getElementById('ip-username-display');
+        if(ipEl) ipEl.innerText = settings.instapay;
+    }
+    if(settings.qr) {
+        const qrContainer = document.getElementById('ip-qr-container');
+        const qrImg = document.getElementById('ip-qr-image');
+        if(qrContainer && qrImg) {
+            qrImg.src = settings.qr;
+            qrContainer.style.display = 'block';
+        }
+    }
+    if(settings.whatsapp) {
+        const waFloat = document.getElementById('wa-float-btn');
+        if(waFloat) {
+            const storeUrl = getStoreUrl();
+            const greet = `أريد تصفح المتجر: ${storeUrl}`;
+            waFloat.href = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(greet)}`;
+        }
+    }
+}
+
+function renderStoreTicker() {
+    const tickerEl = document.getElementById('ticker-text');
+    if (!tickerEl) return;
+    if (storeTickerTimer) clearTimeout(storeTickerTimer);
+    storeTickerTimer = null;
+
+    let tickerMsgs = JSON.parse(localStorage.getItem('tickerMessages')) || [];
+    if (tickerMsgs.length && typeof tickerMsgs[0] === 'string') {
+        tickerMsgs = tickerMsgs.map(text => ({text, duration: 5, speed: 20}));
+    }
+    const hasExcelMessages = localStorage.getItem('tickerMessages') !== null;
+    if (tickerMsgs.length === 0 && !hasExcelMessages) {
+        const single = localStorage.getItem('tickerText');
+        if (single) tickerMsgs = [{text: single, duration: 5, speed: 20}];
+    }
+    if (tickerMsgs.length === 0 && !hasExcelMessages) {
+        tickerMsgs = [{text: '🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥', duration: 5}];
+    }
+
+    const tickerContainer = tickerEl.closest('.news-ticker');
+    if (tickerMsgs.length === 0) {
+        tickerEl.textContent = '';
+        if (tickerContainer) tickerContainer.style.display = 'none';
+        return;
+    }
+    if (tickerContainer) tickerContainer.style.display = '';
+
+    let tickerIndex = 0;
+    const showTickerMsg = () => {
+        const message = tickerMsgs[tickerIndex];
+        tickerEl.innerText = message.text;
+        const duration = Number(message.duration) > 0 ? Number(message.duration) : 5;
+        const speed = Number(message.speed) > 0 ? Number(message.speed) : 20;
+        tickerEl.style.animation = 'none';
+        void tickerEl.offsetWidth;
+        tickerEl.style.animation = `ticker ${speed}s linear infinite`;
+        storeTickerTimer = setTimeout(() => {
+            tickerIndex = (tickerIndex + 1) % tickerMsgs.length;
+            showTickerMsg();
+        }, duration * 1000);
+    };
+    showTickerMsg();
+}
+
+function refreshStoreViewFromLocalData() {
+    products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+    const storeSettings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    const cartAutoCloseSetting = String(storeSettings.cart_auto_close_seconds ?? '').trim();
+    const parsedCartAutoClose = Number(cartAutoCloseSetting);
+    cartAutoCloseSeconds = cartAutoCloseSetting && Number.isFinite(parsedCartAutoClose)
+        ? Math.min(30, Math.max(0, parsedCartAutoClose))
+        : 3;
+    applySiteBranding(storeSettings);
+    applyPaymentSettings(storeSettings);
+    startSocialProof();
+    renderStoreTicker();
+    renderCategories();
+    setupProductCategoryScrolling();
+    renderProducts(products);
+    renderOffersCatalog();
+    updateCartUI();
+}
+
 async function initializeStore() {
     window.setTimeout(hideAppSplash, 8000);
     // التحقق مما إذا كان المستخدم مديراً (لتجنب مسح التعديلات المحلية عند التحديث)
     const isAdmin = sessionStorage.getItem('mashily_user');
-
-    if (!isAdmin) {
-        // 1) المصدر الرئيسي: ملف Excel (store-data.xlsx) على GitHub
-        let excelLoaded = false;
-        if (typeof fetchStoreFromExcel === 'function') {
-            const excelData = await fetchStoreFromExcel();
-            if (excelData) {
-                applyStoreData(excelData);
-                excelLoaded = true;
-                console.log('✅ تم تحميل البيانات من ملف Excel');
-            }
-        }
-        // 2) حل احتياطي: ملف db.json
-        if (!excelLoaded) {
-            try {
-                const response = await fetch('db.json?v=' + new Date().getTime()); // منع التخزين المؤقت
-                if (response.ok) {
-                    const data = await response.json();
-                    // تحديث البيانات المحلية ببيانات السيرفر
-                    if(data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
-                    if(data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
-                    if(data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
-                    if(data.ticker) localStorage.setItem('tickerText', data.ticker);
-                    if(data.proof) localStorage.setItem('proofText', data.proof);
-                    if(data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
-                }
-            } catch (e) {
-                console.log('وضع الأوفلاين أو لم يتم رفع ملف db.json بعد');
-            }
-        }
-    }
+    const storeRefreshPromise = isAdmin ? Promise.resolve(false) : refreshStoreData();
 
     // تحميل البيانات للمتغيرات
     products = JSON.parse(localStorage.getItem('storeProducts')) || [];
@@ -212,38 +316,8 @@ async function initializeStore() {
     // }
 
     // تحميل إعدادات الدفع المخصصة
-    const settings = JSON.parse(localStorage.getItem('storeSettings'));
-    if(settings) {
-        const bankNameEl = document.getElementById('bank-name-display');
-        const bankAccountEl = document.getElementById('bank-account-display');
-        if(bankNameEl) bankNameEl.innerText = settings.bank_name || '—';
-        if(bankAccountEl) bankAccountEl.innerText = settings.bank_account || '—';
-        if(settings.vodafone) {
-            const vfEl = document.getElementById('vf-number-display');
-            if(vfEl) vfEl.innerText = settings.vodafone;
-        }
-        if(settings.instapay) {
-            const ipEl = document.getElementById('ip-username-display');
-            if(ipEl) ipEl.innerText = settings.instapay;
-        }
-        if(settings.qr) {
-            const qrContainer = document.getElementById('ip-qr-container');
-            const qrImg = document.getElementById('ip-qr-image');
-            if(qrContainer && qrImg) {
-                qrImg.src = settings.qr;
-                qrContainer.style.display = 'block';
-            }
-        }
-        // تحديث رقم الواتساب
-        if(settings.whatsapp) {
-            const waFloat = document.getElementById('wa-float-btn');
-            if(waFloat) {
-                const storeUrl = getStoreUrl();
-                const greet = `أريد تصفح المتجر: ${storeUrl}`;
-                waFloat.href = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(greet)}`;
-            }
-        }
-    }
+    const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    applyPaymentSettings(settings);
 
     // استبدال الافتراضي الداكن السابق بالفاتح مرة واحدة مع حفظ اختيار الزائر الصريح.
     let savedTheme = localStorage.getItem('theme');
@@ -286,56 +360,28 @@ async function initializeStore() {
         themeIcon.style.color = themeColors[savedTheme] || '#5a8f7b';
     }
 
-    // 2. تحديث شريط الأخبار السفلي (يعرض كل الرسائل من ملف Excel بالتناوب حسب مدة كل رسالة)
-    const tickerEl = document.getElementById('ticker-text');
-    if(tickerEl) {
-        let tickerMsgs = JSON.parse(localStorage.getItem('tickerMessages')) || [];
-        // توافق مع البيانات القديمة (نصوص فقط)
-        if (tickerMsgs.length && typeof tickerMsgs[0] === 'string') {
-            tickerMsgs = tickerMsgs.map(t => ({ text: t, duration: 5, speed: 20 }));
-        }
-        const hasExcelMessages = localStorage.getItem('tickerMessages') !== null;
-        if (tickerMsgs.length === 0 && !hasExcelMessages) {
-            const single = localStorage.getItem('tickerText');
-            if (single) tickerMsgs = [{ text: single, duration: 5, speed: 20 }];
-        }
-        if (tickerMsgs.length === 0 && !hasExcelMessages) {
-            tickerMsgs = [{ text: "🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥", duration: 5 }];
-        }
-        const tickerContainer = tickerEl.closest('.news-ticker');
-        if (tickerMsgs.length === 0) {
-            tickerEl.textContent = '';
-            if (tickerContainer) tickerContainer.style.display = 'none';
-        } else {
-            if (tickerContainer) tickerContainer.style.display = '';
-            let tickerIndex = 0;
-            const showTickerMsg = () => {
-                const message = tickerMsgs[tickerIndex];
-                tickerEl.innerText = message.text;
-                const duration = Number(message.duration) > 0 ? Number(message.duration) : 5;
-                const speed = Number(message.speed) > 0 ? Number(message.speed) : 20;
-                tickerEl.style.animation = 'none';
-                void tickerEl.offsetWidth;
-                tickerEl.style.animation = `ticker ${speed}s linear infinite`;
-                setTimeout(() => {
-                    tickerIndex = (tickerIndex + 1) % tickerMsgs.length;
-                    showTickerMsg();
-                }, duration * 1000);
-            };
-            showTickerMsg();
-        }
-    }
+    // 2. تحديث شريط الأخبار من البيانات المحلية.
+    renderStoreTicker();
 
     // 3. عرض الأقسام والمنتجات مع تأثير التحميل
     renderCategories();
     setupProductCategoryScrolling();
     setupOffersCarousel();
     showSkeletons();
-    setTimeout(() => {
+    const hasCachedProducts = products.length > 0;
+    requestAnimationFrame(() => {
         renderProducts(products);
         renderOffersCatalog();
-        hideAppSplash();
-    }, 700);
+        if (hasCachedProducts || isAdmin) hideAppSplash();
+    });
+
+    storeRefreshPromise.then(updated => {
+        if (updated) refreshStoreViewFromLocalData();
+        if (!hasCachedProducts) hideAppSplash();
+    }).catch(error => {
+        console.error('تعذر تحديث بيانات المتجر.', error);
+        if (!hasCachedProducts) hideAppSplash();
+    });
 
     updateCartUI();
     updateWishlistBadge();
@@ -637,8 +683,8 @@ function createProductCard(p, index = 0, animateEntrance = false) {
     
     return `
     <div class="product-card ${isOut ? 'product-unavailable' : ''} ${animateEntrance ? 'store-entrance' : ''}" ${animateEntrance ? `style="--entrance-index:${Math.min(index, 11)}"` : ''} onclick="if(!event.target.closest('button,a,input,select,textarea')) openProductDetails(${p.id})" onmouseleave="hideAllInfos()">
-        <button class="share-btn" onclick="shareProduct(${p.id}, event)" title="مشاركة المنتج">
-            <i class="fas fa-share-alt"></i>
+        <button class="share-btn" type="button" onclick="shareProduct(${p.id}, event)" title="مشاركة عبر واتساب" aria-label="مشاركة ${escapeAcademyHtml(p.name)} عبر واتساب">
+            <i class="fab fa-whatsapp" aria-hidden="true"></i>
         </button>
         <div class="img-container" onclick="openProductDetails(${p.id})">
             <button class="product-cart-overlay" type="button" data-product-id="${escapeAcademyHtml(p.id)}" ${isOut ? 'disabled' : ''} onclick="addToCart(${p.id}, 1, event, true)" aria-label="إضافة ${escapeAcademyHtml(p.name)} إلى السلة وفتحها" title="${isOut ? 'غير متوفر' : 'أضف للسلة وافتحها'}">
@@ -804,10 +850,7 @@ function openProductDetails(id) {
     // زر المشاركة
     const shareBtn = document.getElementById('modal-share-btn');
     if(shareBtn) {
-        shareBtn.onclick = () => {
-            const text = `شاهد هذا المنتج المميز من متجر مشالى: 🔥\n\n*${product.name}*\n\nالسعر: ${product.price} ج.م\n\n${product.description}\n\nرابط المتجر:\n${getStoreUrl()}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-        };
+        shareBtn.onclick = event => shareProduct(product.id, event);
     }
 
     // Add a history entry so the mobile back button closes details before leaving the store.
@@ -1250,7 +1293,7 @@ function setupOffersCarousel() {
         const distance = event.clientX - dragState.startX;
         if (Math.abs(distance) > 5) dragState.moved = true;
         if (!dragState.moved) return;
-        const cycleTime = ((dragState.startTime - distance * dragState.durationMs / dragState.groupWidth) % dragState.durationMs + dragState.durationMs) % dragState.durationMs;
+        const cycleTime = ((dragState.startTime + distance * dragState.durationMs / dragState.groupWidth) % dragState.durationMs + dragState.durationMs) % dragState.durationMs;
         dragState.animation.currentTime = cycleTime;
     });
     const finishDrag = event => {
@@ -1293,7 +1336,6 @@ function updateOffersTrackGeometry() {
         for (let index = 1; index < cycleCount; index++) {
             const copy = firstGroup.cloneNode(true);
             copy.setAttribute('aria-hidden', 'true');
-            copy.setAttribute('inert', '');
             copy.querySelectorAll('button').forEach(button => button.tabIndex = -1);
             track.appendChild(copy);
         }
@@ -1859,12 +1901,29 @@ function shareProduct(id, event) {
     if (event) event.stopPropagation();
     const product = products.find(p => p.id === id);
     if (!product) return;
-    const text = 'شاهد هذا المنتج من مشالي للإلكترونيات:\n' + product.name + '\nالسعر: ' + product.price + ' ج.م\nرابط المتجر:\n' + getStoreUrl();
-    if (navigator.share) {
-        navigator.share({ title: product.name, text: text, url: window.location.href }).catch(() => {});
-    } else {
-        window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
-    }
+    const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    const storeName = String(settings.brand_name || 'مشالى').trim();
+    const whatsappNumber = String(settings.whatsapp || '201551831308').replace(/\D/g, '');
+    const price = Number(product.price) || 0;
+    const oldPrice = Number(product.originalPrice || product.oldPrice) || 0;
+    const description = String(product.description || product.desc || '').trim();
+    const specs = Array.isArray(product.specs)
+        ? product.specs.filter(Boolean).join('، ')
+        : String(product.specs || '').trim();
+    const message = [
+        `مرحباً، أود الاستفسار عن هذا المنتج من متجر ${storeName}:`,
+        '',
+        `اسم الصنف: ${product.name}`,
+        `السعر: ${price.toLocaleString('ar-EG')} ج.م`,
+        oldPrice > price ? `السعر قبل الخصم: ${oldPrice.toLocaleString('ar-EG')} ج.م` : '',
+        description ? `التفاصيل: ${description}` : '',
+        specs ? `المواصفات: ${specs}` : '',
+        `التوفر: ${getProductAvailabilityText(product.stock)}`,
+        product.image ? `صورة المنتج: ${product.image}` : '',
+        `رقم واتساب المتجر: +${whatsappNumber}`,
+        `رابط المتجر: ${getStoreUrl()}`
+    ].filter(Boolean).join('\n');
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
 }
 
 // --- الإشعار الترحيبي (يظهر أول مرة فقط) ---
@@ -2652,7 +2711,7 @@ function initInvoiceTab() {
 }
 
 // استدعاء التهيئة عند تحميل الصفحة
-window.addEventListener('load', init);
+document.addEventListener('DOMContentLoaded', init, {once: true});
 
 // ==========================================
 // 🎓 نظام الأكاديمية (Academy System)

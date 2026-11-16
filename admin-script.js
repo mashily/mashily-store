@@ -244,12 +244,12 @@ function loadCategories() {
         return;
     }
 
-    container.innerHTML = categories.map(c => `
+    container.innerHTML = categories.map((c, index) => `
         <div class="item-card">
-            <h4><i class="${c.icon}"></i> ${c.name}</h4>
+            <h4><img src="${c.image || 'category-images/default.svg'}" alt="" width="24" height="24" style="vertical-align:middle; object-fit:contain;" onerror="this.src='category-images/default.svg'"> <i class="${c.icon}"></i> ${c.name}</h4>
             <p>${c.description || ''}</p>
             <div class="item-actions">
-                <button class="btn btn-info" onclick="editCategory('${c.name}')">
+                <button class="btn btn-info" onclick="editCategory(${index})">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
                 <button class="btn btn-danger" onclick="deleteCategory('${c.name}')">
@@ -372,12 +372,12 @@ function deleteProduct(productId) {
     showAlert('تم حذف المنتج بنجاح', 'success');
 }
 
-function openCategoryModal(categoryName = null) {
+function openCategoryModal(categoryIndex = null) {
     const modal = document.getElementById('modal');
     const title = document.getElementById('modal-title');
     const body = document.getElementById('modal-body');
     
-    const category = categoryName ? categories.find(c => c.name === categoryName) : null;
+    const category = Number.isInteger(categoryIndex) ? categories[categoryIndex] : null;
     
     title.textContent = category ? 'تعديل صنف' : 'إضافة صنف جديد';
     
@@ -391,11 +391,16 @@ function openCategoryModal(categoryName = null) {
             <input type="text" id="category-icon" value="${category ? category.icon : 'fas fa-tag'}">
         </div>
         <div class="form-group">
+            <label>صورة الصنف:</label>
+            <input type="text" id="category-image" list="category-image-options" value="${category ? category.image || '' : ''}" placeholder="category-images/example.svg">
+            <small>اكتب مسار الصورة داخل مجلد category-images أو اختر صورة مقترحة.</small>
+        </div>
+        <div class="form-group">
             <label>الوصف:</label>
             <textarea id="category-description" rows="3">${category ? category.description : ''}</textarea>
         </div>
         <div class="form-actions">
-            <button class="btn btn-success" onclick="saveCategory('${categoryName || 'null'}')">
+            <button class="btn btn-success" onclick="saveCategory(${Number.isInteger(categoryIndex) ? categoryIndex : 'null'})">
                 <i class="fas fa-save"></i> حفظ
             </button>
             <button class="btn btn-danger" onclick="closeModal()">
@@ -407,22 +412,21 @@ function openCategoryModal(categoryName = null) {
     modal.classList.add('active');
 }
 
-function saveCategory(categoryName) {
+function saveCategory(categoryIndex) {
     const name = document.getElementById('category-name').value;
     const icon = document.getElementById('category-icon').value;
+    const image = document.getElementById('category-image').value.trim();
     const description = document.getElementById('category-description').value;
     
     const categoryData = {
         name,
         icon,
+        image,
         description
     };
     
-    if (categoryName) {
-        const index = categories.findIndex(c => c.name === categoryName);
-        if (index !== -1) {
-            categories[index] = categoryData;
-        }
+    if (Number.isInteger(categoryIndex) && categories[categoryIndex]) {
+        categories[categoryIndex] = categoryData;
     } else {
         categories.push(categoryData);
     }
@@ -433,8 +437,8 @@ function saveCategory(categoryName) {
     showAlert('تم حفظ الصنف بنجاح', 'success');
 }
 
-function editCategory(categoryName) {
-    openCategoryModal(categoryName);
+function editCategory(categoryIndex) {
+    openCategoryModal(categoryIndex);
 }
 
 function deleteCategory(categoryName) {
