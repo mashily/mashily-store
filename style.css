@@ -2253,7 +2253,58 @@ html { color-scheme: light; }
     border-bottom: 1px solid var(--border);
     box-shadow: 0 3px 12px rgba(24, 42, 33, .08);
 }
+.market-electric-effect {
+    position: absolute;
+    z-index: 1;
+    inset: 0 0 auto;
+    height: 16px;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(90, 143, 123, .2), transparent);
+    pointer-events: none;
+}
+.market-electric-effect::before {
+    position: absolute;
+    top: 9px;
+    left: -24%;
+    width: 24%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #65ffc5 28%, #fff 50%, #8fffd0 72%, transparent);
+    box-shadow: 0 0 7px #65ffc5, 0 0 15px rgba(103, 255, 197, .9);
+    content: "";
+    animation: market-electric-sweep 3.8s linear infinite, market-electric-flicker 1.7s steps(1, end) infinite;
+}
+.market-electric-effect::after {
+    position: absolute;
+    top: 2px;
+    left: -13%;
+    width: 13%;
+    height: 12px;
+    background: linear-gradient(90deg, #65ffc5, #fff, #ffe27c);
+    clip-path: polygon(0 42%, 38% 42%, 48% 0, 54% 76%, 61% 40%, 100% 40%, 100% 60%, 63% 60%, 52% 100%, 46% 22%, 41% 58%, 0 58%);
+    content: "";
+    filter: drop-shadow(0 0 5px #65ffc5);
+    animation: market-electric-sweep 4.6s linear -1.4s infinite, market-electric-flicker 1.5s steps(1, end) infinite;
+}
+.market-electric-bolt {
+    position: absolute;
+    top: 0;
+    left: -12px;
+    color: #ffe27c;
+    font-size: 15px;
+    line-height: 1;
+    filter: drop-shadow(0 0 4px #ffe27c) drop-shadow(0 0 8px rgba(103, 255, 197, .9));
+    animation: market-electric-sweep 3.8s linear infinite, market-electric-flicker 1.7s steps(1, end) infinite;
+}
+@keyframes market-electric-sweep {
+    to { transform: translateX(calc(100vw + 120%)); }
+}
+@keyframes market-electric-flicker {
+    0%, 19%, 23%, 51%, 55%, 100% { opacity: 1; }
+    20%, 22%, 52%, 54% { opacity: .35; }
+}
 .market-header-main {
+    position: relative;
+    z-index: 2;
     display: grid;
     grid-template-columns: auto auto minmax(220px, 1fr) auto auto;
     align-items: center;
@@ -2507,6 +2558,31 @@ html { color-scheme: light; }
     .product-details h4 { min-height: 2.4em; font-size: .78rem; }
     .product-details .qty-btn { min-height: 34px; font-size: .74rem; }
 }
+@media (max-width: 600px) {
+    .market-electric-effect { height: 4px; opacity: .52; }
+    .market-electric-effect::before {
+        top: 1px;
+        left: -13%;
+        width: 13%;
+        height: 2px;
+        animation: market-electric-sweep 8s linear infinite;
+        box-shadow: 0 0 5px rgba(103, 255, 197, .7);
+    }
+    .market-electric-effect::after { display: none; }
+    .market-electric-bolt { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .market-electric-effect::before {
+        top: 6px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        animation: none;
+        opacity: .55;
+    }
+    .market-electric-effect::after,
+    .market-electric-bolt { display: none; animation: none; }
+}
 
 @media (max-width: 768px) {
     .category-scroll-button { display: none; }
@@ -2631,6 +2707,44 @@ html { color-scheme: light; }
     margin-inline-end: 7px;
     font-size: .9em;
 }
+.offers-heading-title-group { display: flex; min-width: 0; align-items: center; flex-wrap: wrap; gap: 10px; }
+.offers-heading-title-group h2 { margin: 0; }
+.offers-deadline {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 6px 9px;
+    border: 1px solid rgba(220, 77, 53, .18);
+    border-radius: 13px;
+    background: linear-gradient(135deg, rgba(255, 246, 239, .96), rgba(255, 255, 255, .94));
+    box-shadow: 0 4px 12px rgba(130, 59, 39, .07);
+    animation: offersDeadlineEnter .35s ease both;
+}
+.offers-deadline[hidden], .offers-countdown[hidden], .offers-expired[hidden] { display: none !important; }
+.offers-deadline-caption { display: flex; align-items: center; gap: 5px; color: var(--text-light); font-size: .76rem; white-space: nowrap; }
+.offers-deadline-caption i { color: #d84f38; animation: offersClockPulse 2.4s ease-in-out infinite; }
+.offers-deadline-caption time { color: var(--text); font-weight: 800; }
+.offers-countdown { display: flex; align-items: center; gap: 3px; direction: rtl; }
+.offers-countdown-unit {
+    display: inline-flex;
+    min-width: 38px;
+    align-items: baseline;
+    justify-content: center;
+    gap: 3px;
+    padding: 3px 5px;
+    border: 1px solid rgba(196, 74, 48, .1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .88);
+    line-height: 1.2;
+}
+.offers-countdown-unit strong { color: #b83b2b; font-size: .86rem; font-variant-numeric: tabular-nums; }
+.offers-countdown-unit small { color: var(--text-light); font-size: .62rem; }
+.offers-countdown-unit strong.is-ticking { animation: offersDigitTick .28s ease both; }
+.offers-expired { padding: 4px 8px; border-radius: 8px; background: rgba(127, 140, 141, .12); color: var(--text-light); font-size: .78rem; }
+@keyframes offersDeadlineEnter { from { opacity: 0; transform: translateY(4px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes offersClockPulse { 0%, 100% { transform: rotate(0); } 12%, 24% { transform: rotate(-10deg); } 18%, 30% { transform: rotate(10deg); } 38% { transform: rotate(0); } }
+@keyframes offersDigitTick { from { opacity: .35; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 .offers-products-viewport {
     overflow: hidden;
     padding: 3px 1px 15px;
@@ -2803,6 +2917,24 @@ button, a { touch-action: manipulation; }
 }
 @media (max-width: 400px) {
     .product-card { height: 300px; }
+}
+
+[data-theme="dark"] .offers-deadline {
+    border-color: rgba(215, 132, 101, .25);
+    background: linear-gradient(135deg, rgba(69, 48, 41, .96), rgba(42, 37, 34, .94));
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .14);
+}
+[data-theme="dark"] .offers-countdown-unit { border-color: rgba(215, 132, 101, .16); background: rgba(255, 255, 255, .055); }
+[data-theme="dark"] .offers-countdown-unit strong { color: #ffb49a; }
+[data-theme="dark"] .offers-expired { background: rgba(255, 255, 255, .08); }
+@media (max-width: 600px) {
+    .offers-heading-title-group { gap: 7px; }
+    .offers-deadline { gap: 5px; padding: 5px 7px; }
+    .offers-deadline-caption { font-size: .7rem; }
+    .offers-countdown-unit { min-width: 34px; padding: 3px 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .offers-deadline, .offers-deadline-caption i, .offers-countdown-unit strong.is-ticking { animation: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
     .store-entrance { animation: none !important; opacity: 1; transform: none; }

@@ -10,6 +10,8 @@ let storeToastTimer = null;
 let storeTickerTimer = null;
 let storeEntrancePending = true;
 let offersLayoutRevision = 0;
+let offersCampaignEndTime = NaN;
+let offersCampaignExpired = false;
 const DEFAULT_STORE_URL = 'https://mashily.github.io/mashily-store/';
 
 function getStoreUrl() {
@@ -270,8 +272,9 @@ function refreshStoreViewFromLocalData() {
     renderStoreTicker();
     renderCategories();
     setupProductCategoryScrolling();
-    renderProducts(products);
+    applyProductFilters();
     renderOffersCatalog();
+    updateStoreCatalogHeading();
     updateCartUI();
 }
 
@@ -1182,7 +1185,7 @@ function renderCategories() {
     // التأكد من وجود قسم "الكل" دائماً في البداية وإزالة أي تكرار له من القائمة الأصلية
     const categories = [
         {name: 'الكل', icon: 'fas fa-layer-group', image: 'category-images/all.svg'},
-        {name: 'offers', label: 'عروض مؤقتة', icon: 'fas fa-clock', image: 'category-images/offers.svg'},
+        {name: 'offers', label: 'تخفيضات 🔥', icon: 'fas fa-fire', image: 'category-images/offers.svg'},
         ...categoriesFromStorage.filter(c => c.name !== 'الكل' && c.name !== 'offers')
     ];
     const activeOffersCount = getDiscountedProducts().length;
@@ -1197,7 +1200,7 @@ function renderCategories() {
         const label = cat.label || (cat.name === 'الكل' ? 'كل الأصناف' : cat.name);
         const image = getCategoryImageSource(cat.image, cat.icon);
         return `
-        <button type="button" class="cat-btn ${currentCategory === cat.name ? 'active' : ''} ${storeEntrancePending ? 'store-entrance' : ''}" 
+        <button type="button" class="cat-btn ${isOffers ? 'cat-btn-offer' : ''} ${currentCategory === cat.name ? 'active' : ''} ${storeEntrancePending ? 'store-entrance' : ''}" 
                 ${storeEntrancePending ? `style="--entrance-index:${Math.min(index, 9)}"` : ''}
                 aria-pressed="${currentCategory === cat.name}"
                 data-category="${escapeAcademyHtml(cat.name)}"
@@ -1211,7 +1214,15 @@ function renderCategories() {
         catContainer.dataset.clickHandler = 'true';
         catContainer.addEventListener('click', event => {
             const button = event.target.closest('[data-category]');
-            if (button && catContainer.contains(button)) filterByCategory(button.dataset.category);
+            if (!button || !catContainer.contains(button)) return;
+            filterByCategory(button.dataset.category);
+            if (button.dataset.category === 'offers') {
+                const catalog = document.getElementById('store-catalog');
+                if (catalog) {
+                    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+                    catalog.scrollIntoView({behavior, block: 'start'});
+                }
+            }
         });
     }
 }
@@ -1242,15 +1253,29 @@ function isProductDiscounted(product) {
     return Number.isFinite(oldPrice) && Number.isFinite(currentPrice) && oldPrice > currentPrice;
 }
 
+function getOffersCampaignEndTime() {
+    const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    return parseOfferDate(settings.offers_end_date, true);
+}
+
+function isOffersCampaignActive(now = Date.now()) {
+    const end = getOffersCampaignEndTime();
+    return !Number.isFinite(end) || end > now;
+}
+
 function getDiscountedProducts() {
+    const now = Date.now();
+    const campaignEnd = getOffersCampaignEndTime();
+    if (Number.isFinite(campaignEnd) && campaignEnd <= now) return [];
     return products.filter(product => {
         if (product.stock === 'out' || !isProductDiscounted(product)) return false;
         const hasOfferDates = Boolean(product.offerStarts || product.offerEnds);
-        return !hasOfferDates || isProductOfferActive(product);
+        return !hasOfferDates || isProductOfferActive(product, now);
     });
 }
 
 function getMovingOfferProducts() {
+    if (!isOffersCampaignActive()) return [];
     return products.filter(product => {
         if (product.stock === 'out' || product.showInOffers === false) return false;
         if (product.showInOffers === true) return true;
@@ -1343,12 +1368,83 @@ function updateOffersTrackGeometry() {
     });
 }
 
+function updateOffersCampaignCountdown() {
+    const endTime = getOffersCampaignEndTime();
+    const widgets = document.querySelectorAll('[data-offers-deadline]');
+    if (!Number.isFinite(endTime)) {
+        offersCampaignEndTime = NaN;
+        offersCampaignExpired = false;
+        widgets.forEach(widget => {
+            widget.hidden = true;
+        });
+        return false;
+    }
+
+    if (endTime !== offersCampaignEndTime) {
+        offersCampaignEndTime = endTime;
+        offersCampaignExpired = false;
+    }
+
+    const now = Date.now();
+    const remaining = endTime - now;
+    const expired = remaining <= 0;
+    const newlyExpired = expired && !offersCampaignExpired;
+    offersCampaignExpired = expired;
+    const endDate = new Date(endTime);
+    const dateLabel = new Intl.DateTimeFormat('ar-EG', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }).format(endDate);
+
+    widgets.forEach(widget => {
+        const isStoreCatalogWidget = Boolean(widget.closest('#store-catalog'));
+        widget.hidden = isStoreCatalogWidget && currentCategory !== 'offers';
+        const dateElement = widget.querySelector('[data-offers-end-date]');
+        if (dateElement) {
+            dateElement.dateTime = endDate.toISOString();
+            dateElement.textContent = dateLabel;
+        }
+
+        const units = widget.querySelector('[data-offers-units]');
+        const expiredMessage = widget.querySelector('[data-offers-expired]');
+        if (units) units.hidden = expired;
+        if (expiredMessage) expiredMessage.hidden = !expired;
+        if (expired) return;
+
+        const totalSeconds = Math.floor(remaining / 1000);
+        const values = {
+            days: Math.floor(totalSeconds / 86400),
+            hours: Math.floor((totalSeconds % 86400) / 3600),
+            minutes: Math.floor((totalSeconds % 3600) / 60),
+            seconds: totalSeconds % 60
+        };
+        Object.entries(values).forEach(([unit, value]) => {
+            const element = widget.querySelector(`[data-offers-unit="${unit}"]`);
+            if (!element) return;
+            const displayValue = value.toLocaleString('ar-EG', {
+                minimumIntegerDigits: unit === 'days' ? 1 : 2,
+                useGrouping: false
+            });
+            if (element.textContent === displayValue) return;
+            element.textContent = displayValue;
+            element.classList.remove('is-ticking');
+            void element.offsetWidth;
+            element.classList.add('is-ticking');
+        });
+    });
+    return newlyExpired;
+}
+
 function renderOffersCatalog() {
     const section = document.getElementById('offers-catalog');
     const count = document.getElementById('offers-results-count');
     const track = document.getElementById('offers-products-track');
     if (!section || !track) return;
 
+    updateOffersCampaignCountdown();
     const movingOfferProducts = getMovingOfferProducts();
     section.hidden = movingOfferProducts.length === 0;
     if (count) count.textContent = `${movingOfferProducts.length.toLocaleString('ar-EG')} منتج`;
@@ -1390,6 +1486,13 @@ function filterByCategory(cat) {
     currentCategory = cat;
     renderCategories(); // لتحديث اللون النشط
     applyProductFilters();
+    updateStoreCatalogHeading();
+}
+
+function updateStoreCatalogHeading() {
+    const title = document.getElementById('store-catalog-title');
+    if (title) title.textContent = currentCategory === 'offers' ? 'كل التخفيضات 🔥' : 'منتجات المتجر';
+    updateOffersCampaignCountdown();
 }
 
 function normalizeSearchText(value) {
@@ -1870,6 +1973,7 @@ function startSocialProof() {
 // --- تحديث العداد التنازلي للعروض ---
 setInterval(() => {
     let expiredOfferVisible = false;
+    const campaignJustExpired = updateOffersCampaignCountdown();
     document.querySelectorAll('.countdown-timer').forEach(el => {
         const end = Number(el.dataset.ends);
         const now = new Date().getTime();
@@ -1890,7 +1994,8 @@ setInterval(() => {
             el.innerHTML = `🔥 باقي ${d}ي ${h}س ${m}د ${s}ث`;
         }
     });
-    if (expiredOfferVisible) {
+    if (campaignJustExpired) renderCategories();
+    if (expiredOfferVisible || campaignJustExpired) {
         renderOffersCatalog();
         if (currentCategory === 'offers') filterByCategory('offers');
     }

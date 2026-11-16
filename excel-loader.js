@@ -427,6 +427,7 @@ function buildStoreWorkbook() {
         { 'المفتاح': 'app_icon_512', 'القيمة': settings.app_icon_512 || 'icon-512.png', 'الوصف': 'مسار أيقونة التطبيق المربعة بحجم 512×512؛ تستخدم أيضاً لشاشة بدء Android' },
         { 'المفتاح': 'app_splash_image', 'القيمة': settings.app_splash_image || settings.brand_logo_image || 'logo.png', 'الوصف': 'مسار الصورة التي تظهر أثناء تحميل التطبيق؛ ارفع الصورة إلى المستودع' },
         { 'المفتاح': 'cart_auto_close_seconds', 'القيمة': settings.cart_auto_close_seconds !== undefined && settings.cart_auto_close_seconds !== '' ? settings.cart_auto_close_seconds : '3', 'الوصف': 'عدد الثواني قبل إغلاق السلة تلقائياً بعد إضافة صنف؛ اكتب 0 لإيقاف الإغلاق التلقائي' },
+        { 'المفتاح': 'offers_end_date', 'القيمة': settings.offers_end_date || '', 'الوصف': 'موعد انتهاء التخفيضات بصيغة YYYY-MM-DD HH:mm (مثال: 2026-12-31 23:59)' },
         { 'المفتاح': 'site_name', 'القيمة': settings.site_name || 'متجر مشالى | الإلكترونيات', 'الوصف': 'اسم الموقع وعنوان صفحة المتجر' },
         { 'المفتاح': 'app_name', 'القيمة': settings.app_name || settings.site_name || 'متجر مشالى | الإلكترونيات', 'الوصف': 'الاسم الكامل لتطبيق الهاتف المثبت' },
         { 'المفتاح': 'short_name', 'القيمة': settings.short_name || 'مشالى', 'الوصف': 'الاسم المختصر لأيقونة التطبيق المثبت' },

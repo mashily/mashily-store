@@ -65,6 +65,9 @@
         <span>جاري تحميل المتجر...</span>
     </div>
     <header class="market-header">
+        <div class="market-electric-effect" aria-hidden="true">
+            <span class="market-electric-bolt"><i class="fas fa-bolt"></i></span>
+        </div>
         <div class="market-header-main">
             <a class="market-brand" href="index.html" aria-label="متجر مشالى" onclick="triggerAdmin(event)">
                 <img class="store-brand-logo" src="logo.png" alt="شعار متجر مشالى">
@@ -99,9 +102,6 @@
                         <button onclick="setTheme('mint', event)" title="نعناعي"><i class="fas fa-leaf"></i></button>
                     </div>
                 </div>
-                <button class="market-icon-button market-badge-button" type="button" onclick="showWishlist()" aria-label="المفضلة">
-                    <i class="fas fa-heart"></i><span id="wishlist-badge" class="market-badge" style="display:none;">0</span>
-                </button>
                 <button class="market-icon-button market-badge-button market-cart-button" type="button" onclick="toggleCart(true)" aria-label="سلة المشتريات">
                     <i class="fas fa-shopping-basket"></i><span class="market-cart-label">السلة</span><span id="cart-badge" class="market-badge">0</span>
                 </button>
@@ -120,7 +120,23 @@
 
     <section id="offers-catalog" class="offers-catalog" aria-labelledby="offers-catalog-title" hidden>
         <div class="store-catalog-heading">
-            <h2 id="offers-catalog-title">عروض المتجر</h2>
+            <div class="offers-heading-title-group">
+                <h2 id="offers-catalog-title">تخفيضات</h2>
+                <div class="offers-deadline" data-offers-deadline hidden>
+                    <div class="offers-deadline-caption">
+                        <i class="fas fa-clock" aria-hidden="true"></i>
+                        <span>تنتهي التخفيضات في</span>
+                        <time data-offers-end-date></time>
+                    </div>
+                    <div class="offers-countdown" data-offers-units role="timer" aria-label="الوقت المتبقي لنهاية التخفيضات">
+                        <span class="offers-countdown-unit"><strong data-offers-unit="days">0</strong><small>يوم</small></span>
+                        <span class="offers-countdown-unit"><strong data-offers-unit="hours">00</strong><small>ساعة</small></span>
+                        <span class="offers-countdown-unit"><strong data-offers-unit="minutes">00</strong><small>دقيقة</small></span>
+                        <span class="offers-countdown-unit"><strong data-offers-unit="seconds">00</strong><small>ثانية</small></span>
+                    </div>
+                    <strong class="offers-expired" data-offers-expired hidden>انتهت التخفيضات</strong>
+                </div>
+            </div>
             <span id="offers-results-count" class="store-results-count"></span>
         </div>
         <div id="offers-products-viewport" class="offers-products-viewport" aria-label="المنتجات المخفضة">
@@ -130,8 +146,22 @@
 
     <section class="store-catalog" id="store-catalog" aria-labelledby="store-catalog-title">
         <div class="store-catalog-heading">
-            <div>
+            <div class="offers-heading-title-group">
                 <h2 id="store-catalog-title">منتجات المتجر</h2>
+                <div class="offers-deadline" data-offers-deadline hidden>
+                    <div class="offers-deadline-caption">
+                        <i class="fas fa-clock" aria-hidden="true"></i>
+                        <span>تنتهي التخفيضات في</span>
+                        <time data-offers-end-date></time>
+                    </div>
+                    <div class="offers-countdown" data-offers-units role="timer" aria-label="الوقت المتبقي لنهاية التخفيضات">
+                        <span class="offers-countdown-unit"><strong data-offers-unit="days">0</strong><small>يوم</small></span>
+                        <span class="offers-countdown-unit"><strong data-offers-unit="hours">00</strong><small>ساعة</small></span>
+                        <span class="offers-countdown-unit"><strong data-offers-unit="minutes">00</strong><small>دقيقة</small></span>
+                        <span class="offers-countdown-unit"><strong data-offers-unit="seconds">00</strong><small>ثانية</small></span>
+                    </div>
+                    <strong class="offers-expired" data-offers-expired hidden>انتهت التخفيضات</strong>
+                </div>
             </div>
             <span id="store-results-count" class="store-results-count" role="status" aria-live="polite"></span>
         </div>
