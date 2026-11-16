@@ -89,6 +89,7 @@ function downloadProductsExcel() {
             name: p.name,
             price: p.price,
             originalPrice: p.originalPrice || '',
+            'عرض متحرك': p.showInOffers === null || p.showInOffers === undefined ? '' : (p.showInOffers ? 'نعم' : 'لا'),
             description: p.description,
             category: p.category,
             stock: p.stock,
@@ -105,8 +106,8 @@ function downloadProductsExcel() {
     if (categories.length > 0) {
         const categoriesData = categories.map(c => ({
             name: c.name,
+            'صورة الصنف': c.image || '',
             icon: c.icon,
-            image: c.image || '',
             description: c.description
         }));
         const categoriesWs = XLSX.utils.json_to_sheet(categoriesData);
@@ -192,6 +193,7 @@ function normalizeProduct(p) {
         name: p.name || '',
         price: parseFloat(p.price) || 0,
         originalPrice: parseFloat(p.originalPrice) || 0,
+        showInOffers: parseOptionalBoolean(p.showInOffers !== undefined ? p.showInOffers : p['عرض متحرك']),
         description: p.description || '',
         category: p.category || '',
         stock: parseInt(p.stock) || 0,
@@ -206,7 +208,7 @@ function normalizeCategory(c) {
     return {
         name: c.name || c['الاسم'] || '',
         icon: c.icon || c['الأيقونة'] || 'fas fa-tag',
-        image: c.image || c['الصورة'] || c.image_path || '',
+        image: c.image || c['صورة الصنف'] || c['اسم صورة الصنف'] || c['الصورة'] || c.image_path || '',
         description: c.description || c['الوصف'] || ''
     };
 }

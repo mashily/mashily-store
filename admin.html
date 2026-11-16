@@ -2505,6 +2505,7 @@
                     category: p.category || 'general',
                     stock: p.stock || 10,
                     status: p.status || '',
+                    showInOffers: parseOptionalBoolean(p.showInOffers !== undefined ? p.showInOffers : p['عرض متحرك']),
                     tags: tags,
                     specs: specs,
                     rating: 0,
@@ -3196,7 +3197,7 @@
                 {
                     name: "اسم المنتج مثال", price: 1000, originalPrice: 1200, description: "وصف المنتج...",
                     images: "https://picsum.photos/300/200?random=1\nhttps://picsum.photos/300/200?random=2", category: "storage", stock: 10,
-                    status: "جديد", tags: "جديد, عرض خاص", specs: "مواصفة 1\nمواصفة 2"
+                    status: "جديد", showInOffers: true, tags: "جديد, عرض خاص", specs: "مواصفة 1\nمواصفة 2"
                 }
             ];
             const ws = XLSX.utils.json_to_sheet(templateData);

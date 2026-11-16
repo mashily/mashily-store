@@ -17,6 +17,17 @@ function parseNum(value) {
     return isNaN(n) ? 0 : n;
 }
 
+function parseOptionalBoolean(value) {
+    const normalized = String(value == null ? '' : value)
+        .trim()
+        .toLowerCase()
+        .replace(/[\u064B-\u065F\u0670]/g, '');
+    if (!normalized) return null;
+    if (['نعم', 'yes', 'true', '1', 'on'].includes(normalized)) return true;
+    if (['لا', 'no', 'false', '0', 'off'].includes(normalized)) return false;
+    return null;
+}
+
 function getFirstValue(row, keys) {
     for (const key of keys) {
         if (row[key] !== undefined && row[key] !== null && row[key] !== '') return row[key];
@@ -181,6 +192,7 @@ async function fetchStoreFromExcel() {
                 specs: parseSplit(r['custom_label_1']),
                 offerStarts: getFirstValue(r, ['offer_start', 'بداية العرض', 'offerStarts']),
                 offerEnds: getFirstValue(r, ['end', 'نهاية العرض', 'offerEnds']),
+                showInOffers: parseOptionalBoolean(getFirstValue(r, ['عرض متحرك', 'إظهار في العروض', 'عرض في العروض', 'showInOffers'])),
                 videos: parseSplit(getFirstValue(r, ['فيديوهات (|)', 'فيديوهات', 'videos'])),
                 rating: parseNum(r['التقييم']),
                 reviewCount: parseNum(r['عدد التقييمات'])
@@ -193,7 +205,7 @@ async function fetchStoreFromExcel() {
             .map(r => ({
                 name: String(getFirstValue(r, ['الاسم', 'name', 'category']) || '').trim(),
                 icon: getFirstValue(r, ['الأيقونة', 'icon']) || 'fas fa-tag',
-                image: String(getFirstValue(r, ['الصورة', 'image', 'image_path']) || '').trim()
+                image: String(getFirstValue(r, ['صورة الصنف', 'اسم صورة الصنف', 'الصورة', 'image', 'image_path']) || '').trim()
             }))
             .filter(c => c.name);
 
@@ -356,6 +368,7 @@ function buildStoreWorkbook() {
         custom_label_1: (p.specs || []).join('|'),
         offer_start: p.offerStarts || '',
         end: p.offerEnds || '',
+        'عرض متحرك': p.showInOffers === null || p.showInOffers === undefined ? '' : (p.showInOffers ? 'نعم' : 'لا'),
         'فيديوهات (|)': (p.videos || []).join('|'),
         التقييم: p.rating || 0,
         'عدد التقييمات': p.reviewCount || 0
@@ -365,8 +378,8 @@ function buildStoreWorkbook() {
     // الأصناف
     const catRows = categories.map(c => ({
         'الاسم': c.name,
+        'صورة الصنف': c.image || '',
         'الأيقونة': c.icon || 'fas fa-tag',
-        'الصورة': c.image || ''
     }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(catRows), 'Categories');
 

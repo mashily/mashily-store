@@ -1207,6 +1207,15 @@ function getDiscountedProducts() {
     });
 }
 
+function getMovingOfferProducts() {
+    return products.filter(product => {
+        if (product.stock === 'out' || product.showInOffers === false) return false;
+        if (product.showInOffers === true) return true;
+        const hasOfferDates = Boolean(product.offerStarts || product.offerEnds);
+        return isProductDiscounted(product) && (!hasOfferDates || isProductOfferActive(product));
+    });
+}
+
 function setupOffersCarousel() {
     const viewport = document.getElementById('offers-products-viewport');
     const track = document.getElementById('offers-products-track');
@@ -1298,15 +1307,15 @@ function renderOffersCatalog() {
     const track = document.getElementById('offers-products-track');
     if (!section || !track) return;
 
-    const discountedProducts = getDiscountedProducts();
-    section.hidden = discountedProducts.length === 0;
-    if (count) count.textContent = `${discountedProducts.length.toLocaleString('ar-EG')} منتج`;
-    if (!discountedProducts.length) {
+    const movingOfferProducts = getMovingOfferProducts();
+    section.hidden = movingOfferProducts.length === 0;
+    if (count) count.textContent = `${movingOfferProducts.length.toLocaleString('ar-EG')} منتج`;
+    if (!movingOfferProducts.length) {
         track.replaceChildren();
         return;
     }
 
-    track.innerHTML = `<div class="offers-products-group">${discountedProducts.map(product => createProductCard(product)).join('')}</div>`;
+    track.innerHTML = `<div class="offers-products-group">${movingOfferProducts.map(product => createProductCard(product)).join('')}</div>`;
     requestAnimationFrame(updateOffersTrackGeometry);
 }
 

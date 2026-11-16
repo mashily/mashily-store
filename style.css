@@ -2648,8 +2648,8 @@ html { color-scheme: light; }
     display: flex;
     flex: 0 0 auto;
     align-items: stretch;
-    gap: 14px;
-    padding-inline-end: 14px;
+    gap: 0;
+    padding-inline-end: 0;
 }
 .offers-products-group[aria-hidden="true"] { pointer-events: none; }
 .offers-products-track .product-card {
@@ -2736,7 +2736,7 @@ button, a { touch-action: manipulation; }
     .cat-label { font-size: .65rem; }
     .cat-count { top: 0; min-width: 17px; height: 17px; font-size: .58rem; }
     .offers-catalog { padding: 10px 10px 2px; }
-    .offers-products-group { gap: 9px; padding-inline-end: 9px; }
+    .offers-products-group { gap: 0; padding-inline-end: 0; }
     .img-container .product-cart-overlay { top: 7px; right: 7px; width: 36px; height: 36px; font-size: .98rem; }
     .market-header-main { padding-top: max(7px, env(safe-area-inset-top)); }
 }
