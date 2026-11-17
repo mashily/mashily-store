@@ -118,6 +118,7 @@ body {
     direction: rtl; 
     padding-bottom: 60px; /* مساحة للشريط السفلي */
     transition: 0.3s;
+    isolation: isolate;
 }
 
 /* الهيدر وشعار مشالي والأكاديمية */
@@ -2253,6 +2254,57 @@ html { color-scheme: light; }
     border-bottom: 1px solid var(--border);
     box-shadow: 0 3px 12px rgba(24, 42, 33, .08);
 }
+.site-electric-background {
+    position: fixed;
+    z-index: -1;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    color: #55e8b3;
+}
+.site-electric-glow {
+    position: absolute;
+    width: clamp(240px, 42vw, 680px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(69, 244, 177, .14), rgba(69, 244, 177, .035) 42%, transparent 72%);
+    filter: blur(22px);
+    animation: site-electric-glow-drift 18s ease-in-out infinite alternate;
+}
+.site-electric-glow-one { top: 8%; left: -18%; }
+.site-electric-glow-two {
+    right: -20%;
+    bottom: 5%;
+    background: radial-gradient(circle, rgba(91, 188, 255, .13), rgba(91, 188, 255, .03) 44%, transparent 72%);
+    animation-delay: -8s;
+    animation-duration: 23s;
+}
+.site-electric-trace {
+    position: absolute;
+    left: -42vw;
+    width: clamp(260px, 38vw, 620px);
+    height: 24px;
+    background: linear-gradient(90deg, transparent, rgba(77, 255, 190, .7), #f5fff9, rgba(77, 255, 190, .62), transparent);
+    clip-path: polygon(0 43%, 30% 43%, 36% 13%, 42% 85%, 48% 42%, 62% 42%, 68% 17%, 74% 78%, 80% 43%, 100% 43%, 100% 57%, 80% 57%, 74% 91%, 68% 34%, 62% 57%, 48% 57%, 42% 100%, 36% 29%, 33% 57%, 0 57%);
+    filter: drop-shadow(0 0 5px rgba(85, 255, 190, .9));
+    opacity: .2;
+    animation: site-electric-trace-flow 19s linear infinite;
+}
+.site-electric-trace-one { top: 27%; }
+.site-electric-trace-two {
+    top: 73%;
+    height: 18px;
+    opacity: .14;
+    animation-delay: -10s;
+    animation-duration: 25s;
+}
+@keyframes site-electric-trace-flow {
+    to { transform: translateX(190vw); }
+}
+@keyframes site-electric-glow-drift {
+    from { transform: translate3d(-3vw, -2vh, 0) scale(.92); }
+    to { transform: translate3d(5vw, 4vh, 0) scale(1.08); }
+}
 .market-electric-effect {
     position: absolute;
     z-index: 1;
@@ -2710,41 +2762,93 @@ html { color-scheme: light; }
 .offers-heading-title-group { display: flex; min-width: 0; align-items: center; flex-wrap: wrap; gap: 10px; }
 .offers-heading-title-group h2 { margin: 0; }
 .offers-deadline {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 7px;
-    padding: 6px 9px;
-    border: 1px solid rgba(220, 77, 53, .18);
-    border-radius: 13px;
-    background: linear-gradient(135deg, rgba(255, 246, 239, .96), rgba(255, 255, 255, .94));
-    box-shadow: 0 4px 12px rgba(130, 59, 39, .07);
-    animation: offersDeadlineEnter .35s ease both;
+    gap: 8px;
+    padding: 7px 9px;
+    border: 1px solid rgba(71, 192, 143, .38);
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(246, 255, 250, .98), rgba(237, 248, 242, .96));
+    box-shadow: 0 5px 16px rgba(32, 99, 69, .13), 0 0 0 1px rgba(88, 244, 179, .08);
+    animation: offersDeadlineEnter .35s ease both, offersVoltagePulse 4s ease-in-out 1s infinite;
+}
+.offers-deadline::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgba(87, 255, 187, .17) 48%, rgba(255, 255, 255, .62) 50%, rgba(87, 255, 187, .12) 53%, transparent 72%);
+    content: "";
+    transform: translateX(110%);
+    animation: offersVoltageSweep 6s ease-in-out infinite;
 }
 .offers-deadline[hidden], .offers-countdown[hidden], .offers-expired[hidden] { display: none !important; }
-.offers-deadline-caption { display: flex; align-items: center; gap: 5px; color: var(--text-light); font-size: .76rem; white-space: nowrap; }
-.offers-deadline-caption i { color: #d84f38; animation: offersClockPulse 2.4s ease-in-out infinite; }
-.offers-deadline-caption time { color: var(--text); font-weight: 800; }
-.offers-countdown { display: flex; align-items: center; gap: 3px; direction: rtl; }
+.offers-deadline-caption {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-light);
+    font-size: .78rem;
+    white-space: nowrap;
+}
+.offers-deadline-caption i { color: #e05b42; filter: drop-shadow(0 0 5px rgba(224, 91, 66, .35)); animation: offersClockPulse 2.4s ease-in-out infinite; }
+.offers-deadline-label { color: #a63e30; font-weight: 900; }
+.offers-deadline-date {
+    padding: 3px 8px;
+    border: 1px solid rgba(220, 105, 61, .24);
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(255, 238, 219, .95), rgba(255, 255, 255, .96));
+    color: #a63e30;
+    font-weight: 900;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 2px 7px rgba(159, 70, 43, .1);
+    animation: offersDateGlow 2.8s ease-in-out infinite;
+}
+.offers-countdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid rgba(104, 239, 177, .3);
+    border-radius: 12px;
+    background: linear-gradient(145deg, #10271e, #1d4332 60%, #122a20);
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, .35), 0 3px 10px rgba(16, 54, 37, .22), 0 0 12px rgba(84, 242, 173, .12);
+    direction: rtl;
+}
 .offers-countdown-unit {
     display: inline-flex;
-    min-width: 38px;
-    align-items: baseline;
+    min-width: 42px;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    gap: 3px;
-    padding: 3px 5px;
-    border: 1px solid rgba(196, 74, 48, .1);
+    gap: 1px;
+    padding: 4px 5px 3px;
+    border: 1px solid rgba(175, 255, 213, .12);
     border-radius: 8px;
-    background: rgba(255, 255, 255, .88);
-    line-height: 1.2;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .025));
+    line-height: 1.1;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07);
 }
-.offers-countdown-unit strong { color: #b83b2b; font-size: .86rem; font-variant-numeric: tabular-nums; }
-.offers-countdown-unit small { color: var(--text-light); font-size: .62rem; }
-.offers-countdown-unit strong.is-ticking { animation: offersDigitTick .28s ease both; }
+.offers-countdown-unit strong {
+    color: #b5ffd5;
+    font-size: .98rem;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 8px rgba(106, 255, 183, .6);
+}
+.offers-countdown-unit small { color: rgba(235, 255, 244, .72); font-size: .62rem; }
+.offers-countdown-unit strong.is-ticking { animation: offersDigitTick .28s ease both, offersDigitVoltage .65s ease-out; }
 .offers-expired { padding: 4px 8px; border-radius: 8px; background: rgba(127, 140, 141, .12); color: var(--text-light); font-size: .78rem; }
 @keyframes offersDeadlineEnter { from { opacity: 0; transform: translateY(4px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes offersClockPulse { 0%, 100% { transform: rotate(0); } 12%, 24% { transform: rotate(-10deg); } 18%, 30% { transform: rotate(10deg); } 38% { transform: rotate(0); } }
 @keyframes offersDigitTick { from { opacity: .35; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes offersVoltagePulse { 0%, 100% { box-shadow: 0 5px 16px rgba(32, 99, 69, .13), 0 0 0 1px rgba(88, 244, 179, .08); } 50% { box-shadow: 0 5px 18px rgba(32, 99, 69, .18), 0 0 15px rgba(88, 244, 179, .2); } }
+@keyframes offersVoltageSweep { 0%, 15% { transform: translateX(110%); opacity: 0; } 32% { opacity: 1; } 58%, 100% { transform: translateX(-110%); opacity: 0; } }
+@keyframes offersDateGlow { 0%, 100% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 2px 7px rgba(159, 70, 43, .1); } 50% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 0 10px rgba(224, 91, 66, .24); } }
+@keyframes offersDigitVoltage { 0%, 100% { color: #b5ffd5; text-shadow: 0 0 8px rgba(106, 255, 183, .6); } 45% { color: #fff; text-shadow: 0 0 5px #fff, 0 0 15px #65ffc5; } }
 .offers-products-viewport {
     overflow: hidden;
     padding: 3px 1px 15px;
@@ -2920,22 +3024,181 @@ button, a { touch-action: manipulation; }
 }
 
 [data-theme="dark"] .offers-deadline {
-    border-color: rgba(215, 132, 101, .25);
-    background: linear-gradient(135deg, rgba(69, 48, 41, .96), rgba(42, 37, 34, .94));
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .14);
+    border-color: rgba(112, 225, 167, .26);
+    background: linear-gradient(135deg, rgba(22, 38, 30, .98), rgba(32, 48, 39, .96));
+    box-shadow: 0 5px 16px rgba(0, 0, 0, .22), 0 0 12px rgba(84, 242, 173, .1);
 }
-[data-theme="dark"] .offers-countdown-unit { border-color: rgba(215, 132, 101, .16); background: rgba(255, 255, 255, .055); }
-[data-theme="dark"] .offers-countdown-unit strong { color: #ffb49a; }
+[data-theme="dark"] .offers-deadline-label { color: #ffe0a6; }
+[data-theme="dark"] .offers-deadline-date {
+    border-color: rgba(255, 205, 126, .24);
+    background: linear-gradient(135deg, rgba(103, 70, 38, .58), rgba(61, 52, 39, .8));
+    color: #ffe0a6;
+}
+[data-theme="dark"] .offers-deadline-caption i { color: #ff9a76; }
 [data-theme="dark"] .offers-expired { background: rgba(255, 255, 255, .08); }
 @media (max-width: 600px) {
-    .offers-heading-title-group { gap: 7px; }
-    .offers-deadline { gap: 5px; padding: 5px 7px; }
-    .offers-deadline-caption { font-size: .7rem; }
+    .store-catalog-heading { flex-wrap: wrap; align-items: flex-start; }
+    .offers-heading-title-group { width: 100%; gap: 7px; }
+    .site-electric-background { opacity: .58; }
+    .site-electric-glow { filter: blur(30px); }
+    .site-electric-trace { width: 76vw; height: 13px; opacity: .12; animation-duration: 30s; }
+    .site-electric-trace-two { animation-duration: 36s; }
+    .offers-deadline { display: grid; width: 100%; max-width: 100%; box-sizing: border-box; justify-items: center; gap: 6px; padding: 6px; }
+    .offers-deadline-caption { justify-content: center; flex-wrap: wrap; gap: 5px; font-size: .68rem; }
+    .offers-deadline-date { padding: 3px 6px; }
+    .offers-countdown { gap: 3px; padding: 3px; }
     .offers-countdown-unit { min-width: 34px; padding: 3px 4px; }
+    .offers-countdown-unit strong { font-size: .86rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .offers-deadline, .offers-deadline-caption i, .offers-countdown-unit strong.is-ticking { animation: none !important; }
+    .site-electric-trace { display: none; animation: none !important; }
+    .site-electric-glow { opacity: .08; animation: none !important; }
+    .offers-deadline, .offers-deadline::before, .offers-deadline-caption i,
+    .offers-deadline-date, .offers-countdown-unit strong.is-ticking { animation: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
     .store-entrance { animation: none !important; opacity: 1; transform: none; }
+}
+
+.store-catalog,
+.offers-catalog {
+    position: relative;
+    isolation: isolate;
+}
+.store-catalog::before,
+.offers-catalog::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 14% 22%, rgba(80, 255, 184, .1), transparent 36%),
+        radial-gradient(ellipse at 84% 72%, rgba(88, 225, 175, .07), transparent 34%);
+    content: "";
+    pointer-events: none;
+    animation: catalog-electric-breathe 9s ease-in-out infinite alternate;
+}
+.store-catalog::after,
+.offers-catalog::after {
+    position: absolute;
+    z-index: -1;
+    top: 76px;
+    left: -22%;
+    width: clamp(90px, 16vw, 190px);
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(91, 255, 190, .35), #eafff5, rgba(91, 255, 190, .45), transparent);
+    clip-path: polygon(0 42%, 32% 42%, 39% 0, 45% 100%, 51% 42%, 100% 42%, 100% 58%, 51% 58%, 45% 100%, 39% 24%, 35% 58%, 0 58%);
+    content: "";
+    filter: drop-shadow(0 0 4px rgba(67, 255, 179, .75));
+    opacity: .48;
+    pointer-events: none;
+    animation: catalog-electric-flow 24s linear infinite;
+}
+.product-card::after {
+    position: absolute;
+    z-index: 20;
+    inset: 0;
+    border: 1px solid rgba(89, 255, 190, .72);
+    border-radius: inherit;
+    background: linear-gradient(112deg, transparent 26%, rgba(133, 255, 208, .2) 47%, rgba(255, 255, 255, .08) 51%, transparent 68%);
+    content: "";
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-58%);
+}
+.product-card.product-electric-selected::after,
+.product-card.product-electric-added::after {
+    animation: product-electric-flash .56s ease-out both;
+}
+.product-card.product-electric-added {
+    border-color: rgba(72, 235, 161, .72);
+    box-shadow: 0 0 0 1px rgba(72, 235, 161, .16), 0 0 16px rgba(72, 235, 161, .18);
+}
+@keyframes catalog-electric-breathe {
+    from { opacity: .48; }
+    to { opacity: .88; }
+}
+@keyframes catalog-electric-flow {
+    to { transform: translateX(calc(100vw + 140%)); }
+}
+@keyframes product-electric-flash {
+    0% { opacity: 0; transform: translateX(-58%); }
+    28% { opacity: .72; }
+    100% { opacity: 0; transform: translateX(58%); }
+}
+@media (max-width: 600px) {
+    .store-catalog::before,
+    .offers-catalog::before { animation-duration: 13s; opacity: .58; }
+    .store-catalog::after,
+    .offers-catalog::after { top: 62px; opacity: .3; animation-duration: 32s; }
+    .product-card.product-electric-added { box-shadow: 0 0 0 1px rgba(72, 235, 161, .13), 0 0 10px rgba(72, 235, 161, .12); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .store-catalog::before,
+    .offers-catalog::before { animation: none; opacity: .2; }
+    .store-catalog::after,
+    .offers-catalog::after,
+    .product-card::after { animation: none !important; display: none; }
+    .product-card.product-electric-added { border-color: var(--border); box-shadow: none; }
+}
+
+.product-offer-countdown {
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: stretch;
+    gap: 3px;
+    padding: 4px;
+    border-color: rgba(79, 255, 179, .72);
+    background: linear-gradient(145deg, #071b13, #0d3824 60%, #092319);
+    box-shadow: inset 0 0 12px rgba(30, 255, 153, .15), 0 0 13px rgba(50, 255, 164, .34);
+    animation: none;
+}
+.product-offer-countdown .offers-countdown-unit {
+    min-width: 0;
+    flex: 1 1 0;
+    gap: 1px;
+    padding: 3px 2px;
+    border-color: rgba(113, 255, 190, .32);
+    background: linear-gradient(180deg, rgba(89, 255, 173, .16), rgba(255, 255, 255, .035));
+    box-shadow: inset 0 0 8px rgba(67, 255, 169, .12), 0 0 5px rgba(67, 255, 169, .1);
+}
+.product-offer-countdown .offers-countdown-unit strong {
+    color: #c9ffdf;
+    font-size: .78rem;
+    text-shadow: 0 0 7px rgba(62, 255, 160, .95), 0 0 15px rgba(35, 255, 145, .55);
+}
+.product-offer-countdown .offers-countdown-unit small {
+    color: rgba(208, 255, 226, .88);
+    font-size: .54rem;
+}
+.product-offer-countdown.is-expired {
+    justify-content: center;
+    border-color: rgba(165, 190, 177, .4);
+    background: linear-gradient(145deg, #26352d, #35463c);
+    box-shadow: none;
+    color: #d3ded7;
+    font-size: .76rem;
+}
+.product-details .product-offer-countdown {
+    min-height: 0;
+    white-space: normal;
+}
+.product-offer-countdown-modal { margin-top: 8px; }
+@media (max-width: 600px) {
+    .product-offer-countdown { gap: 2px; padding: 3px; }
+    .product-offer-countdown .offers-countdown-unit { padding: 3px 1px; }
+    .product-offer-countdown .offers-countdown-unit strong { font-size: .72rem; }
+}
+.product-card .wishlist-btn { display: none !important; }
+.product-card.store-entrance {
+    animation-delay: calc(300ms + var(--entrance-index, 0) * 40ms);
+}
+.store-catalog-heading.store-heading-reveal {
+    animation: store-heading-drop .36s cubic-bezier(.2, .75, .3, 1) both;
+}
+@keyframes store-heading-drop {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .store-catalog-heading.store-heading-reveal { animation: none !important; }
 }

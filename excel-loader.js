@@ -319,6 +319,7 @@ async function fetchStoreFromExcel() {
    ------------------------------------------------------------ */
 function applyStoreData(data) {
     if (!data) return false;
+    localStorage.setItem('storeDataVersion', String(Date.now()));
     if (data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
     if (data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
     if (data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));

@@ -9,10 +9,32 @@ let storeInitializationPromise = null;
 let storeToastTimer = null;
 let storeTickerTimer = null;
 let storeEntrancePending = true;
+let storeHeadingRevealTimer = null;
 let offersLayoutRevision = 0;
 let offersCampaignEndTime = NaN;
 let offersCampaignExpired = false;
+const productElectricTimers = new WeakMap();
 const DEFAULT_STORE_URL = 'https://mashily.github.io/mashily-store/';
+
+function pulseProductCard(productId, effect = 'selected') {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const card = Array.from(document.querySelectorAll('.product-card[data-product-id]'))
+        .find(element => element.dataset.productId === String(productId));
+    if (!card) return;
+
+    const selectedClass = effect === 'added' ? 'product-electric-added' : 'product-electric-selected';
+    const previousTimer = productElectricTimers.get(card);
+    if (previousTimer) window.clearTimeout(previousTimer);
+    card.classList.remove('product-electric-selected', 'product-electric-added');
+    window.requestAnimationFrame(() => {
+        card.classList.add(selectedClass);
+        const timer = window.setTimeout(() => {
+            card.classList.remove(selectedClass);
+            productElectricTimers.delete(card);
+        }, effect === 'added' ? 800 : 600);
+        productElectricTimers.set(card, timer);
+    });
+}
 
 function getStoreUrl() {
     const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
@@ -280,9 +302,7 @@ function refreshStoreViewFromLocalData() {
 
 async function initializeStore() {
     window.setTimeout(hideAppSplash, 8000);
-    // التحقق مما إذا كان المستخدم مديراً (لتجنب مسح التعديلات المحلية عند التحديث)
-    const isAdmin = sessionStorage.getItem('mashily_user');
-    const storeRefreshPromise = isAdmin ? Promise.resolve(false) : refreshStoreData();
+    const storeRefreshPromise = refreshStoreData();
 
     // تحميل البيانات للمتغيرات
     products = JSON.parse(localStorage.getItem('storeProducts')) || [];
@@ -375,7 +395,7 @@ async function initializeStore() {
     requestAnimationFrame(() => {
         renderProducts(products);
         renderOffersCatalog();
-        if (hasCachedProducts || isAdmin) hideAppSplash();
+        if (hasCachedProducts) hideAppSplash();
     });
 
     storeRefreshPromise.then(updated => {
@@ -675,6 +695,17 @@ function toggleDarkMode() {
     setTheme(target);
 }
 
+function renderProductCountdown(product, variant = '') {
+    const endTime = parseOfferDate(product.offerEnds, true);
+    return `
+        <div class="countdown-timer offers-countdown product-offer-countdown ${variant}" data-ends="${escapeAcademyHtml(endTime)}" role="timer" aria-label="الوقت المتبقي على العرض">
+            <span class="offers-countdown-unit"><strong data-product-unit="days">0</strong><small>يوم</small></span>
+            <span class="offers-countdown-unit"><strong data-product-unit="hours">00</strong><small>ساعة</small></span>
+            <span class="offers-countdown-unit"><strong data-product-unit="minutes">00</strong><small>دقيقة</small></span>
+            <span class="offers-countdown-unit"><strong data-product-unit="seconds">00</strong><small>ثانية</small></span>
+        </div>`;
+}
+
 // دالة مساعدة لإنشاء كارت المنتج (لإعادة الاستخدام)
 function createProductCard(p, index = 0, animateEntrance = false) {
     const isOut = p.stock === 'out';
@@ -685,7 +716,7 @@ function createProductCard(p, index = 0, animateEntrance = false) {
     const hasDiscount = Number(oldPrice) > Number(p.price);
     
     return `
-    <div class="product-card ${isOut ? 'product-unavailable' : ''} ${animateEntrance ? 'store-entrance' : ''}" ${animateEntrance ? `style="--entrance-index:${Math.min(index, 11)}"` : ''} onclick="if(!event.target.closest('button,a,input,select,textarea')) openProductDetails(${p.id})" onmouseleave="hideAllInfos()">
+    <div class="product-card ${isOut ? 'product-unavailable' : ''} ${animateEntrance ? 'store-entrance' : ''}" data-product-id="${escapeAcademyHtml(p.id)}" ${animateEntrance ? `style="--entrance-index:${Math.min(index, 11)}"` : ''} onclick="if(!event.target.closest('button,a,input,select,textarea')) openProductDetails(${p.id})" onmouseleave="hideAllInfos()">
         <button class="share-btn" type="button" onclick="shareProduct(${p.id}, event)" title="مشاركة عبر واتساب" aria-label="مشاركة ${escapeAcademyHtml(p.name)} عبر واتساب">
             <i class="fab fa-whatsapp" aria-hidden="true"></i>
         </button>
@@ -696,7 +727,7 @@ function createProductCard(p, index = 0, animateEntrance = false) {
             </button>
             ${!isOut && p.status ? `<div class="pro-badge ${p.status==='عرض خاص'?'offer':''}">${p.status}</div>` : ''}
             ${discountPercent > 0 ? `<div class="product-discount-badge">خصم ${discountPercent}%</div>` : ''}
-            <img src="${p.image}" alt="${p.name}">
+            <img src="${escapeAcademyHtml(getStoreImageSource(p.image))}" alt="${escapeAcademyHtml(p.name)}" onerror="this.onerror=null;this.src='category-images/default.svg'">
             ${isOut ? '<div class="out-badge">غير متوفر حالياً ❌</div>' : ''}
             <div class="product-info-overlay">${p.desc || 'منتج أصلي من متجر مشالي'}</div>
         </div>
@@ -707,7 +738,7 @@ function createProductCard(p, index = 0, animateEntrance = false) {
                 <span class="sale-price">${p.price} <small>ج.م</small></span>
                 ${hasDiscount ? `<span class="old-price"><span>السعر قبل الخصم</span><s>${oldPrice} ج.م</s></span>` : ''}
             </div>
-            ${hasTimer ? `<div class="countdown-timer" data-ends="${parseOfferDate(p.offerEnds, true)}">جاري التحميل...</div>` : ''}
+            ${hasTimer ? renderProductCountdown(p) : ''}
         </div>
     </div>
     `;
@@ -723,6 +754,7 @@ let cartAutoCloseSeconds = 3;
 function openProductDetails(id) {
     const product = products.find(p => p.id === id);
     if (!product) return;
+    pulseProductCard(id);
 
     // إعداد الصور
     const productImages = Array.isArray(product.images)
@@ -767,7 +799,7 @@ function openProductDetails(id) {
 
     // 4. عداد العرض (كامل العرض)
     if (hasTimer) {
-        metaHTML += `<div class="countdown-timer" data-ends="${parseOfferDate(product.offerEnds, true)}" style="width:100%; text-align:center; margin-top:8px; font-size:1rem; padding:10px; background:#fff3cd; color:#d35400; border:1px dashed #e67e22; border-radius:8px; font-weight:bold;">جاري التحميل...</div>`;
+        metaHTML += renderProductCountdown(product, 'product-offer-countdown-modal');
     }
 
     const metaContainer = document.getElementById('modal-meta');
@@ -896,7 +928,7 @@ function updateGallery() {
         img.style.display = 'block';
         videoContainer.style.display = 'none';
         videoContainer.innerHTML = '';
-        img.src = item.src;
+        img.src = getStoreImageSource(item.src);
         container.style.cursor = 'zoom-in';
     } else {
         img.style.display = 'none';
@@ -926,7 +958,7 @@ function updateGallery() {
         thumbsContainer.innerHTML = currentProductImages.map((item, i) => {
             const activeClass = i === currentGalleryIndex ? 'active' : '';
             if (item.type === 'image') {
-                return `<img src="${item.src}" class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()">`;
+                return `<img src="${escapeAcademyHtml(getStoreImageSource(item.src))}" class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()">`;
             } else {
                 return `<div class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()" style="display:flex; align-items:center; justify-content:center; background:#000; color:#fff; font-size:1.5rem; cursor:pointer; border-radius:8px; width:60px; height:60px;"><i class="fas fa-play"></i></div>`;
             }
@@ -1069,7 +1101,13 @@ function renderProducts(items) {
         return;
     }
 
-    grid.innerHTML = items.map((p, index) => createProductCard(p, index, storeEntrancePending)).join('');
+    const existingProductIds = new Set(
+        Array.from(grid.querySelectorAll('.product-card[data-product-id]'), card => card.dataset.productId)
+    );
+    grid.innerHTML = items.map((p, index) => {
+        const animateEntrance = storeEntrancePending || !existingProductIds.has(String(p.id));
+        return createProductCard(p, index, animateEntrance);
+    }).join('');
     storeEntrancePending = false;
 }
 
@@ -1172,6 +1210,21 @@ function normalizeStoreCategory(value) {
     return String(value == null ? '' : value).trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 }
 
+function getStoreImageSource(source) {
+    const imagePath = String(source == null ? '' : source).trim().replace(/\\/g, '/');
+    if (!imagePath || /^(?:https?:|data:|blob:|\/\/)/i.test(imagePath)) return imagePath;
+
+    try {
+        const imageUrl = new URL(imagePath, document.baseURI);
+        if (imageUrl.origin !== window.location.origin) return imagePath;
+        imageUrl.searchParams.set('v', localStorage.getItem('storeDataVersion') || '1');
+        return imageUrl.href;
+    } catch (error) {
+        console.warn('تعذر تجهيز مسار صورة المتجر:', imagePath, error);
+        return imagePath;
+    }
+}
+
 function renderCategories() {
     const catContainer = document.getElementById('product-cats');
     if(!catContainer) return;
@@ -1198,7 +1251,7 @@ function renderCategories() {
                 ? products.length
                 : products.filter(product => normalizeStoreCategory(product.category) === normalizeStoreCategory(cat.name)).length;
         const label = cat.label || (cat.name === 'الكل' ? 'كل الأصناف' : cat.name);
-        const image = getCategoryImageSource(cat.image, cat.icon);
+        const image = getStoreImageSource(getCategoryImageSource(cat.image, cat.icon));
         return `
         <button type="button" class="cat-btn ${isOffers ? 'cat-btn-offer' : ''} ${currentCategory === cat.name ? 'active' : ''} ${storeEntrancePending ? 'store-entrance' : ''}" 
                 ${storeEntrancePending ? `style="--entrance-index:${Math.min(index, 9)}"` : ''}
@@ -1216,12 +1269,11 @@ function renderCategories() {
             const button = event.target.closest('[data-category]');
             if (!button || !catContainer.contains(button)) return;
             filterByCategory(button.dataset.category);
-            if (button.dataset.category === 'offers') {
-                const catalog = document.getElementById('store-catalog');
-                if (catalog) {
-                    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
-                    catalog.scrollIntoView({behavior, block: 'start'});
-                }
+            animateStoreCatalogHeading();
+            const catalog = document.getElementById('store-catalog');
+            if (catalog) {
+                const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+                catalog.scrollIntoView({behavior, block: 'start'});
             }
         });
     }
@@ -1453,7 +1505,13 @@ function renderOffersCatalog() {
         return;
     }
 
-    track.innerHTML = `<div class="offers-products-group">${movingOfferProducts.map(product => createProductCard(product)).join('')}</div>`;
+    const existingProductIds = new Set(
+        Array.from(track.querySelectorAll('.product-card[data-product-id]'), card => card.dataset.productId)
+    );
+    track.innerHTML = `<div class="offers-products-group">${movingOfferProducts.map((product, index) => {
+        const animateEntrance = !existingProductIds.has(String(product.id));
+        return createProductCard(product, index, animateEntrance);
+    }).join('')}</div>`;
     requestAnimationFrame(updateOffersTrackGeometry);
 }
 
@@ -1484,9 +1542,24 @@ function showStoreToast(message) {
 
 function filterByCategory(cat) {
     currentCategory = cat;
+    storeEntrancePending = true;
     renderCategories(); // لتحديث اللون النشط
     applyProductFilters();
     updateStoreCatalogHeading();
+}
+
+function animateStoreCatalogHeading() {
+    const heading = document.querySelector('#store-catalog .store-catalog-heading');
+    if (!heading || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    heading.classList.remove('store-heading-reveal');
+    window.requestAnimationFrame(() => {
+        heading.classList.add('store-heading-reveal');
+        window.clearTimeout(storeHeadingRevealTimer);
+        storeHeadingRevealTimer = window.setTimeout(() => {
+            heading.classList.remove('store-heading-reveal');
+            storeHeadingRevealTimer = null;
+        }, 600);
+    });
 }
 
 function updateStoreCatalogHeading() {
@@ -1626,6 +1699,7 @@ function addToCart(id, quantity = 1, clickEvent = null, openCartAfterAdd = false
     }
     const p = products.find(x => String(x.id) === String(id));
     if (!p) return;
+    pulseProductCard(p.id, 'added');
     const amount = Math.max(1, Math.floor(Number(quantity) || 1));
     const item = cart.find(x => String(x.id) === String(id));
     if(item) item.qty = (Number(item.qty) || 0) + amount;
@@ -1984,14 +2058,30 @@ setInterval(() => {
         } else if(diff <= 0) {
             if (!el.dataset.expired) expiredOfferVisible = true;
             el.dataset.expired = 'true';
-            el.innerHTML = "انتهى العرض ⌛";
-            el.style.color = "#7f8c8d"; el.style.borderColor = "#ccc"; el.style.background = "#eee";
+            if (!el.classList.contains('is-expired')) {
+                el.classList.add('is-expired');
+                el.textContent = 'انتهى العرض ⌛';
+            }
         } else {
+            el.classList.remove('is-expired');
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const s = Math.floor((diff % (1000 * 60)) / 1000);
-            el.innerHTML = `🔥 باقي ${d}ي ${h}س ${m}د ${s}ث`;
+            const values = {days: d, hours: h, minutes: m, seconds: s};
+            Object.entries(values).forEach(([unit, value]) => {
+                const element = el.querySelector(`[data-product-unit="${unit}"]`);
+                if (!element) return;
+                const displayValue = value.toLocaleString('ar-EG', {
+                    minimumIntegerDigits: unit === 'days' ? 1 : 2,
+                    useGrouping: false
+                });
+                if (element.textContent === displayValue) return;
+                element.textContent = displayValue;
+                element.classList.remove('is-ticking');
+                void element.offsetWidth;
+                element.classList.add('is-ticking');
+            });
         }
     });
     if (campaignJustExpired) renderCategories();
