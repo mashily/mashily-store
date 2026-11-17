@@ -15,6 +15,11 @@ let offersCampaignEndTime = NaN;
 let offersCampaignExpired = false;
 const productElectricTimers = new WeakMap();
 const DEFAULT_STORE_URL = 'https://mashily.github.io/mashily-store/';
+const DEFAULT_DRIVE_IMAGE_FOLDER_ID = '1ONsyQHZaoPNvzCXWxLjIaXs6yfMwiVRD';
+const DRIVE_IMAGE_CACHE_KEY = 'MASHILY_DRIVE_IMAGE_INDEX';
+let driveImageIdsByName = new Map();
+let driveImageCacheFolderId = '';
+let driveImageIndexPromise = null;
 
 function pulseProductCard(productId, effect = 'selected') {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -185,7 +190,10 @@ function refreshStoreData() {
                 console.warn('تعذر تحديث البيانات من ملف Excel، سيتم تجربة المصدر الاحتياطي.', error);
             }
         }
-        if (excelLoaded) return true;
+        if (excelLoaded) {
+            await loadDriveImageIndex();
+            return true;
+        }
 
         try {
             const response = await fetch('db.json?v=' + new Date().getTime());
@@ -197,6 +205,7 @@ function refreshStoreData() {
             if(data.ticker) localStorage.setItem('tickerText', data.ticker);
             if(data.proof) localStorage.setItem('proofText', data.proof);
             if(data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
+            await loadDriveImageIndex();
             return true;
         } catch (error) {
             console.log('وضع الأوفلاين أو لم يتم رفع ملف db.json بعد');
@@ -727,7 +736,7 @@ function createProductCard(p, index = 0, animateEntrance = false) {
             </button>
             ${!isOut && p.status ? `<div class="pro-badge ${p.status==='عرض خاص'?'offer':''}">${p.status}</div>` : ''}
             ${discountPercent > 0 ? `<div class="product-discount-badge">خصم ${discountPercent}%</div>` : ''}
-            <img src="${escapeAcademyHtml(getStoreImageSource(p.image))}" alt="${escapeAcademyHtml(p.name)}" onerror="this.onerror=null;this.src='category-images/default.svg'">
+            <img src="${escapeAcademyHtml(getProductImageSource(p.image))}" alt="${escapeAcademyHtml(p.name)}" onerror="this.onerror=null;this.src='category-images/default.svg'">
             ${isOut ? '<div class="out-badge">غير متوفر حالياً ❌</div>' : ''}
             <div class="product-info-overlay">${p.desc || 'منتج أصلي من متجر مشالي'}</div>
         </div>
@@ -928,7 +937,7 @@ function updateGallery() {
         img.style.display = 'block';
         videoContainer.style.display = 'none';
         videoContainer.innerHTML = '';
-        img.src = getStoreImageSource(item.src);
+        img.src = getProductImageSource(item.src);
         container.style.cursor = 'zoom-in';
     } else {
         img.style.display = 'none';
@@ -958,7 +967,7 @@ function updateGallery() {
         thumbsContainer.innerHTML = currentProductImages.map((item, i) => {
             const activeClass = i === currentGalleryIndex ? 'active' : '';
             if (item.type === 'image') {
-                return `<img src="${escapeAcademyHtml(getStoreImageSource(item.src))}" class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()">`;
+                return `<img src="${escapeAcademyHtml(getProductImageSource(item.src))}" class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()">`;
             } else {
                 return `<div class="thumbnail-img ${activeClass}" onclick="currentGalleryIndex=${i}; updateGallery()" style="display:flex; align-items:center; justify-content:center; background:#000; color:#fff; font-size:1.5rem; cursor:pointer; border-radius:8px; width:60px; height:60px;"><i class="fas fa-play"></i></div>`;
             }
@@ -1225,21 +1234,169 @@ function getStoreImageSource(source) {
     }
 }
 
+function getDriveImageSettings() {
+    let settings = {};
+    try {
+        settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    } catch (error) {
+        console.warn('تعذر قراءة إعدادات صور Google Drive:', error);
+    }
+    return {
+        folderId: String(settings.drive_folder_id || DEFAULT_DRIVE_IMAGE_FOLDER_ID).trim(),
+        apiKey: String(settings.drive_api_key || '').trim()
+    };
+}
+
+function normalizeDriveImageName(name) {
+    return String(name || '').trim().replace(/\\/g, '/').split('/').pop().toLocaleLowerCase();
+}
+
+function loadCachedDriveImageIndex(folderId) {
+    if (driveImageCacheFolderId === folderId) return;
+    driveImageCacheFolderId = folderId;
+    driveImageIdsByName = new Map();
+    try {
+        const cached = JSON.parse(localStorage.getItem(DRIVE_IMAGE_CACHE_KEY) || 'null');
+        if (!cached || cached.folderId !== folderId || !cached.files) return;
+        driveImageIdsByName = new Map(Object.entries(cached.files));
+    } catch (error) {
+        console.warn('تعذر قراءة فهرس صور Google Drive المحفوظ:', error);
+    }
+}
+
+async function loadDriveImageIndex() {
+    const settings = getDriveImageSettings();
+    loadCachedDriveImageIndex(settings.folderId);
+    if (!settings.apiKey) return false;
+    if (driveImageIndexPromise) return driveImageIndexPromise;
+
+    const cached = (() => {
+        try {
+            return JSON.parse(localStorage.getItem(DRIVE_IMAGE_CACHE_KEY) || 'null');
+        } catch (error) {
+            console.warn('تعذر قراءة وقت تحديث فهرس صور Google Drive:', error);
+            return null;
+        }
+    })();
+    const cacheIsFresh = cached && cached.folderId === settings.folderId
+        && Date.now() - Number(cached.fetchedAt) < 15 * 60 * 1000;
+    if (cacheIsFresh) return true;
+    if (!/^[A-Za-z0-9_-]+$/.test(settings.folderId)) {
+        console.warn('معرّف مجلد صور Google Drive غير صالح.');
+        return driveImageIdsByName.size > 0;
+    }
+
+    driveImageIndexPromise = (async () => {
+        const files = [];
+        let pageToken = '';
+        do {
+            const url = new URL('https://www.googleapis.com/drive/v3/files');
+            url.searchParams.set('q', `'${settings.folderId}' in parents and trashed = false`);
+            url.searchParams.set('key', settings.apiKey);
+            url.searchParams.set('fields', 'nextPageToken,files(id,name,mimeType)');
+            url.searchParams.set('pageSize', '1000');
+            if (pageToken) url.searchParams.set('pageToken', pageToken);
+
+            const response = await fetch(url.href);
+            if (!response.ok) {
+                console.warn(`تعذر قراءة صور Google Drive (HTTP ${response.status}).`);
+                return driveImageIdsByName.size > 0;
+            }
+            const page = await response.json();
+            if (!Array.isArray(page.files)) {
+                console.warn('استجابة Google Drive لا تحتوي على قائمة صور صالحة.');
+                return driveImageIdsByName.size > 0;
+            }
+            files.push(...page.files.filter(file => file && file.id && file.name && String(file.mimeType || '').startsWith('image/')));
+            pageToken = page.nextPageToken || '';
+        } while (pageToken);
+
+        const imageIds = {};
+        const duplicateNames = new Set();
+        files.forEach(file => {
+            const name = normalizeDriveImageName(file.name);
+            if (!name || duplicateNames.has(name)) return;
+            if (imageIds[name]) {
+                delete imageIds[name];
+                duplicateNames.add(name);
+                return;
+            }
+            imageIds[name] = file.id;
+        });
+        if (duplicateNames.size) {
+            console.warn('توجد أسماء صور مكررة داخل مجلد Google Drive؛ غيّر أسماء الملفات المكررة:', [...duplicateNames]);
+        }
+
+        driveImageIdsByName = new Map(Object.entries(imageIds));
+        const index = {
+            folderId: settings.folderId,
+            fetchedAt: Date.now(),
+            files: imageIds
+        };
+        try {
+            localStorage.setItem(DRIVE_IMAGE_CACHE_KEY, JSON.stringify(index));
+        } catch (error) {
+            console.warn('تعذر حفظ فهرس صور Google Drive على هذا الجهاز:', error);
+        }
+        return true;
+    })().catch(error => {
+        console.warn('تعذر تحميل فهرس صور Google Drive؛ سيُستخدم الفهرس المحفوظ إن وجد.', error);
+        return driveImageIdsByName.size > 0;
+    }).finally(() => {
+        driveImageIndexPromise = null;
+    });
+    return driveImageIndexPromise;
+}
+
+function getGoogleDriveImageUrl(fileId) {
+    return `https://drive.google.com/thumbnail?id=${encodeURIComponent(fileId)}&sz=w1200`;
+}
+
+function getGoogleDriveFileId(source) {
+    try {
+        const url = new URL(source);
+        const host = url.hostname.toLowerCase();
+        if (host !== 'drive.google.com' && host !== 'www.drive.google.com') return '';
+        const pathMatch = url.pathname.match(/\/file\/d\/([^/]+)/);
+        return pathMatch ? decodeURIComponent(pathMatch[1]) : (url.searchParams.get('id') || '');
+    } catch {
+        return '';
+    }
+}
+
+function getProductImageSource(source) {
+    const imagePath = String(source == null ? '' : source).trim();
+    if (!imagePath) return '';
+    const driveFileId = getGoogleDriveFileId(imagePath);
+    if (driveFileId) return getGoogleDriveImageUrl(driveFileId);
+    if (/^(?:https?:|data:|blob:|\/\/)/i.test(imagePath)) return getStoreImageSource(imagePath);
+
+    const normalizedPath = imagePath.replace(/\\/g, '/');
+    if (!normalizedPath.includes('/')) {
+        const settings = getDriveImageSettings();
+        loadCachedDriveImageIndex(settings.folderId);
+        const fileId = driveImageIdsByName.get(normalizeDriveImageName(normalizedPath));
+        if (fileId) return getGoogleDriveImageUrl(fileId);
+    }
+    return getStoreImageSource(imagePath);
+}
+
 function renderCategories() {
     const catContainer = document.getElementById('product-cats');
     if(!catContainer) return;
     let rawCats = JSON.parse(localStorage.getItem('storeCategories')) || [];
+    const categoryImageSettings = JSON.parse(localStorage.getItem('storeCategoryImages')) || {};
     
     // تحويل البيانات القديمة (نصوص) إلى كائنات لضمان التوافق
     let categoriesFromStorage = (rawCats.length > 0 && typeof rawCats[0] === 'string') 
         ? rawCats.map(c => ({ name: c, icon: 'fas fa-tag' })) 
         : rawCats;
 
-    // التأكد من وجود قسم "الكل" دائماً في البداية وإزالة أي تكرار له من القائمة الأصلية
+    // تظل الأقسام الخاصة مثبتة بالأول، لكن مسارات صورها تأتي من ورقة Categories.
     const categories = [
-        {name: 'الكل', icon: 'fas fa-layer-group', image: 'category-images/all.svg'},
-        {name: 'offers', label: 'تخفيضات 🔥', icon: 'fas fa-fire', image: 'category-images/offers.svg'},
-        ...categoriesFromStorage.filter(c => c.name !== 'الكل' && c.name !== 'offers')
+        {name: 'الكل', icon: 'fas fa-layer-group', image: categoryImageSettings.all || 'category-images/all.svg'},
+        {name: 'offers', label: 'تخفيضات 🔥', icon: 'fas fa-fire', image: categoryImageSettings.offers || 'category-images/offers.svg'},
+        ...categoriesFromStorage.filter(c => !isPinnedStoreCategory(c.name))
     ];
     const activeOffersCount = getDiscountedProducts().length;
     
@@ -1277,6 +1434,11 @@ function renderCategories() {
             }
         });
     }
+}
+
+function isPinnedStoreCategory(name) {
+    const normalizedName = String(name || '').trim().toLowerCase();
+    return ['الكل', 'كل الأصناف', 'كل الأقسام', 'all', 'offers', 'التخفيضات', 'تخفيضات'].includes(normalizedName);
 }
 
 function getCategoryImageSource(image, icon = '') {

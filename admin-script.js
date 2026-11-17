@@ -102,17 +102,20 @@ function downloadProductsExcel() {
         XLSX.utils.book_append_sheet(wb, productsWs, "Products");
     }
 
-    // ورقة الأصناف
-    if (categories.length > 0) {
-        const categoriesData = categories.map(c => ({
+    // ورقة الأصناف، مع حفظ صور الاختصارات الثابتة بجانب بقية الأقسام.
+    const categoryImages = JSON.parse(localStorage.getItem('storeCategoryImages')) || {};
+    const categoriesData = [
+        {name: 'الكل', 'صورة الصنف': categoryImages.all || 'category-images/all.svg', icon: 'fas fa-layer-group'},
+        {name: 'offers', 'صورة الصنف': categoryImages.offers || 'category-images/offers.svg', icon: 'fas fa-fire'},
+        ...categories.filter(c => !getPinnedCategoryType(c.name)).map(c => ({
             name: c.name,
             'صورة الصنف': c.image || '',
             icon: c.icon,
             description: c.description
-        }));
-        const categoriesWs = XLSX.utils.json_to_sheet(categoriesData);
-        XLSX.utils.book_append_sheet(wb, categoriesWs, "Categories");
-    }
+        }))
+    ];
+    const categoriesWs = XLSX.utils.json_to_sheet(categoriesData);
+    XLSX.utils.book_append_sheet(wb, categoriesWs, "Categories");
 
     XLSX.writeFile(wb, "products_categories_backup.xlsx");
     showAlert('تم تنزيل ملف Excel بنجاح', 'success');
@@ -151,6 +154,18 @@ function uploadProductsExcel(event) {
             if (workbook.SheetNames.includes('Categories')) {
                 const categoriesWs = workbook.Sheets['Categories'];
                 newCategories = XLSX.utils.sheet_to_json(categoriesWs);
+            }
+            const categoryImageSettings = JSON.parse(localStorage.getItem('storeCategoryImages')) || {};
+            let hasCategoryImageSettings = false;
+            newCategories = newCategories.map(normalizeCategory).filter(category => {
+                const pinnedCategoryType = getPinnedCategoryType(category.name);
+                if (!pinnedCategoryType) return true;
+                categoryImageSettings[pinnedCategoryType] = category.image;
+                hasCategoryImageSettings = true;
+                return false;
+            });
+            if (hasCategoryImageSettings) {
+                localStorage.setItem('storeCategoryImages', JSON.stringify(categoryImageSettings));
             }
 
             if (mode === 'replace') {
@@ -211,6 +226,13 @@ function normalizeCategory(c) {
         image: c.image || c['صورة الصنف'] || c['اسم صورة الصنف'] || c['الصورة'] || c.image_path || '',
         description: c.description || c['الوصف'] || ''
     };
+}
+
+function getPinnedCategoryType(name) {
+    const normalizedName = String(name || '').trim().toLowerCase();
+    if (['الكل', 'كل الأصناف', 'كل الأقسام', 'all'].includes(normalizedName)) return 'all';
+    if (['offers', 'التخفيضات', 'تخفيضات'].includes(normalizedName)) return 'offers';
+    return '';
 }
 
 function loadProducts() {

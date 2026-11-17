@@ -176,7 +176,9 @@ async function fetchStoreFromExcel() {
         // ---- المنتجات ----
         const prodRows = sheetToObjects(wb.Sheets['Products']);
         data.products = prodRows.map(r => {
-            const images = parseProductImages(r['image_link'], r['additional_image_link']);
+            const imageName = String(getFirstValue(r, ['اسم الصورة']) || '').trim();
+            const primaryImage = getFirstValue(r, ['اسم الصورة', 'image_link', 'صورة الصنف', 'الصورة', 'image_path']);
+            const images = parseProductImages(primaryImage, getFirstValue(r, ['additional_image_link', 'صور إضافية']));
             return {
                 id: r['id'] !== undefined && r['id'] !== '' ? r['id'] : (Date.now() + Math.floor(Math.random()*100000)),
                 name: getFirstValue(r, ['title', 'الاسم', 'name']),
@@ -184,6 +186,7 @@ async function fetchStoreFromExcel() {
                 originalPrice: parseNum(r['sale_price']) || null,
                 description: getFirstValue(r, ['description', 'الوصف', 'desc']),
                 image: images[0] || '',
+                imageName,
                 images,
                 category: getFirstValue(r, ['product_type', 'الصنف', 'category']) || 'الكل',
                 stock: parseStock(r['availability'], getFirstValue(r, ['المخزون', 'quantity', 'stock_quantity'])),
@@ -201,13 +204,23 @@ async function fetchStoreFromExcel() {
 
         // ---- الأصناف ----
         const catRows = sheetToObjects(wb.Sheets['Categories']);
-        data.categories = catRows
+        const categoryEntries = catRows
             .map(r => ({
                 name: String(getFirstValue(r, ['الاسم', 'name', 'category']) || '').trim(),
                 icon: getFirstValue(r, ['الأيقونة', 'icon']) || 'fas fa-tag',
                 image: String(getFirstValue(r, ['صورة الصنف', 'اسم صورة الصنف', 'الصورة', 'image', 'image_path']) || '').trim()
             }))
             .filter(c => c.name);
+        const categoryNameKey = name => String(name || '').trim().toLowerCase();
+        const isAllCategory = name => ['الكل', 'كل الأصناف', 'كل الأقسام', 'all'].includes(categoryNameKey(name));
+        const isOffersCategory = name => ['offers', 'التخفيضات', 'تخفيضات'].includes(categoryNameKey(name));
+        const allCategory = categoryEntries.find(category => isAllCategory(category.name));
+        const offersCategory = categoryEntries.find(category => isOffersCategory(category.name));
+        data.categoryImages = {
+            all: allCategory && allCategory.image || 'category-images/all.svg',
+            offers: offersCategory && offersCategory.image || 'category-images/offers.svg'
+        };
+        data.categories = categoryEntries.filter(category => !isAllCategory(category.name) && !isOffersCategory(category.name));
 
         // ---- الفيديوهات ----
         const vidRows = sheetToObjects(wb.Sheets['Videos']);
@@ -322,6 +335,7 @@ function applyStoreData(data) {
     localStorage.setItem('storeDataVersion', String(Date.now()));
     if (data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
     if (data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
+    if (data.categoryImages) localStorage.setItem('storeCategoryImages', JSON.stringify(data.categoryImages));
     if (data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
     if (data.accessCodes) localStorage.setItem('academyAccessCodes', JSON.stringify(data.accessCodes));
     if (data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
@@ -342,6 +356,7 @@ function applyStoreData(data) {
 function buildStoreWorkbook() {
     const products = JSON.parse(localStorage.getItem('storeProducts')) || [];
     const categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
+    const categoryImages = JSON.parse(localStorage.getItem('storeCategoryImages')) || {};
     const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
     const accessCodes = JSON.parse(localStorage.getItem('academyAccessCodes')) || [];
     const coupons = JSON.parse(localStorage.getItem('storeCoupons')) || [];
@@ -359,7 +374,8 @@ function buildStoreWorkbook() {
         price: p.price,
         sale_price: p.originalPrice || '',
         description: p.description || '',
-        image_link: p.image || '',
+        image_link: p.imageName ? '' : (p.image || ''),
+        'اسم الصورة': p.imageName || '',
         additional_image_link: (p.images || []).join('|'),
         product_type: p.category || '',
         availability: p.stock === 'out' ? 'out of stock' : 'in stock',
@@ -377,11 +393,18 @@ function buildStoreWorkbook() {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(prodRows), 'Products');
 
     // الأصناف
-    const catRows = categories.map(c => ({
-        'الاسم': c.name,
-        'صورة الصنف': c.image || '',
-        'الأيقونة': c.icon || 'fas fa-tag',
-    }));
+    const categoryEntries = categories.map(category => typeof category === 'string' ? {name: category} : category);
+    const categoryNameKey = name => String(name || '').trim().toLowerCase();
+    const isPinnedCategory = name => ['الكل', 'كل الأصناف', 'كل الأقسام', 'all', 'offers', 'التخفيضات', 'تخفيضات'].includes(categoryNameKey(name));
+    const catRows = [
+        {'الاسم': 'الكل', 'صورة الصنف': categoryImages.all || 'category-images/all.svg', 'الأيقونة': 'fas fa-layer-group'},
+        {'الاسم': 'offers', 'صورة الصنف': categoryImages.offers || 'category-images/offers.svg', 'الأيقونة': 'fas fa-fire'},
+        ...categoryEntries.filter(category => !isPinnedCategory(category.name)).map(category => ({
+            'الاسم': category.name,
+            'صورة الصنف': category.image || '',
+            'الأيقونة': category.icon || 'fas fa-tag'
+        }))
+    ];
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(catRows), 'Categories');
 
     // الفيديوهات
@@ -422,6 +445,8 @@ function buildStoreWorkbook() {
     const setRows = [
         { 'المفتاح': 'whatsapp', 'القيمة': settings.whatsapp || '', 'الوصف': 'رقم الواتساب (بصيغة دولية بدون + أو 00)' },
         { 'المفتاح': 'website', 'القيمة': settings.website || 'https://mashily.github.io/mashily-store/', 'الوصف': 'رابط المتجر على الإنترنت (لمعاينة واتساب والمشاركة)' },
+        { 'المفتاح': 'drive_folder_id', 'القيمة': settings.drive_folder_id || '1ONsyQHZaoPNvzCXWxLjIaXs6yfMwiVRD', 'الوصف': 'معرّف مجلد صور Google Drive؛ اجعل الوصول للصور Anyone with the link / Viewer' },
+        { 'المفتاح': 'drive_api_key', 'القيمة': settings.drive_api_key || '', 'الوصف': 'مفتاح Google Drive API مقيّد بالموقع وبـ Drive API فقط؛ المفتاح ظاهر للزوار لذا يجب تقييده' },
         { 'المفتاح': 'brand_name', 'القيمة': settings.brand_name || 'مشالى', 'الوصف': 'اسم العلامة التجارية الظاهر في رأس الموقع' },
         { 'المفتاح': 'brand_logo_image', 'القيمة': settings.brand_logo_image || 'logo.png', 'الوصف': 'مسار صورة شعار المتجر؛ اكتب اسم الملف أو رابطه وارفع ملف الصورة إلى GitHub' },
         { 'المفتاح': 'app_icon_192', 'القيمة': settings.app_icon_192 || 'icon-192.png', 'الوصف': 'مسار أيقونة التطبيق المربعة بحجم 192×192؛ حدّث الصورة وارفعها للمستودع' },
