@@ -111,6 +111,10 @@
                 <button class="market-icon-button market-badge-button market-cart-button" type="button" onclick="toggleCart(true)" aria-label="سلة المشتريات">
                     <i class="fas fa-shopping-basket"></i><span class="market-cart-label">السلة</span><span id="cart-badge" class="market-badge">0</span>
                 </button>
+                <button id="maintenance-open-btn" class="maintenance-open-btn" type="button" onclick="openMaintenanceRequest()" hidden>
+                    <i class="fas fa-screwdriver-wrench" aria-hidden="true"></i>
+                    <span id="maintenance-button-label">طلب صيانة</span>
+                </button>
             </div>
         </div>
     </header>
@@ -201,9 +205,10 @@
             </div>
             <div class="store-footer-bottom">
                 <span id="store-footer-copyright"></span>
-                <button id="store-footer-policy-link" class="store-footer-policy-link" type="button" onclick="openStorePolicy()" hidden>
-                    سياسة الاستبدال والاسترجاع
-                </button>
+                <div class="store-footer-actions">
+                    <button id="store-footer-maintenance-link" class="store-footer-policy-link" type="button" onclick="openMaintenanceRequest()" hidden>طلب صيانة</button>
+                    <button id="store-footer-policy-link" class="store-footer-policy-link" type="button" onclick="openStorePolicy()" hidden>سياسة الاستبدال والاسترجاع</button>
+                </div>
             </div>
         </div>
     </footer>
@@ -213,6 +218,52 @@
         </form>
         <h2 id="store-policy-title">سياسة الاستبدال والاسترجاع</h2>
         <div id="store-policy-content" class="store-policy-content"></div>
+    </dialog>
+    <dialog id="product-checkout-dialog" class="store-form-dialog" aria-labelledby="product-checkout-title" onclick="if(event.target === this) closeStoreForm('product-checkout-dialog')">
+        <form class="store-form-dialog-content" onsubmit="submitProductOrder(event)">
+            <button class="store-policy-close" type="button" onclick="closeStoreForm('product-checkout-dialog')" aria-label="إغلاق نموذج الطلب">×</button>
+            <h2 id="product-checkout-title">تأكيد طلب المنتجات</h2>
+            <p class="store-form-intro">اكتب بيانات التواصل والتوصيل، ثم راجع طلبك قبل إرساله عبر واتساب.</p>
+            <div id="product-order-summary" class="product-order-summary"></div>
+            <div class="store-customer-fields">
+                <label>الاسم الكامل<input type="text" name="name" data-customer-field="name" autocomplete="name" required maxlength="100"></label>
+                <label>رقم الهاتف<input type="tel" name="phone" data-customer-field="phone" autocomplete="tel" inputmode="tel" required maxlength="25"></label>
+                <label class="store-field-wide">العنوان بالتفصيل<textarea name="address" data-customer-field="address" autocomplete="street-address" rows="3" required maxlength="500"></textarea></label>
+                <label class="store-remember-customer"><input type="checkbox" data-remember-customer> تذكر بياناتي على هذا الجهاز</label>
+            </div>
+            <div class="store-form-payment-summary"><strong>طريقة الدفع:</strong> <span id="product-order-payment"></span></div>
+            <div class="store-form-actions">
+                <button class="store-form-submit" type="submit"><i class="fab fa-whatsapp" aria-hidden="true"></i> متابعة إلى واتساب</button>
+                <button class="store-form-cancel" type="button" onclick="closeStoreForm('product-checkout-dialog')">رجوع للسلة</button>
+            </div>
+        </form>
+    </dialog>
+    <dialog id="maintenance-request-dialog" class="store-form-dialog" aria-labelledby="maintenance-request-title" onclick="if(event.target === this) closeStoreForm('maintenance-request-dialog')">
+        <form class="store-form-dialog-content" onsubmit="submitMaintenanceRequest(event)">
+            <button class="store-policy-close" type="button" onclick="closeStoreForm('maintenance-request-dialog')" aria-label="إغلاق طلب الصيانة">×</button>
+            <h2 id="maintenance-request-title">طلب صيانة</h2>
+            <p id="maintenance-request-intro" class="store-form-intro"></p>
+            <div class="store-customer-fields">
+                <label>الاسم الكامل<input type="text" name="name" data-customer-field="name" autocomplete="name" required maxlength="100"></label>
+                <label>رقم الهاتف<input type="tel" name="phone" data-customer-field="phone" autocomplete="tel" inputmode="tel" required maxlength="25"></label>
+                <label class="store-field-wide">العنوان بالتفصيل<textarea name="address" data-customer-field="address" autocomplete="street-address" rows="3" required maxlength="500"></textarea></label>
+                <label class="store-remember-customer"><input type="checkbox" data-remember-customer> تذكر بياناتي على هذا الجهاز</label>
+            </div>
+            <div class="store-customer-fields maintenance-device-fields">
+                <label>نوع الجهاز<input type="text" name="device" required maxlength="100" placeholder="مثال: لابتوب أو تلفزيون"></label>
+                <label>الماركة والموديل<input type="text" name="model" maxlength="120" placeholder="إن أمكن"></label>
+                <label class="store-field-wide">الخدمة المطلوبة
+                    <select id="maintenance-service-select" name="service" required></select>
+                </label>
+                <label class="store-field-wide">وصف العطل<textarea name="issue" rows="3" required maxlength="1000" placeholder="اشرح العطل ومتى بدأ"></textarea></label>
+                <label class="store-field-wide">المنطقة (اختياري)<input type="text" name="area" list="maintenance-area-options" maxlength="120"></label>
+                <datalist id="maintenance-area-options"></datalist>
+            </div>
+            <div class="store-form-actions">
+                <button class="store-form-submit" type="submit"><i class="fab fa-whatsapp" aria-hidden="true"></i> إرسال طلب الصيانة عبر واتساب</button>
+                <button class="store-form-cancel" type="button" onclick="closeStoreForm('maintenance-request-dialog')">إلغاء</button>
+            </div>
+        </form>
     </dialog>
 
     <div class="news-ticker">
@@ -292,7 +343,7 @@
             </div>
 
             <button class="cart-checkout-btn" type="button" onclick="sendToWhatsApp()">
-                <i class="fab fa-whatsapp"></i> تأكيد الطلب عبر واتساب
+                <i class="fas fa-clipboard-check"></i> تأكيد الطلب
             </button>
 
             <!-- زر تفريغ السلة -->

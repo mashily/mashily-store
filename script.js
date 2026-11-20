@@ -47,6 +47,260 @@ function getStoreUrl() {
     return url || DEFAULT_STORE_URL;
 }
 
+const CUSTOMER_SESSION_KEY = 'MASHILY_CUSTOMER_SESSION';
+const CUSTOMER_SAVED_KEY = 'MASHILY_CUSTOMER_SAVED';
+
+function getCustomerContactData() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(CUSTOMER_SAVED_KEY) || 'null');
+        if (saved && typeof saved === 'object') return saved;
+        const session = JSON.parse(sessionStorage.getItem(CUSTOMER_SESSION_KEY) || 'null');
+        return session && typeof session === 'object' ? session : {};
+    } catch (error) {
+        console.warn('تعذر استعادة بيانات التواصل المحفوظة على هذا الجهاز.', error);
+        return {};
+    }
+}
+
+function saveCustomerContactData(data) {
+    const contact = {
+        name: String(data.name || '').trim(),
+        phone: String(data.phone || '').trim(),
+        address: String(data.address || '').trim()
+    };
+    try {
+        sessionStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify(contact));
+        if (document.querySelector('[data-remember-customer]:checked')) {
+            localStorage.setItem(CUSTOMER_SAVED_KEY, JSON.stringify(contact));
+        }
+    } catch (error) {
+        console.warn('تعذر حفظ بيانات التواصل في هذا المتصفح.', error);
+    }
+    return contact;
+}
+
+function syncCustomerContactField(field, value) {
+    document.querySelectorAll(`[data-customer-field="${field}"]`).forEach(input => {
+        if (input.value !== value) input.value = value;
+    });
+    const remember = localStorage.getItem(CUSTOMER_SAVED_KEY) !== null;
+    document.querySelectorAll('[data-remember-customer]').forEach(checkbox => {
+        checkbox.checked = remember;
+    });
+}
+
+function initializeCustomerContactForms() {
+    const customer = getCustomerContactData();
+    ['name', 'phone', 'address'].forEach(field => syncCustomerContactField(field, String(customer[field] || '')));
+
+    document.querySelectorAll('[data-customer-field]').forEach(input => {
+        input.addEventListener('input', () => {
+            syncCustomerContactField(input.dataset.customerField, input.value);
+            const contact = {};
+            document.querySelectorAll('#product-checkout-dialog [data-customer-field]').forEach(field => {
+                contact[field.dataset.customerField] = field.value;
+            });
+            try {
+                sessionStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify(contact));
+                if (document.querySelector('[data-remember-customer]:checked')) {
+                    localStorage.setItem(CUSTOMER_SAVED_KEY, JSON.stringify(contact));
+                }
+            } catch (error) {
+                console.warn('تعذر تحديث بيانات التواصل المحفوظة.', error);
+            }
+        });
+    });
+    document.querySelectorAll('[data-remember-customer]').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) {
+                const contact = {};
+                checkbox.closest('form').querySelectorAll('[data-customer-field]').forEach(field => {
+                    contact[field.dataset.customerField] = field.value;
+                });
+                try {
+                    localStorage.setItem(CUSTOMER_SAVED_KEY, JSON.stringify(contact));
+                } catch (error) {
+                    console.warn('تعذر حفظ بيانات التواصل على هذا الجهاز.', error);
+                }
+            } else {
+                localStorage.removeItem(CUSTOMER_SAVED_KEY);
+            }
+            document.querySelectorAll('[data-remember-customer]').forEach(otherCheckbox => {
+                otherCheckbox.checked = checkbox.checked;
+            });
+        });
+    });
+}
+
+function getCustomerFormData(form) {
+    return {
+        name: String(form.elements.namedItem('name').value || '').trim(),
+        phone: String(form.elements.namedItem('phone').value || '').trim(),
+        address: String(form.elements.namedItem('address').value || '').trim()
+    };
+}
+
+function validateCustomerContact(contact) {
+    const phoneDigits = contact.phone
+        .replace(/[٠-٩]/g, digit => String(digit.charCodeAt(0) - 0x0660))
+        .replace(/[۰-۹]/g, digit => String(digit.charCodeAt(0) - 0x06F0))
+        .replace(/\D/g, '');
+    if (!contact.name || !contact.phone || !contact.address) {
+        alert('من فضلك اكتب الاسم ورقم الهاتف والعنوان بالكامل.');
+        return false;
+    }
+    if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+        alert('من فضلك اكتب رقم هاتف صحيحاً من 7 إلى 15 رقماً.');
+        return false;
+    }
+    return true;
+}
+
+function getWhatsAppNumber(value) {
+    return String(value || '')
+        .replace(/[٠-٩]/g, digit => String(digit.charCodeAt(0) - 0x0660))
+        .replace(/[۰-۹]/g, digit => String(digit.charCodeAt(0) - 0x06F0))
+        .replace(/\D/g, '');
+}
+
+function isStoreSettingEnabled(value, fallback = true) {
+    if (value === undefined || value === null || String(value).trim() === '') return fallback;
+    return !['لا', 'no', 'false', '0', 'off'].includes(String(value).trim().toLowerCase());
+}
+
+function openStoreForm(dialogId) {
+    const dialog = document.getElementById(dialogId);
+    if (dialog && typeof dialog.showModal === 'function') dialog.showModal();
+}
+
+function closeStoreForm(dialogId) {
+    const dialog = document.getElementById(dialogId);
+    if (dialog && dialog.open) dialog.close();
+}
+
+function getSelectedPaymentLabel() {
+    if (selectedPaymentMethod === 'vodafone') return 'فودافون كاش';
+    if (selectedPaymentMethod === 'instapay') return 'InstaPay';
+    const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    return `تحويل بنكي${settings.bank_name ? ` - ${settings.bank_name}` : ''}`;
+}
+
+function updateProductOrderSummary() {
+    const summary = document.getElementById('product-order-summary');
+    const payment = document.getElementById('product-order-payment');
+    if (!summary) return;
+    summary.replaceChildren();
+    cart.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'product-order-summary-row';
+        const name = document.createElement('span');
+        name.textContent = `${item.name} × ${item.qty}`;
+        const price = document.createElement('strong');
+        price.textContent = `${(Number(item.price) * Number(item.qty)).toLocaleString('ar-EG')} ج.م`;
+        row.append(name, price);
+        summary.appendChild(row);
+    });
+    const total = document.createElement('div');
+    total.className = 'product-order-summary-total';
+    total.textContent = `الإجمالي: ${document.getElementById('total-price')?.innerText || '0'} ج.م`;
+    summary.appendChild(total);
+    if (payment) payment.textContent = getSelectedPaymentLabel();
+}
+
+function getEnabledMaintenanceServices() {
+    const services = JSON.parse(localStorage.getItem('storeMaintenanceServices') || '[]');
+    return Array.isArray(services) ? services.filter(service => service && service.active !== false) : [];
+}
+
+function openMaintenanceRequest() {
+    const settings = JSON.parse(localStorage.getItem('storeSettings') || '{}');
+    if (!isStoreSettingEnabled(settings.maintenance_enabled)) return;
+
+    const dialog = document.getElementById('maintenance-request-dialog');
+    const intro = document.getElementById('maintenance-request-intro');
+    const buttonLabel = document.getElementById('maintenance-button-label');
+    const openButton = document.getElementById('maintenance-open-btn');
+    const serviceSelect = document.getElementById('maintenance-service-select');
+    const areaOptions = document.getElementById('maintenance-area-options');
+    if (!dialog || !serviceSelect) return;
+    if (intro) intro.textContent = String(settings.maintenance_intro || 'أرسل تفاصيل الجهاز والعطل، وسيتواصل معك فريق الصيانة لتأكيد الخطوات والتكلفة.').trim();
+    if (buttonLabel) buttonLabel.textContent = String(settings.maintenance_button_label || 'طلب صيانة').trim();
+    if (openButton) openButton.hidden = false;
+
+    const services = getEnabledMaintenanceServices();
+    serviceSelect.replaceChildren();
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'اختر الخدمة المطلوبة';
+    serviceSelect.appendChild(defaultOption);
+    services.forEach(service => {
+        const option = document.createElement('option');
+        option.value = String(service.title || '');
+        option.textContent = service.description ? `${service.title} — ${service.description}` : service.title;
+        serviceSelect.appendChild(option);
+    });
+    if (!services.length) {
+        const option = document.createElement('option');
+        option.value = 'صيانة عامة';
+        option.textContent = 'صيانة عامة';
+        serviceSelect.appendChild(option);
+        serviceSelect.value = option.value;
+    }
+
+    if (areaOptions) {
+        const areas = String(settings.maintenance_areas || '').split(/[|,\r\n]+/).map(area => area.trim()).filter(Boolean);
+        areaOptions.replaceChildren(...areas.map(area => {
+            const option = document.createElement('option');
+            option.value = area;
+            return option;
+        }));
+    }
+    openStoreForm('maintenance-request-dialog');
+}
+
+function submitMaintenanceRequest(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const contact = getCustomerFormData(form);
+    if (!validateCustomerContact(contact)) return;
+    const settings = JSON.parse(localStorage.getItem('storeSettings') || '{}');
+    const whatsappNumber = getWhatsAppNumber(settings.maintenance_whatsapp || settings.whatsapp);
+    if (whatsappNumber.length < 7 || whatsappNumber.length > 15) {
+        alert('رقم واتساب الصيانة غير مضبوط. يرجى التواصل مع المتجر.');
+        return;
+    }
+
+    const service = String(form.elements.namedItem('service').value || '').trim();
+    const device = String(form.elements.namedItem('device').value || '').trim();
+    const model = String(form.elements.namedItem('model').value || '').trim();
+    const issue = String(form.elements.namedItem('issue').value || '').trim();
+    const area = String(form.elements.namedItem('area').value || '').trim();
+    saveCustomerContactData(contact);
+    const message = [
+        `طلب صيانة جديد — متجر ${settings.brand_name || 'مشالى'}`,
+        `الاسم: ${contact.name}`,
+        `رقم الهاتف: ${contact.phone}`,
+        `العنوان: ${contact.address}`,
+        area ? `المنطقة: ${area}` : '',
+        `نوع الجهاز: ${device}`,
+        model ? `الماركة والموديل: ${model}` : '',
+        service ? `الخدمة المطلوبة: ${service}` : '',
+        `وصف العطل: ${issue}`,
+        `رابط المتجر: ${getStoreUrl()}`
+    ].filter(Boolean).join('\n');
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+    closeStoreForm('maintenance-request-dialog');
+}
+
+function renderMaintenanceButton(settings = {}) {
+    const button = document.getElementById('maintenance-open-btn');
+    const label = document.getElementById('maintenance-button-label');
+    if (!button) return;
+    const enabled = isStoreSettingEnabled(settings.maintenance_enabled);
+    button.hidden = !enabled;
+    if (label) label.textContent = String(settings.maintenance_button_label || 'طلب صيانة').trim();
+}
+
 function getSafeExternalUrl(value) {
     const rawUrl = String(value || '').trim();
     if (!rawUrl) return '';
@@ -70,10 +324,16 @@ function renderStoreFooter(settings = {}, policies = []) {
     const contactHeading = document.getElementById('store-footer-contact-title');
     const socialHeading = document.getElementById('store-footer-social-title');
     const policyLink = document.getElementById('store-footer-policy-link');
+    const maintenanceLink = document.getElementById('store-footer-maintenance-link');
     if (brandElement) brandElement.textContent = `متجر ${brandName}`;
     if (contactHeading) contactHeading.textContent = String(settings.footer_contact_heading || 'العنوان ومواعيد العمل').trim();
     if (socialHeading) socialHeading.textContent = String(settings.footer_social_heading || 'تابعنا وتواصل معنا').trim();
     if (policyLink) policyLink.textContent = String(settings.footer_policy_label || 'سياسة الاستبدال والاسترجاع').trim();
+    const maintenanceLabel = String(settings.maintenance_button_label || 'طلب صيانة').trim();
+    if (maintenanceLink) maintenanceLink.textContent = maintenanceLabel;
+    const headerMaintenanceLabel = document.getElementById('maintenance-button-label');
+    if (headerMaintenanceLabel) headerMaintenanceLabel.textContent = maintenanceLabel;
+    if (maintenanceLink) maintenanceLink.hidden = !isStoreSettingEnabled(settings.maintenance_enabled);
     if (descriptionElement) {
         const description = String(settings.footer_description || '').trim();
         descriptionElement.textContent = description;
@@ -442,6 +702,7 @@ function refreshStoreViewFromLocalData() {
         : 3;
     applySiteBranding(storeSettings);
     applyPaymentSettings(storeSettings);
+    renderMaintenanceButton(storeSettings);
     renderStoreFooter(storeSettings, storePolicies);
     startSocialProof();
     renderStoreTicker();
@@ -467,7 +728,9 @@ async function initializeStore() {
         ? Math.min(30, Math.max(0, parsedCartAutoClose))
         : 3;
     applySiteBranding(storeSettings);
+    renderMaintenanceButton(storeSettings);
     renderStoreFooter(storeSettings, storePolicies);
+    initializeCustomerContactForms();
     startSocialProof();
 
     // --- إضافة منتج تجريبي (للتجربة) ---
@@ -2223,34 +2486,58 @@ function sendToWhatsApp() {
         alert('السلة فارغة! الرجاء إضافة منتجات أولاً.');
         return;
     }
-    
-    // معرفة طريقة الدفع المختارة
-    const paymentMethod = selectedPaymentMethod;
-    let paymentText = 'تحويل بنكي';
-    if (paymentMethod === 'cash') {
-        const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
-        paymentText = `تحويل بنكي${settings.bank_name ? ` - ${settings.bank_name}` : ''}${settings.bank_account ? ` - رقم الحساب: ${settings.bank_account}` : ''}`;
-    }
-    if (paymentMethod === 'vodafone') paymentText = 'فودافون كاش (يرجى مراجعة التحويل)';
-    else if (paymentMethod === 'instapay') paymentText = 'InstaPay (يرجى مراجعة التحويل)';
+    updateProductOrderSummary();
+    toggleCart(false);
+    openStoreForm('product-checkout-dialog');
+}
 
-    let details = cart.map(i => i.name + " (" + i.qty + ")").join(' , ');
-    let history = JSON.parse(localStorage.getItem('orderHistory')) || [];
-    history.unshift({ date: new Date().toLocaleString('ar-EG'), details: details });
+function submitProductOrder(event) {
+    event.preventDefault();
+    if (!cart.length) {
+        alert('السلة فارغة! الرجاء إضافة منتجات أولاً.');
+        closeStoreForm('product-checkout-dialog');
+        return;
+    }
+
+    const form = event.currentTarget;
+    const contact = getCustomerFormData(form);
+    if (!validateCustomerContact(contact)) return;
+    const settings = JSON.parse(localStorage.getItem('storeSettings') || '{}');
+    const whatsappNumber = getWhatsAppNumber(settings.whatsapp || '201551831308');
+    if (whatsappNumber.length < 7 || whatsappNumber.length > 15) {
+        alert('رقم واتساب المتجر غير مضبوط. يرجى التواصل مع المتجر.');
+        return;
+    }
+
+    saveCustomerContactData(contact);
+    const details = cart.map(item => `${item.name} (${item.qty})`).join('\n');
+    let paymentText = getSelectedPaymentLabel();
+    if (selectedPaymentMethod === 'cash' && settings.bank_account) {
+        paymentText += ` - رقم الحساب: ${settings.bank_account}`;
+    }
+    const message = [
+        `طلب جديد من متجر ${settings.brand_name || 'مشالى'}`,
+        `الاسم: ${contact.name}`,
+        `رقم الهاتف: ${contact.phone}`,
+        `العنوان: ${contact.address}`,
+        '',
+        'المنتجات:',
+        details,
+        appliedCoupon ? `كوبون الخصم: ${appliedCoupon.code}` : '',
+        `الإجمالي النهائي: ${document.getElementById('total-price')?.innerText || '0'} ج.م`,
+        `طريقة الدفع: ${paymentText}`,
+        '',
+        `رابط المتجر: ${getStoreUrl()}`
+    ].filter(Boolean).join('\n');
+
+    const history = JSON.parse(localStorage.getItem('orderHistory') || '[]');
+    history.unshift({
+        date: new Date().toLocaleString('ar-EG'),
+        details
+    });
     localStorage.setItem('orderHistory', JSON.stringify(history.slice(0, 15)));
-    
-    // جلب رقم الواتساب من الإعدادات أو استخدام الافتراضي
-    const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
-    const waNumber = settings.whatsapp || '201551831308';
-
-    let msg = `طلب جديد من متجر مشالى:\n${details}\n`;
-    if(appliedCoupon) {
-        msg += `\n🎟️ كوبون خصم: ${appliedCoupon.code}`;
-    }
-    msg += `\n💰 الإجمالي النهائي: ${document.getElementById('total-price').innerText} ج.م\n💳 طريقة الدفع: ${paymentText}`;
-    msg += `\n\nرابط المتجر:\n${getStoreUrl()}`;
-    
-    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`);
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+    closeStoreForm('product-checkout-dialog');
 }
 
 // --- نظام البحث ---

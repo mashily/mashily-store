@@ -296,6 +296,24 @@ async function fetchStoreFromExcel() {
             .filter(policy => policy.active && policy.content)
             .sort((left, right) => left.order - right.order);
 
+        // ---- خدمات الصيانة (ورقة اختيارية للتوافق مع ملفات المتجر القديمة) ----
+        const maintenanceRows = wb.Sheets['Maintenance'] ? sheetToObjects(wb.Sheets['Maintenance']) : [];
+        if (wb.Sheets['Maintenance']) {
+            validateSheetColumns(wb.Sheets['Maintenance'], 'Maintenance', [
+                ['الخدمة', 'اسم الخدمة', 'العنوان', 'title'],
+                ['الوصف', 'description']
+            ]);
+        }
+        data.maintenanceServices = maintenanceRows
+            .map((row, index) => ({
+                title: String(getFirstValue(row, ['الخدمة', 'اسم الخدمة', 'العنوان', 'title']) || '').trim(),
+                description: String(getFirstValue(row, ['الوصف', 'description']) || '').trim(),
+                order: parseNum(getFirstValue(row, ['الترتيب', 'order'])) || index + 1,
+                active: isMessageActive(row)
+            }))
+            .filter(service => service.title && service.active)
+            .sort((left, right) => left.order - right.order);
+
         // ---- الحالات ----
         const stRows = sheetToObjects(wb.Sheets['Statuses']);
         data.statuses = stRows.map(r => r['القيمة']).filter(Boolean);
@@ -365,6 +383,7 @@ function applyStoreData(data) {
     if (data.popups) localStorage.setItem('storePopups', JSON.stringify(data.popups));
     if (data.settings) localStorage.setItem('storeSettings', JSON.stringify(data.settings));
     if (data.footerPolicies) localStorage.setItem('storeFooterPolicies', JSON.stringify(data.footerPolicies));
+    if (data.maintenanceServices) localStorage.setItem('storeMaintenanceServices', JSON.stringify(data.maintenanceServices));
     return true;
 }
 
@@ -381,6 +400,7 @@ function buildStoreWorkbook() {
     const coupons = JSON.parse(localStorage.getItem('storeCoupons')) || [];
     const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
     const footerPolicies = JSON.parse(localStorage.getItem('storeFooterPolicies')) || [];
+    const maintenanceServices = JSON.parse(localStorage.getItem('storeMaintenanceServices')) || [];
     const ticker = localStorage.getItem('tickerText') || '';
     const proof = localStorage.getItem('proofText') || '';
     const popups = JSON.parse(localStorage.getItem('storePopups')) || [];
@@ -474,6 +494,19 @@ function buildStoreWorkbook() {
         : XLSX.utils.aoa_to_sheet([policyHeaders]);
     XLSX.utils.book_append_sheet(wb, policiesSheet, 'Policies');
 
+    // خدمات الصيانة
+    const maintenanceHeaders = ['الخدمة', 'الوصف', 'الترتيب', 'فعال'];
+    const maintenanceRows = maintenanceServices.map((service, index) => ({
+        'الخدمة': service.title || '',
+        'الوصف': service.description || '',
+        'الترتيب': service.order || index + 1,
+        'فعال': service.active === false ? 'لا' : 'نعم'
+    }));
+    const maintenanceSheet = maintenanceRows.length
+        ? XLSX.utils.json_to_sheet(maintenanceRows, {header: maintenanceHeaders})
+        : XLSX.utils.aoa_to_sheet([maintenanceHeaders]);
+    XLSX.utils.book_append_sheet(wb, maintenanceSheet, 'Maintenance');
+
     // الإعدادات
     const setRows = [
         { 'المفتاح': 'whatsapp', 'القيمة': settings.whatsapp || '', 'الوصف': 'رقم الواتساب (بصيغة دولية بدون + أو 00)' },
@@ -491,6 +524,11 @@ function buildStoreWorkbook() {
         { 'المفتاح': 'footer_instagram_url', 'القيمة': settings.footer_instagram_url || '', 'الوصف': 'رابط Instagram (اختياري)' },
         { 'المفتاح': 'footer_tiktok_url', 'القيمة': settings.footer_tiktok_url || '', 'الوصف': 'رابط TikTok (اختياري)' },
         { 'المفتاح': 'footer_whatsapp', 'القيمة': settings.footer_whatsapp || settings.whatsapp || '', 'الوصف': 'رقم واتساب دولي لزر التواصل في التذييل؛ يترك فارغاً لاستخدام رقم whatsapp' },
+        { 'المفتاح': 'maintenance_enabled', 'القيمة': settings.maintenance_enabled !== undefined ? settings.maintenance_enabled : 'نعم', 'الوصف': 'إظهار زر طلب الصيانة؛ نعم أو لا' },
+        { 'المفتاح': 'maintenance_button_label', 'القيمة': settings.maintenance_button_label || 'طلب صيانة', 'الوصف': 'نص زر فتح طلب الصيانة' },
+        { 'المفتاح': 'maintenance_whatsapp', 'القيمة': settings.maintenance_whatsapp || '', 'الوصف': 'رقم واتساب الصيانة بصيغة دولية؛ اتركه فارغاً لاستخدام رقم whatsapp' },
+        { 'المفتاح': 'maintenance_intro', 'القيمة': settings.maintenance_intro || 'أرسل تفاصيل الجهاز والعطل، وسيتواصل معك فريق الصيانة لتأكيد الخطوات والتكلفة.', 'الوصف': 'تعليمات نموذج طلب الصيانة' },
+        { 'المفتاح': 'maintenance_areas', 'القيمة': settings.maintenance_areas || '', 'الوصف': 'مناطق الخدمة مفصولة بفاصلة أو | أو سطر جديد (اختياري)' },
         { 'المفتاح': 'website', 'القيمة': settings.website || 'https://mashily.github.io/mashily-store/', 'الوصف': 'رابط المتجر على الإنترنت (لمعاينة واتساب والمشاركة)' },
         { 'المفتاح': 'drive_folder_id', 'القيمة': settings.drive_folder_id || '1ONsyQHZaoPNvzCXWxLjIaXs6yfMwiVRD', 'الوصف': 'معرّف مجلد صور Google Drive؛ اجعل الوصول للصور Anyone with the link / Viewer' },
         { 'المفتاح': 'drive_api_key', 'القيمة': settings.drive_api_key || '', 'الوصف': 'مفتاح Google Drive API مقيّد بالموقع وبـ Drive API فقط؛ المفتاح ظاهر للزوار لذا يجب تقييده' },
