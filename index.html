@@ -129,11 +129,6 @@
             <div class="offers-heading-title-group">
                 <h2 id="offers-catalog-title">تخفيضات</h2>
                 <div class="offers-deadline" data-offers-deadline hidden>
-                    <div class="offers-deadline-caption">
-                        <i class="fas fa-clock" aria-hidden="true"></i>
-                        <span class="offers-deadline-label">تنتهي التخفيضات في</span>
-                        <time class="offers-deadline-date" data-offers-end-date></time>
-                    </div>
                     <div class="offers-countdown" data-offers-units role="timer" aria-label="الوقت المتبقي لنهاية التخفيضات">
                         <span class="offers-countdown-unit"><strong data-offers-unit="days">0</strong><small>يوم</small></span>
                         <span class="offers-countdown-unit"><strong data-offers-unit="hours">00</strong><small>ساعة</small></span>
@@ -155,11 +150,6 @@
             <div class="offers-heading-title-group">
                 <h2 id="store-catalog-title">منتجات المتجر</h2>
                 <div class="offers-deadline" data-offers-deadline hidden>
-                    <div class="offers-deadline-caption">
-                        <i class="fas fa-clock" aria-hidden="true"></i>
-                        <span class="offers-deadline-label">تنتهي التخفيضات في</span>
-                        <time class="offers-deadline-date" data-offers-end-date></time>
-                    </div>
                     <div class="offers-countdown" data-offers-units role="timer" aria-label="الوقت المتبقي لنهاية التخفيضات">
                         <span class="offers-countdown-unit"><strong data-offers-unit="days">0</strong><small>يوم</small></span>
                         <span class="offers-countdown-unit"><strong data-offers-unit="hours">00</strong><small>ساعة</small></span>
@@ -173,6 +163,57 @@
         </div>
         <main class="products-grid" id="products-grid" aria-label="منتجات المتجر"></main>
     </section>
+
+    <footer id="store-footer" class="store-footer" aria-label="معلومات متجر مشالى">
+        <div class="store-footer-inner">
+            <div class="store-footer-main">
+                <section class="store-footer-about">
+                    <a class="store-footer-brand" href="./">
+                        <i class="fas fa-store" aria-hidden="true"></i>
+                        <span id="store-footer-brand">متجر مشالى</span>
+                    </a>
+                    <p id="store-footer-description" hidden></p>
+                </section>
+                <section class="store-footer-contact" id="store-footer-contact" aria-labelledby="store-footer-contact-title">
+                    <h2 id="store-footer-contact-title">العنوان ومواعيد العمل</h2>
+                    <div class="store-footer-detail" id="store-footer-address-row" hidden>
+                        <i class="fas fa-location-dot" aria-hidden="true"></i>
+                        <span id="store-footer-address"></span>
+                        <a id="store-footer-map-link" hidden target="_blank" rel="noopener noreferrer">افتح الخريطة</a>
+                    </div>
+                    <div class="store-footer-detail" id="store-footer-hours-row" hidden>
+                        <i class="fas fa-clock" aria-hidden="true"></i>
+                        <span id="store-footer-hours"></span>
+                    </div>
+                    <div class="store-footer-detail" id="store-footer-closed-row" hidden>
+                        <i class="fas fa-calendar-xmark" aria-hidden="true"></i>
+                        <span id="store-footer-closed"></span>
+                    </div>
+                    <div class="store-footer-detail" id="store-footer-phone-row" hidden>
+                        <i class="fas fa-phone" aria-hidden="true"></i>
+                        <a id="store-footer-phone"></a>
+                    </div>
+                </section>
+                <section class="store-footer-social" id="store-footer-social" aria-labelledby="store-footer-social-title" hidden>
+                    <h2 id="store-footer-social-title">تابعنا وتواصل معنا</h2>
+                    <div class="store-footer-social-links" id="store-footer-social-links"></div>
+                </section>
+            </div>
+            <div class="store-footer-bottom">
+                <span id="store-footer-copyright"></span>
+                <button id="store-footer-policy-link" class="store-footer-policy-link" type="button" onclick="openStorePolicy()" hidden>
+                    سياسة الاستبدال والاسترجاع
+                </button>
+            </div>
+        </div>
+    </footer>
+    <dialog id="store-policy-dialog" class="store-policy-dialog" aria-labelledby="store-policy-title" onclick="if(event.target === this) closeStorePolicy()">
+        <form method="dialog" class="store-policy-close-form">
+            <button class="store-policy-close" aria-label="إغلاق سياسة الاستبدال والاسترجاع">×</button>
+        </form>
+        <h2 id="store-policy-title">سياسة الاستبدال والاسترجاع</h2>
+        <div id="store-policy-content" class="store-policy-content"></div>
+    </dialog>
 
     <div class="news-ticker">
         <div class="ticker-content" id="ticker-text">🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥</div>

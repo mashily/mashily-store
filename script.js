@@ -47,6 +47,148 @@ function getStoreUrl() {
     return url || DEFAULT_STORE_URL;
 }
 
+function getSafeExternalUrl(value) {
+    const rawUrl = String(value || '').trim();
+    if (!rawUrl) return '';
+    const candidate = /^[a-z][a-z\d+.-]*:/i.test(rawUrl) ? rawUrl : `https://${rawUrl}`;
+    try {
+        const url = new URL(candidate);
+        return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+    } catch (error) {
+        return '';
+    }
+}
+
+function renderStoreFooter(settings = {}, policies = []) {
+    const footer = document.getElementById('store-footer');
+    if (!footer) return;
+
+    const brandName = String(settings.brand_name || 'مشالى').trim();
+    const brandElement = document.getElementById('store-footer-brand');
+    const descriptionElement = document.getElementById('store-footer-description');
+    const copyrightElement = document.getElementById('store-footer-copyright');
+    const contactHeading = document.getElementById('store-footer-contact-title');
+    const socialHeading = document.getElementById('store-footer-social-title');
+    const policyLink = document.getElementById('store-footer-policy-link');
+    if (brandElement) brandElement.textContent = `متجر ${brandName}`;
+    if (contactHeading) contactHeading.textContent = String(settings.footer_contact_heading || 'العنوان ومواعيد العمل').trim();
+    if (socialHeading) socialHeading.textContent = String(settings.footer_social_heading || 'تابعنا وتواصل معنا').trim();
+    if (policyLink) policyLink.textContent = String(settings.footer_policy_label || 'سياسة الاستبدال والاسترجاع').trim();
+    if (descriptionElement) {
+        const description = String(settings.footer_description || '').trim();
+        descriptionElement.textContent = description;
+        descriptionElement.hidden = !description;
+    }
+    if (copyrightElement) {
+        copyrightElement.textContent = `© ${new Date().getFullYear()} متجر ${brandName} — جميع الحقوق محفوظة`;
+    }
+
+    const address = String(settings.footer_address || '').trim();
+    const addressRow = document.getElementById('store-footer-address-row');
+    const addressElement = document.getElementById('store-footer-address');
+    const mapLink = document.getElementById('store-footer-map-link');
+    const mapUrl = getSafeExternalUrl(settings.footer_maps_url);
+    if (addressRow) addressRow.hidden = !address && !mapUrl;
+    if (addressElement) addressElement.textContent = address;
+    if (mapLink) {
+        mapLink.hidden = !mapUrl;
+        if (mapUrl) mapLink.href = mapUrl;
+        else mapLink.removeAttribute('href');
+    }
+
+    const hours = String(settings.footer_working_hours || '').trim();
+    const closedDays = String(settings.footer_closed_days || '').trim();
+    const hoursRow = document.getElementById('store-footer-hours-row');
+    const closedRow = document.getElementById('store-footer-closed-row');
+    const hoursElement = document.getElementById('store-footer-hours');
+    const closedElement = document.getElementById('store-footer-closed');
+    if (hoursRow) hoursRow.hidden = !hours;
+    if (closedRow) closedRow.hidden = !closedDays;
+    if (hoursElement) hoursElement.textContent = hours;
+    if (closedElement) {
+        closedElement.textContent = closedDays ? `الإجازة الأسبوعية: ${closedDays}` : '';
+    }
+
+    const phone = String(settings.footer_phone || '').trim();
+    const phoneNumber = phone.replace(/[^\d+]/g, '');
+    const phoneRow = document.getElementById('store-footer-phone-row');
+    const phoneElement = document.getElementById('store-footer-phone');
+    if (phoneRow) phoneRow.hidden = !phoneNumber;
+    if (phoneElement) {
+        phoneElement.textContent = phone;
+        if (phoneNumber) phoneElement.href = `tel:${phoneNumber}`;
+        else phoneElement.removeAttribute('href');
+    }
+    const contactSection = document.getElementById('store-footer-contact');
+    if (contactSection) {
+        contactSection.hidden = !address && !mapUrl && !hours && !closedDays && !phoneNumber;
+    }
+
+    const socialLinks = [
+        {key: 'footer_facebook_url', label: 'فيسبوك', icon: 'fab fa-facebook-f', className: 'facebook'},
+        {key: 'footer_youtube_url', label: 'يوتيوب', icon: 'fab fa-youtube', className: 'youtube'},
+        {key: 'footer_instagram_url', label: 'إنستغرام', icon: 'fab fa-instagram', className: 'instagram'},
+        {key: 'footer_tiktok_url', label: 'تيك توك', icon: 'fab fa-tiktok', className: 'tiktok'}
+    ].map(item => ({...item, url: getSafeExternalUrl(settings[item.key])})).filter(item => item.url);
+    const whatsappNumber = String(settings.footer_whatsapp || settings.whatsapp || '').replace(/\D/g, '');
+    if (whatsappNumber) {
+        socialLinks.push({
+            label: 'واتساب',
+            icon: 'fab fa-whatsapp',
+            className: 'whatsapp',
+            url: `https://wa.me/${whatsappNumber}`
+        });
+    }
+
+    const socialSection = document.getElementById('store-footer-social');
+    const socialContainer = document.getElementById('store-footer-social-links');
+    if (socialSection) socialSection.hidden = socialLinks.length === 0;
+    if (socialContainer) {
+        socialContainer.replaceChildren(...socialLinks.map(item => {
+            const link = document.createElement('a');
+            link.className = `store-footer-social-link ${item.className}`;
+            link.href = item.url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.setAttribute('aria-label', item.label);
+            link.title = item.label;
+            const icon = document.createElement('i');
+            icon.className = item.icon;
+            icon.setAttribute('aria-hidden', 'true');
+            link.appendChild(icon);
+            return link;
+        }));
+    }
+
+    const activePolicies = Array.isArray(policies)
+        ? policies.filter(policy => policy && String(policy.content || '').trim())
+        : [];
+    if (policyLink) policyLink.hidden = activePolicies.length === 0;
+}
+
+function openStorePolicy() {
+    const dialog = document.getElementById('store-policy-dialog');
+    const content = document.getElementById('store-policy-content');
+    if (!dialog || !content) return;
+    const policies = JSON.parse(localStorage.getItem('storeFooterPolicies')) || [];
+    content.replaceChildren(...policies.filter(policy => policy && String(policy.content || '').trim()).map(policy => {
+        const section = document.createElement('section');
+        section.className = 'store-policy-section';
+        const heading = document.createElement('h3');
+        heading.textContent = policy.title || 'سياسة الاستبدال والاسترجاع';
+        const paragraph = document.createElement('p');
+        paragraph.textContent = policy.content;
+        section.append(heading, paragraph);
+        return section;
+    }));
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+}
+
+function closeStorePolicy() {
+    const dialog = document.getElementById('store-policy-dialog');
+    if (dialog && dialog.open) dialog.close();
+}
+
 function getProductVideoSource(source) {
     try {
         const url = new URL(source);
@@ -292,6 +434,7 @@ function renderStoreTicker() {
 function refreshStoreViewFromLocalData() {
     products = JSON.parse(localStorage.getItem('storeProducts')) || [];
     const storeSettings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    const storePolicies = JSON.parse(localStorage.getItem('storeFooterPolicies')) || [];
     const cartAutoCloseSetting = String(storeSettings.cart_auto_close_seconds ?? '').trim();
     const parsedCartAutoClose = Number(cartAutoCloseSetting);
     cartAutoCloseSeconds = cartAutoCloseSetting && Number.isFinite(parsedCartAutoClose)
@@ -299,6 +442,7 @@ function refreshStoreViewFromLocalData() {
         : 3;
     applySiteBranding(storeSettings);
     applyPaymentSettings(storeSettings);
+    renderStoreFooter(storeSettings, storePolicies);
     startSocialProof();
     renderStoreTicker();
     renderCategories();
@@ -316,12 +460,14 @@ async function initializeStore() {
     // تحميل البيانات للمتغيرات
     products = JSON.parse(localStorage.getItem('storeProducts')) || [];
     const storeSettings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    const storePolicies = JSON.parse(localStorage.getItem('storeFooterPolicies')) || [];
     const cartAutoCloseSetting = String(storeSettings.cart_auto_close_seconds ?? '').trim();
     const parsedCartAutoClose = Number(cartAutoCloseSetting);
     cartAutoCloseSeconds = cartAutoCloseSetting && Number.isFinite(parsedCartAutoClose)
         ? Math.min(30, Math.max(0, parsedCartAutoClose))
         : 3;
     applySiteBranding(storeSettings);
+    renderStoreFooter(storeSettings, storePolicies);
     startSocialProof();
 
     // --- إضافة منتج تجريبي (للتجربة) ---
@@ -1604,23 +1750,10 @@ function updateOffersCampaignCountdown() {
     const expired = remaining <= 0;
     const newlyExpired = expired && !offersCampaignExpired;
     offersCampaignExpired = expired;
-    const endDate = new Date(endTime);
-    const dateLabel = new Intl.DateTimeFormat('ar-EG', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    }).format(endDate);
 
     widgets.forEach(widget => {
         const isStoreCatalogWidget = Boolean(widget.closest('#store-catalog'));
         widget.hidden = isStoreCatalogWidget && currentCategory !== 'offers';
-        const dateElement = widget.querySelector('[data-offers-end-date]');
-        if (dateElement) {
-            dateElement.dateTime = endDate.toISOString();
-            dateElement.textContent = dateLabel;
-        }
 
         const units = widget.querySelector('[data-offers-units]');
         const expiredMessage = widget.querySelector('[data-offers-expired]');

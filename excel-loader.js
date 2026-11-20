@@ -278,6 +278,24 @@ async function fetchStoreFromExcel() {
         data.ticker = String(settings.ticker || '');
         data.proof = String(settings.proof || '');
 
+        // ---- سياسة الاستبدال والاسترجاع المعروضة في تذييل المتجر ----
+        const policyRows = wb.Sheets['Policies'] ? sheetToObjects(wb.Sheets['Policies']) : [];
+        if (wb.Sheets['Policies']) {
+            validateSheetColumns(wb.Sheets['Policies'], 'Policies', [
+                ['العنوان', 'title'],
+                ['المحتوى', 'content']
+            ]);
+        }
+        data.footerPolicies = policyRows
+            .map((row, index) => ({
+                title: String(getFirstValue(row, ['العنوان', 'title']) || 'سياسة الاستبدال والاسترجاع').trim(),
+                content: String(getFirstValue(row, ['المحتوى', 'content']) || '').trim(),
+                order: parseNum(getFirstValue(row, ['الترتيب', 'order'])) || index + 1,
+                active: isMessageActive(row)
+            }))
+            .filter(policy => policy.active && policy.content)
+            .sort((left, right) => left.order - right.order);
+
         // ---- الحالات ----
         const stRows = sheetToObjects(wb.Sheets['Statuses']);
         data.statuses = stRows.map(r => r['القيمة']).filter(Boolean);
@@ -346,6 +364,7 @@ function applyStoreData(data) {
     if (data.proofMessages) localStorage.setItem('proofMessages', JSON.stringify(data.proofMessages));
     if (data.popups) localStorage.setItem('storePopups', JSON.stringify(data.popups));
     if (data.settings) localStorage.setItem('storeSettings', JSON.stringify(data.settings));
+    if (data.footerPolicies) localStorage.setItem('storeFooterPolicies', JSON.stringify(data.footerPolicies));
     return true;
 }
 
@@ -361,6 +380,7 @@ function buildStoreWorkbook() {
     const accessCodes = JSON.parse(localStorage.getItem('academyAccessCodes')) || [];
     const coupons = JSON.parse(localStorage.getItem('storeCoupons')) || [];
     const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+    const footerPolicies = JSON.parse(localStorage.getItem('storeFooterPolicies')) || [];
     const ticker = localStorage.getItem('tickerText') || '';
     const proof = localStorage.getItem('proofText') || '';
     const popups = JSON.parse(localStorage.getItem('storePopups')) || [];
@@ -441,9 +461,36 @@ function buildStoreWorkbook() {
     }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(coupRows), 'Coupons');
 
+    // سياسة الاستبدال والاسترجاع
+    const policyHeaders = ['العنوان', 'المحتوى', 'الترتيب', 'فعال'];
+    const policyRows = footerPolicies.map((policy, index) => ({
+        'العنوان': policy.title || 'سياسة الاستبدال والاسترجاع',
+        'المحتوى': policy.content || '',
+        'الترتيب': policy.order || index + 1,
+        'فعال': policy.active === false ? 'لا' : 'نعم'
+    }));
+    const policiesSheet = policyRows.length
+        ? XLSX.utils.json_to_sheet(policyRows, {header: policyHeaders})
+        : XLSX.utils.aoa_to_sheet([policyHeaders]);
+    XLSX.utils.book_append_sheet(wb, policiesSheet, 'Policies');
+
     // الإعدادات
     const setRows = [
         { 'المفتاح': 'whatsapp', 'القيمة': settings.whatsapp || '', 'الوصف': 'رقم الواتساب (بصيغة دولية بدون + أو 00)' },
+        { 'المفتاح': 'footer_address', 'القيمة': settings.footer_address || '', 'الوصف': 'عنوان المحل الظاهر في تذييل المتجر' },
+        { 'المفتاح': 'footer_maps_url', 'القيمة': settings.footer_maps_url || '', 'الوصف': 'رابط موقع المحل على خرائط Google (اختياري)' },
+        { 'المفتاح': 'footer_working_hours', 'القيمة': settings.footer_working_hours || '', 'الوصف': 'مواعيد العمل؛ يمكن كتابة كل فترة في سطر' },
+        { 'المفتاح': 'footer_closed_days', 'القيمة': settings.footer_closed_days || '', 'الوصف': 'يوم أو أيام الإجازة الأسبوعية (اختياري)' },
+        { 'المفتاح': 'footer_phone', 'القيمة': settings.footer_phone || '', 'الوصف': 'رقم اتصال المحل (اختياري)' },
+        { 'المفتاح': 'footer_description', 'القيمة': settings.footer_description || '', 'الوصف': 'عبارة قصيرة أسفل اسم المتجر في التذييل (اختياري)' },
+        { 'المفتاح': 'footer_contact_heading', 'القيمة': settings.footer_contact_heading || 'العنوان ومواعيد العمل', 'الوصف': 'عنوان قسم بيانات المحل في التذييل' },
+        { 'المفتاح': 'footer_social_heading', 'القيمة': settings.footer_social_heading || 'تابعنا وتواصل معنا', 'الوصف': 'عنوان قسم روابط التواصل الاجتماعي' },
+        { 'المفتاح': 'footer_policy_label', 'القيمة': settings.footer_policy_label || 'سياسة الاستبدال والاسترجاع', 'الوصف': 'النص الظاهر لرابط السياسة في التذييل' },
+        { 'المفتاح': 'footer_facebook_url', 'القيمة': settings.footer_facebook_url || '', 'الوصف': 'رابط صفحة المتجر على Facebook' },
+        { 'المفتاح': 'footer_youtube_url', 'القيمة': settings.footer_youtube_url || '', 'الوصف': 'رابط قناة المتجر على YouTube' },
+        { 'المفتاح': 'footer_instagram_url', 'القيمة': settings.footer_instagram_url || '', 'الوصف': 'رابط Instagram (اختياري)' },
+        { 'المفتاح': 'footer_tiktok_url', 'القيمة': settings.footer_tiktok_url || '', 'الوصف': 'رابط TikTok (اختياري)' },
+        { 'المفتاح': 'footer_whatsapp', 'القيمة': settings.footer_whatsapp || settings.whatsapp || '', 'الوصف': 'رقم واتساب دولي لزر التواصل في التذييل؛ يترك فارغاً لاستخدام رقم whatsapp' },
         { 'المفتاح': 'website', 'القيمة': settings.website || 'https://mashily.github.io/mashily-store/', 'الوصف': 'رابط المتجر على الإنترنت (لمعاينة واتساب والمشاركة)' },
         { 'المفتاح': 'drive_folder_id', 'القيمة': settings.drive_folder_id || '1ONsyQHZaoPNvzCXWxLjIaXs6yfMwiVRD', 'الوصف': 'معرّف مجلد صور Google Drive؛ اجعل الوصول للصور Anyone with the link / Viewer' },
         { 'المفتاح': 'drive_api_key', 'القيمة': settings.drive_api_key || '', 'الوصف': 'مفتاح Google Drive API مقيّد بالموقع وبـ Drive API فقط؛ المفتاح ظاهر للزوار لذا يجب تقييده' },
