@@ -31,13 +31,16 @@
     <!-- الهيدر -->
     <header class="market-header">
         <div class="market-header-main">
-            <a class="market-brand" href="index.html" aria-label="متجر مشالى">
-                <img class="store-brand-logo" src="logo.png" alt="شعار متجر مشالى">
-            </a>
-            <a id="academy-header-link" class="market-academy-link" href="#academy-library" aria-label="أكاديمية مشالى للإلكترونيات">
-                <img id="academy-header-icon" class="academy-video-icon" src="video.png" alt="" aria-hidden="true">
-                <span id="academy-header-name">أكاديمية مشالى للإلكترونيات</span>
-            </a>
+            <div class="academy-mode-switch" aria-label="اختيار القسم الرئيسي">
+                <a class="academy-mode-button" href="index.html" onclick="animateStoreModeSwitch(event, this)">
+                    <i class="fas fa-store" aria-hidden="true"></i>
+                    <span>المتجر</span>
+                </a>
+                <a class="academy-mode-button active" href="academy.html" aria-current="page" onclick="animateStoreModeSwitch(event, this)">
+                    <i class="fab fa-youtube" aria-hidden="true"></i>
+                    <span>الفيديوهات التعليمية</span>
+                </a>
+            </div>
             <label class="market-search" for="academy-search">
                 <i class="fas fa-search" aria-hidden="true"></i>
                 <input type="search" id="academy-search" placeholder="ابحث باسم الدرس أو القسم..." oninput="searchAcademy()" aria-label="البحث في الدروس">
@@ -102,6 +105,16 @@
                 <div id="video-progress-bar" class="video-progress-bar"></div>
             </div>
             <div id="video-attachments-container" class="video-attachments"></div>
+            <section id="academy-video-tools" class="academy-video-tools" aria-labelledby="academy-video-tools-title" hidden>
+                <div class="academy-video-tools-heading">
+                    <div>
+                        <span>الأدوات والقطع المستخدمة</span>
+                        <h3 id="academy-video-tools-title">منتجات مرتبطة بالفيديو</h3>
+                    </div>
+                </div>
+                <p id="academy-video-tools-list" class="academy-video-tools-list"></p>
+                <div id="academy-linked-products" class="academy-linked-products"></div>
+            </section>
             
             <!-- قسم التفاعلات (لايك وتعليقات) -->
             <div class="video-interactions">
@@ -147,6 +160,28 @@
     <footer style="text-align: center; padding: 20px; color: var(--text-light); margin-top: 50px; border-top: 1px solid var(--border);">
         <p id="academy-footer-text">© 2026 أكاديمية مشالى - جميع الحقوق محفوظة</p>
     </footer>
+
+    <nav id="academy-mobile-bottom-nav" class="mobile-bottom-nav" aria-label="تنقل المتجر">
+        <button class="mobile-nav-item" type="button" onclick="window.location.href='index.html'" aria-label="الرئيسية">
+            <i class="fas fa-house" aria-hidden="true"></i><span>الرئيسية</span>
+        </button>
+        <button class="mobile-nav-item" type="button" onclick="window.location.href='index.html#product-cats'" aria-label="الأقسام">
+            <i class="fas fa-th-large" aria-hidden="true"></i><span>الأقسام</span>
+        </button>
+        <button class="mobile-nav-store" type="button" onclick="triggerAdmin(event)" aria-label="زر المتجر والدخول للإدارة">
+            <span class="mobile-nav-store-ring"><img id="academy-mobile-store-logo" class="store-brand-logo" src="logo.png" alt="متجر مشالى"></span>
+            <span id="academy-mobile-store-label">المتجر</span>
+        </button>
+        <button class="mobile-nav-item" type="button" onclick="window.location.href='index.html#cart-sidebar'" aria-label="سلة المشتريات">
+            <i class="fas fa-shopping-basket" aria-hidden="true"></i><span>السلة</span>
+        </button>
+        <button id="academy-mobile-nav-maintenance" class="mobile-nav-item" type="button" onclick="window.location.href='index.html'; setTimeout(() => openMaintenanceRequest(), 500)" aria-label="طلب صيانة">
+            <i class="fas fa-screwdriver-wrench" aria-hidden="true"></i><span id="academy-mobile-maintenance-label">الصيانة</span>
+        </button>
+        <button class="mobile-nav-item active" type="button" aria-current="page" aria-label="الفيديوهات">
+            <i class="fas fa-play-circle" aria-hidden="true"></i><span>الفيديوهات</span>
+        </button>
+    </nav>
 
     <script src="xlsx.full.min.js"></script>
     <script src="excel-loader.js"></script>

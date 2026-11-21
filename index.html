@@ -75,13 +75,16 @@
             <span class="market-electric-bolt"><i class="fas fa-bolt"></i></span>
         </div>
         <div class="market-header-main">
-            <a class="market-brand" href="index.html" aria-label="متجر مشالى" onclick="triggerAdmin(event)">
-                <img class="store-brand-logo" src="logo.png" alt="شعار متجر مشالى">
-            </a>
-            <a id="store-academy-link" class="market-academy-link" href="academy.html">
-                <img id="store-academy-icon" class="academy-video-icon" src="video.png" alt="" aria-hidden="true">
-                <span id="store-academy-name">أكاديمية مشالى للإلكترونيات</span>
-            </a>
+            <div class="store-mode-switch" aria-label="اختيار قسم المتجر أو الفيديوهات">
+                <a class="store-mode-button active" href="index.html" aria-current="page" onclick="animateStoreModeSwitch(event, this)">
+                    <i class="fas fa-store" aria-hidden="true"></i>
+                    <span>المتجر</span>
+                </a>
+                <a class="store-mode-button" href="academy.html" onclick="animateStoreModeSwitch(event, this)">
+                    <i class="fab fa-youtube" aria-hidden="true"></i>
+                    <span>الفيديوهات التعليمية</span>
+                </a>
+            </div>
             <div class="market-search">
                 <i class="fas fa-search" aria-hidden="true"></i>
                 <input type="search" id="search-input" oninput="searchProducts()" placeholder="ابحث باسم المنتج أو القسم أو المواصفات" autocomplete="off" aria-label="البحث في المنتجات">
@@ -270,6 +273,33 @@
         <div class="ticker-content" id="ticker-text">🔥 أهلاً بكم في متجر مشالى للإلكترونيات - جودة نثق بها 🔥</div>
     </div>
     <div id="store-toast" class="store-toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <nav id="mobile-bottom-nav" class="mobile-bottom-nav" aria-label="تنقل المتجر">
+        <button class="mobile-nav-item" type="button" data-nav="home" onclick="navigateMobileSection('home')" aria-label="الرئيسية">
+            <i class="fas fa-house" aria-hidden="true"></i>
+            <span>الرئيسية</span>
+        </button>
+        <button class="mobile-nav-item" type="button" data-nav="categories" onclick="navigateMobileSection('categories')" aria-label="الأقسام">
+            <i class="fas fa-th-large" aria-hidden="true"></i>
+            <span>الأقسام</span>
+        </button>
+        <button id="mobile-store-admin-button" class="mobile-nav-store" type="button" onclick="triggerAdmin(event)" aria-label="زر المتجر والدخول للإدارة">
+            <span class="mobile-nav-store-ring"><img id="mobile-nav-store-logo" class="store-brand-logo" src="logo.png" alt="متجر مشالى"></span>
+            <span id="mobile-nav-store-label">المتجر</span>
+        </button>
+        <button class="mobile-nav-item" type="button" data-nav="cart" onclick="toggleCart(true); setMobileNavActive('cart')" aria-label="سلة المشتريات">
+            <span class="mobile-nav-icon-wrap"><i class="fas fa-shopping-basket" aria-hidden="true"></i><span id="mobile-cart-badge" class="mobile-nav-badge" hidden>0</span></span>
+            <span>السلة</span>
+        </button>
+        <button id="mobile-nav-maintenance" class="mobile-nav-item" type="button" data-nav="maintenance" onclick="openMaintenanceRequest(); setMobileNavActive('maintenance')" aria-label="طلب صيانة">
+            <i class="fas fa-screwdriver-wrench" aria-hidden="true"></i>
+            <span id="mobile-nav-maintenance-label">الصيانة</span>
+        </button>
+        <button class="mobile-nav-item" type="button" data-nav="videos" onclick="navigateMobileSection('videos')" aria-label="الفيديوهات">
+            <i class="fas fa-play-circle" aria-hidden="true"></i>
+            <span>الفيديوهات</span>
+        </button>
+    </nav>
 
     <div id="cart-sidebar" class="cart-sidebar" style="width: 350px; background: var(--card); display:flex; flex-direction:column;">
         <!-- رأس السلة -->

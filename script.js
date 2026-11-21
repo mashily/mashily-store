@@ -21,6 +21,16 @@ let driveImageIdsByName = new Map();
 let driveImageCacheFolderId = '';
 let driveImageIndexPromise = null;
 
+function animateStoreModeSwitch(event, button) {
+    if (!button) return;
+    const switcher = button.closest('.store-mode-switch, .academy-mode-switch');
+    if (switcher) {
+        switcher.querySelectorAll('a').forEach(item => item.classList.remove('pressed'));
+        button.classList.add('pressed');
+        window.setTimeout(() => button.classList.remove('pressed'), 460);
+    }
+}
+
 function pulseProductCard(productId, effect = 'selected') {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const card = Array.from(document.querySelectorAll('.product-card[data-product-id]'))
@@ -570,6 +580,8 @@ function applySiteBranding(settings) {
     document.querySelectorAll('meta[name="theme-color"]').forEach(meta => meta.setAttribute('content', themeColor));
     const splash = document.getElementById('app-splash');
     if (splash) splash.style.setProperty('--app-splash-color', themeColor);
+    applyMobileBottomNavigation(settings);
+    initializeOneSignalPush(settings);
 }
 
 function init() {
@@ -2324,7 +2336,13 @@ function updateCartUI() {
     let finalTotal = total - discountAmount;
     if(finalTotal < 0) finalTotal = 0;
 
-    if(badge) badge.innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+    const cartQuantity = cart.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+    if(badge) badge.innerText = cartQuantity;
+    const mobileBadge = document.getElementById('mobile-cart-badge');
+    if (mobileBadge) {
+        mobileBadge.textContent = String(cartQuantity);
+        mobileBadge.hidden = cartQuantity === 0;
+    }
     
     // تحديث منطقة السعر
     const totalArea = document.getElementById('cart-total-area');
@@ -2717,6 +2735,104 @@ function triggerAdmin(event) {
         return;
     }
     adminClickResetTimer = setTimeout(() => { adminClicks = 0; }, 2000);
+}
+
+function setMobileNavActive(section) {
+    document.querySelectorAll('.mobile-bottom-nav [data-nav]').forEach(item => {
+        item.classList.toggle('active', item.dataset.nav === section);
+        if (item.dataset.nav === section) item.setAttribute('aria-current', 'page');
+        else item.removeAttribute('aria-current');
+    });
+}
+
+function navigateMobileSection(section) {
+    if (section === 'home') {
+        setMobileNavActive('home');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        return;
+    }
+    if (section === 'categories') {
+        setMobileNavActive('categories');
+        const categoryBar = document.querySelector('.market-category-bar');
+        if (categoryBar) categoryBar.scrollIntoView({behavior: 'smooth', block: 'start'});
+        return;
+    }
+    if (section === 'videos') {
+        setMobileNavActive('videos');
+        window.location.href = 'academy.html';
+    }
+}
+
+function applyMobileBottomNavigation(settings = {}) {
+    const nav = document.getElementById('mobile-bottom-nav');
+    const academyNav = document.getElementById('academy-mobile-bottom-nav');
+    const enabled = isStoreSettingEnabled(settings.bottom_nav_enabled, true);
+
+    [nav, academyNav].forEach(element => {
+        if (element) element.hidden = !enabled;
+    });
+    if (!enabled) return;
+
+    const labels = {
+        home: settings.bottom_nav_home_label || 'الرئيسية',
+        categories: settings.bottom_nav_categories_label || 'الأقسام',
+        store: settings.bottom_nav_store_label || 'المتجر',
+        cart: settings.bottom_nav_cart_label || 'السلة',
+        maintenance: settings.bottom_nav_maintenance_label || 'الصيانة',
+        videos: settings.bottom_nav_videos_label || 'الفيديوهات'
+    };
+    const labelsBySelector = [
+        ['[data-nav="home"] span', labels.home],
+        ['[data-nav="categories"] span', labels.categories],
+        ['[data-nav="cart"] span:last-child', labels.cart],
+        ['#mobile-nav-maintenance-label', labels.maintenance],
+        ['[data-nav="videos"] span', labels.videos],
+        ['#mobile-nav-store-label', labels.store],
+        ['#academy-mobile-store-label', labels.store],
+        ['#academy-mobile-maintenance-label', labels.maintenance]
+    ];
+    labelsBySelector.forEach(([selector, value]) => {
+        document.querySelectorAll(selector).forEach(element => { element.textContent = value; });
+    });
+
+    const maintenanceVisible = isStoreSettingEnabled(settings.maintenance_enabled);
+    if (nav) nav.classList.toggle('nav-maintenance-hidden', !maintenanceVisible);
+    if (academyNav) academyNav.classList.toggle('nav-maintenance-hidden', !maintenanceVisible);
+    const academyMaintenance = document.getElementById('academy-mobile-nav-maintenance');
+    if (academyMaintenance) academyMaintenance.hidden = !maintenanceVisible;
+
+    const logoUrl = getCampaignUrl(settings.brand_logo_image || 'logo.png');
+    ['mobile-nav-store-logo', 'academy-mobile-store-logo'].forEach(id => {
+        const logo = document.getElementById(id);
+        if (logo && logoUrl) {
+            logo.src = logoUrl;
+            logo.alt = `شعار ${settings.brand_name || 'مشالى'}`;
+        }
+    });
+    const activeColor = /^#[0-9a-f]{6}$/i.test(String(settings.bottom_nav_active_color || ''))
+        ? settings.bottom_nav_active_color
+        : '';
+    if (activeColor) document.documentElement.style.setProperty('--bottom-nav-active', activeColor);
+}
+
+function initializeOneSignalPush(settings = {}) {
+    const appId = String(settings.onesignal_app_id || '').trim();
+    if (!isStoreSettingEnabled(settings.onesignal_enabled, false) || !appId) return;
+    if (window.OneSignal || document.querySelector('script[data-onesignal-sdk]')) return;
+
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+            appId,
+            allowLocalhostAsSecureOrigin: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
+            notifyButton: { enable: false }
+        });
+    });
+    const sdk = document.createElement('script');
+    sdk.defer = true;
+    sdk.dataset.onesignalSdk = 'true';
+    sdk.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
+    document.head.appendChild(sdk);
 }
 
 // ===== نظام الفاتورة =====
@@ -3658,21 +3774,30 @@ function initAcademyPage() {
 
     const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
     const catsContainer = document.getElementById('academy-cats');
-    
-    // عرض الأقسام
-    const categories = [...new Set(videos.map(video => String(video.category || '').trim()).filter(Boolean))];
-    const cats = ['الكل', ...categories];
+    const videoTracks = JSON.parse(localStorage.getItem('academyVideoTracks') || '[]');
+
+    const tracks = videoTracks.length
+        ? [{name: 'الكل', description: 'كل الدروس والفيديوهات', image: 'category-images/all.svg', icon: 'fas fa-layer-group'}, ...videoTracks]
+        : [{name: 'الكل', description: 'كل الدروس والفيديوهات', image: 'category-images/all.svg', icon: 'fas fa-layer-group'},
+            ...[...new Set(videos.map(video => String(video.track || video.category || '').trim()).filter(Boolean))]
+                .map(name => ({name, description: '', image: '', icon: 'fas fa-play-circle'}))];
     const allVideosFilter = document.querySelector('#academy-library-filter option[value="all"]');
     if (allVideosFilter) allVideosFilter.textContent = `كل الفيديوهات (${videos.length.toLocaleString('ar-EG')})`;
     if(catsContainer) {
-        catsContainer.innerHTML = cats.map(category => {
-            const count = category === 'الكل'
+        catsContainer.innerHTML = tracks.map(track => {
+            const count = track.name === 'الكل'
                 ? videos.length
-                : videos.filter(video => String(video.category || '').trim() === category).length;
-            const label = category === 'الكل' ? 'كل الفيديوهات' : category;
-            return `<button type="button" class="cat-btn-chip ${category === 'الكل' ? 'active' : ''}" aria-pressed="${category === 'الكل'}" onclick="filterAcademy('${category}', this)"><span>${label}</span><span class="cat-count">${count.toLocaleString('ar-EG')}</span></button>`;
-        }
-        ).join('');
+                : videos.filter(video => String(video.track || video.category || '').trim() === track.name).length;
+            const imageUrl = track.image ? getCampaignUrl(track.image) : '';
+            const imageHTML = imageUrl
+                ? `<img src="${escapeAcademyHtml(imageUrl)}" alt="" loading="lazy">`
+                : `<i class="${escapeAcademyHtml(track.icon || 'fas fa-book-open')}" aria-hidden="true"></i>`;
+            const encodedTrack = encodeURIComponent(track.name);
+            return `<button type="button" class="academy-category-chip ${track.name === 'الكل' ? 'active' : ''}" data-track="${escapeAcademyHtml(track.name)}" onclick="filterAcademyTrack('${encodedTrack}', this)" aria-pressed="${track.name === 'الكل'}">
+                ${imageHTML}
+                <span class="academy-category-chip-copy"><strong>${escapeAcademyHtml(track.name === 'الكل' ? 'كل الفيديوهات' : track.name)}</strong><span>${count.toLocaleString('ar-EG')}</span></span>
+            </button>`;
+        }).join('');
     }
 
     applyAcademyFilters();
@@ -3805,6 +3930,24 @@ function filterAcademy(cat, btn) {
     btn.classList.add('active');
     btn.setAttribute('aria-pressed', 'true');
     currentAcademyCategory = cat;
+    document.querySelectorAll('.academy-track-card').forEach(card => card.classList.remove('active'));
+    document.querySelectorAll('.academy-track-card').forEach(card => {
+        if (card.dataset.track === cat) card.classList.add('active');
+    });
+    applyAcademyFilters();
+}
+
+function filterAcademyTrack(encodedTrack, btn) {
+    const track = decodeURIComponent(encodedTrack || 'الكل');
+    document.querySelectorAll('.academy-track-card').forEach(button => {
+        button.classList.remove('active');
+        button.setAttribute('aria-pressed', 'false');
+    });
+    if (btn) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
+    }
+    currentAcademyCategory = track;
     applyAcademyFilters();
 }
 
@@ -3828,7 +3971,8 @@ function applyAcademyFilters() {
 
     // 1. فلترة القسم
     if (currentAcademyCategory !== 'الكل') {
-        videos = videos.filter(v => v.category === currentAcademyCategory);
+        videos = videos.filter(v => String(v.track || v.category || '').trim() === currentAcademyCategory
+            || v.category === currentAcademyCategory);
     }
 
     // 2. فلترة مكتبة المستخدم
@@ -3847,7 +3991,7 @@ function applyAcademyFilters() {
 
     // 3. فلترة البحث
     if (term) {
-        videos = videos.filter(video => normalizeSearchText(`${video.title || ''} ${video.category || ''}`).includes(term));
+        videos = videos.filter(video => normalizeSearchText(`${video.title || ''} ${video.category || ''} ${video.track || ''}`).includes(term));
     }
 
     // 4. الترتيب
@@ -3952,6 +4096,48 @@ function loadAcademyYouTubeApi() {
         throw error;
     });
     return window.academyYouTubeApiPromise;
+}
+
+function renderAcademyVideoTools(video) {
+    const section = document.getElementById('academy-video-tools');
+    const toolsList = document.getElementById('academy-video-tools-list');
+    const productsContainer = document.getElementById('academy-linked-products');
+    if (!section || !toolsList || !productsContainer) return;
+
+    const tools = Array.isArray(video.tools) ? video.tools.filter(Boolean) : [];
+    toolsList.innerHTML = tools.length
+        ? tools.map(tool => `<span class="academy-tool-chip"><i class="fas fa-screwdriver-wrench" aria-hidden="true"></i>${escapeAcademyHtml(tool)}</span>`).join('')
+        : 'لا توجد أدوات محددة لهذا الفيديو.';
+
+    const references = Array.isArray(video.linkedProducts) ? video.linkedProducts.filter(Boolean) : [];
+    const linkedProducts = references.map(reference => {
+        const normalizedReference = String(reference).trim();
+        return products.find(product =>
+            String(product.id) === normalizedReference
+            || String(product.name).trim() === normalizedReference
+        );
+    }).filter((product, index, list) =>
+        product && list.findIndex(item => String(item.id) === String(product.id)) === index
+    );
+
+    productsContainer.innerHTML = linkedProducts.length
+        ? linkedProducts.map(product => {
+            const isOut = product.stock === 'out';
+            const image = getProductImageSource(product.image);
+            return `<article class="academy-linked-product">
+                <img src="${escapeAcademyHtml(image)}" alt="${escapeAcademyHtml(product.name)}" loading="lazy" onerror="this.onerror=null;this.src='category-images/default.svg'">
+                <div class="academy-linked-product-info">
+                    <strong>${escapeAcademyHtml(product.name)}</strong>
+                    <span>${Number(product.price || 0).toLocaleString('ar-EG')} ج.م</span>
+                </div>
+                <button type="button" ${isOut ? 'disabled' : ''} onclick="addToCart(${Number.isFinite(Number(product.id)) ? Number(product.id) : JSON.stringify(String(product.id))}, 1, event, false)" aria-label="إضافة ${escapeAcademyHtml(product.name)} إلى السلة">
+                    <i class="fas fa-cart-plus" aria-hidden="true"></i>${isOut ? 'غير متوفر' : 'أضف للسلة'}
+                </button>
+            </article>`;
+        }).join('')
+        : '<div class="academy-linked-empty">لا توجد منتجات مرتبطة بهذا الفيديو حالياً.</div>';
+
+    section.hidden = tools.length === 0 && linkedProducts.length === 0;
 }
 
 function playVideo(id, resumePlayback = false) {
@@ -4082,6 +4268,8 @@ function playVideo(id, resumePlayback = false) {
             `<a href="${a.url}" target="_blank" class="attachment-btn"><i class="fas fa-download"></i> ${a.name}</a>`
         ).join('');
     }
+
+    renderAcademyVideoTools(video);
 
     // --- إعداد التفاعلات (لايك وتعليقات) ---
     setupVideoInteractions(video);

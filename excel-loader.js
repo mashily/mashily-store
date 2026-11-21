@@ -229,13 +229,33 @@ async function fetchStoreFromExcel() {
             title: r['العنوان'] || '',
             url: r['الرابط'] || '',
             category: r['الصنف'] || 'عام',
+            track: getFirstValue(r, ['المسار', 'مسار الفيديو', 'track']) || r['الصنف'] || 'عام',
             type: ['locked', 'paid', 'مدفوع', 'مشفر'].includes(String(r['النوع'] || '').trim().toLowerCase()) ? 'locked' : 'free',
             duration: r['المدة'] || '',
             image: getFirstValue(r, ['رابط الصورة', 'الصورة', 'thumbnail', 'image']),
+            tools: parseSplit(getFirstValue(r, ['الأدوات المستخدمة', 'الأدوات', 'tools'])),
+            linkedProducts: parseSplit(getFirstValue(r, ['المنتجات المرتبطة', 'منتجات مرتبطة', 'linked_products', 'product_ids'])),
+            attachments: parseSplit(getFirstValue(r, ['مرفقات (|)', 'مرفقات', 'attachments'])).map((item, index) => {
+                const separatorIndex = item.indexOf('=');
+                return separatorIndex >= 0
+                    ? {name: item.slice(0, separatorIndex).trim() || `مرفق ${index + 1}`, url: item.slice(separatorIndex + 1).trim()}
+                    : {name: `مرفق ${index + 1}`, url: item};
+            }).filter(item => item.url),
             likes: 0,
             dislikes: 0,
             comments: []
         })).filter(v => v.title);
+
+        // ---- مسارات الفيديوهات (ورقة اختيارية للتنظيم الواضح) ----
+        const trackRows = wb.Sheets['VideoTracks'] ? sheetToObjects(wb.Sheets['VideoTracks']) : [];
+        data.videoTracks = trackRows.map((row, index) => ({
+            name: String(getFirstValue(row, ['الاسم', 'اسم المسار', 'name']) || '').trim(),
+            description: String(getFirstValue(row, ['الوصف', 'description']) || '').trim(),
+            image: String(getFirstValue(row, ['الصورة', 'رابط الصورة', 'image']) || '').trim(),
+            icon: String(getFirstValue(row, ['الأيقونة', 'icon']) || 'fas fa-book-open').trim(),
+            order: parseNum(getFirstValue(row, ['الترتيب', 'order'])) || index + 1,
+            active: isMessageActive(row)
+        })).filter(track => track.name && track.active).sort((left, right) => left.order - right.order);
 
         // ---- أكواد فتح المحتوى المدفوع (تجريبية ومحلية) ----
         const codeRows = wb.Sheets['Codes'] ? sheetToObjects(wb.Sheets['Codes']) : [];
@@ -373,6 +393,7 @@ function applyStoreData(data) {
     if (data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
     if (data.categoryImages) localStorage.setItem('storeCategoryImages', JSON.stringify(data.categoryImages));
     if (data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
+    if (data.videoTracks) localStorage.setItem('academyVideoTracks', JSON.stringify(data.videoTracks));
     if (data.accessCodes) localStorage.setItem('academyAccessCodes', JSON.stringify(data.accessCodes));
     if (data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
     if (data.statuses) localStorage.setItem('storeStatuses', JSON.stringify(data.statuses));
@@ -396,6 +417,7 @@ function buildStoreWorkbook() {
     const categories = JSON.parse(localStorage.getItem('storeCategories')) || [];
     const categoryImages = JSON.parse(localStorage.getItem('storeCategoryImages')) || {};
     const videos = JSON.parse(localStorage.getItem('academyVideos')) || [];
+    const videoTracks = JSON.parse(localStorage.getItem('academyVideoTracks')) || [];
     const accessCodes = JSON.parse(localStorage.getItem('academyAccessCodes')) || [];
     const coupons = JSON.parse(localStorage.getItem('storeCoupons')) || [];
     const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
@@ -453,11 +475,25 @@ function buildStoreWorkbook() {
         'العنوان': v.title,
         'الرابط': v.url,
         'الصنف': v.category || 'عام',
+        'المسار': v.track || v.category || 'عام',
         'النوع': v.type || 'free',
         'المدة': v.duration || '',
-        'الصورة': v.image || ''
+        'الصورة': v.image || '',
+        'الأدوات المستخدمة': (v.tools || []).join('|'),
+        'المنتجات المرتبطة': (v.linkedProducts || []).join('|'),
+        'مرفقات (|)': (v.attachments || []).map(item => `${item.name || ''}=${item.url || ''}`).join('|')
     }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(vidRows), 'Videos');
+
+    const trackRows = videoTracks.map(track => ({
+        'الاسم': track.name,
+        'الوصف': track.description || '',
+        'الصورة': track.image || '',
+        'الأيقونة': track.icon || 'fas fa-book-open',
+        'الترتيب': track.order || 1,
+        'فعال': track.active === false ? 'لا' : 'نعم'
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(trackRows, {header: ['الاسم', 'الوصف', 'الصورة', 'الأيقونة', 'الترتيب', 'فعال']}), 'VideoTracks');
 
     // الأكواد التجريبية لفتح كل الفيديوهات المدفوعة على الجهاز نفسه.
     const codeRows = accessCodes.map(item => ({
@@ -529,6 +565,16 @@ function buildStoreWorkbook() {
         { 'المفتاح': 'maintenance_whatsapp', 'القيمة': settings.maintenance_whatsapp || '', 'الوصف': 'رقم واتساب الصيانة بصيغة دولية؛ اتركه فارغاً لاستخدام رقم whatsapp' },
         { 'المفتاح': 'maintenance_intro', 'القيمة': settings.maintenance_intro || 'أرسل تفاصيل الجهاز والعطل، وسيتواصل معك فريق الصيانة لتأكيد الخطوات والتكلفة.', 'الوصف': 'تعليمات نموذج طلب الصيانة' },
         { 'المفتاح': 'maintenance_areas', 'القيمة': settings.maintenance_areas || '', 'الوصف': 'مناطق الخدمة مفصولة بفاصلة أو | أو سطر جديد (اختياري)' },
+        { 'المفتاح': 'bottom_nav_enabled', 'القيمة': settings.bottom_nav_enabled !== undefined ? settings.bottom_nav_enabled : 'نعم', 'الوصف': 'إظهار شريط التنقل السفلي على الهاتف؛ نعم أو لا' },
+        { 'المفتاح': 'bottom_nav_home_label', 'القيمة': settings.bottom_nav_home_label || 'الرئيسية', 'الوصف': 'اسم زر الرئيسية في الشريط السفلي' },
+        { 'المفتاح': 'bottom_nav_categories_label', 'القيمة': settings.bottom_nav_categories_label || 'الأقسام', 'الوصف': 'اسم زر الأقسام في الشريط السفلي' },
+        { 'المفتاح': 'bottom_nav_store_label', 'القيمة': settings.bottom_nav_store_label || 'المتجر', 'الوصف': 'اسم زر شعار المتجر المركزي؛ اضغط عليه خمس مرات للدخول للإدارة' },
+        { 'المفتاح': 'bottom_nav_cart_label', 'القيمة': settings.bottom_nav_cart_label || 'السلة', 'الوصف': 'اسم زر السلة في الشريط السفلي' },
+        { 'المفتاح': 'bottom_nav_maintenance_label', 'القيمة': settings.bottom_nav_maintenance_label || 'الصيانة', 'الوصف': 'اسم زر طلب الصيانة في الشريط السفلي' },
+        { 'المفتاح': 'bottom_nav_videos_label', 'القيمة': settings.bottom_nav_videos_label || 'الفيديوهات', 'الوصف': 'اسم زر الفيديوهات في الشريط السفلي' },
+        { 'المفتاح': 'bottom_nav_active_color', 'القيمة': settings.bottom_nav_active_color || '', 'الوصف': 'لون زر التنقل النشط بصيغة HEX؛ اتركه فارغاً لاستخدام لون الثيم' },
+        { 'المفتاح': 'onesignal_enabled', 'القيمة': settings.onesignal_enabled || 'لا', 'الوصف': 'تفعيل إشعارات OneSignal في الويب؛ نعم أو لا' },
+        { 'المفتاح': 'onesignal_app_id', 'القيمة': settings.onesignal_app_id || '', 'الوصف': 'App ID الخاص بتطبيق OneSignal (يُعطى من لوحة OneSignal ولا يعد سرًا)' },
         { 'المفتاح': 'website', 'القيمة': settings.website || 'https://mashily.github.io/mashily-store/', 'الوصف': 'رابط المتجر على الإنترنت (لمعاينة واتساب والمشاركة)' },
         { 'المفتاح': 'drive_folder_id', 'القيمة': settings.drive_folder_id || '1ONsyQHZaoPNvzCXWxLjIaXs6yfMwiVRD', 'الوصف': 'معرّف مجلد صور Google Drive؛ اجعل الوصول للصور Anyone with the link / Viewer' },
         { 'المفتاح': 'drive_api_key', 'القيمة': settings.drive_api_key || '', 'الوصف': 'مفتاح Google Drive API مقيّد بالموقع وبـ Drive API فقط؛ المفتاح ظاهر للزوار لذا يجب تقييده' },
