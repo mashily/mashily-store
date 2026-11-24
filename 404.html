@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="robots" content="noindex, follow">
+    <meta name="theme-color" content="#f7f9f8">
+    <title>الصفحة غير موجودة | متجر مشالى</title>
+    <link rel="icon" type="image/png" href="/mashily-store/logo.png">
+    <style>
+        :root {
+            --primary: #2e8b57;
+            --primary-soft: #5a8f7b;
+            --bg: #f7f9f8;
+            --card: #ffffff;
+            --text: #17251c;
+            --text-light: #5f6f66;
+            --border: #e2e9e5;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: radial-gradient(circle at 50% 0%, #eaf4ee 0%, var(--bg) 60%);
+            color: var(--text);
+            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+            text-align: center;
+        }
+        main {
+            width: min(100%, 560px);
+            padding: 36px 26px;
+            border-radius: 22px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            box-shadow: 0 18px 45px rgba(23, 37, 28, .09);
+        }
+        .brand { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 18px; text-decoration: none; color: var(--primary); font-weight: 800; font-size: 1.05rem; }
+        .brand img { width: 44px; height: 44px; object-fit: contain; }
+        .code { font-size: clamp(3.2rem, 14vw, 4.6rem); font-weight: 900; line-height: 1; color: var(--primary); letter-spacing: 2px; }
+        h1 { margin: 12px 0 10px; font-size: clamp(1.25rem, 4vw, 1.6rem); }
+        p { margin: 0 0 22px; color: var(--text-light); line-height: 1.9; font-size: .98rem; }
+        .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            min-height: 46px; padding: 0 20px; border-radius: 12px;
+            font-weight: 700; font-size: .95rem; text-decoration: none;
+            border: 1px solid var(--border); color: var(--text); background: var(--bg);
+            transition: transform .2s ease, background .2s ease;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .btn-whatsapp { background: #25d366; border-color: #25d366; color: #fff; }
+        footer { margin-top: 22px; font-size: .8rem; color: var(--text-light); }
+    </style>
+</head>
+<body>
+    <main>
+        <a class="brand" href="/mashily-store/">
+            <img src="/mashily-store/logo.png" alt="شعار متجر مشالى" width="44" height="44">
+            <span>متجر مشالى</span>
+        </a>
+        <div class="code" aria-hidden="true">404</div>
+        <h1>الصفحة غير موجودة</h1>
+        <p>يبدو أن الرابط الذي فتحته غير صحيح أو أن الصفحة تم نقلها. يمكنك العودة إلى المتجر وتصفح الأقسام والمنتجات.</p>
+        <div class="actions">
+            <a class="btn btn-primary" href="/mashily-store/index.html">العودة إلى المتجر</a>
+            <a class="btn" href="/mashily-store/academy.html">الفيديوهات التعليمية</a>
+            <a class="btn btn-whatsapp" href="https://wa.me/201551831308" target="_blank" rel="noopener noreferrer">تواصل عبر واتساب</a>
+        </div>
+        <footer>متجر مشالى لتجارة الإلكترونيات — بيع وصيانة الإلكترونيات</footer>
+    </main>
+</body>
+</html>

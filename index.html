@@ -58,6 +58,37 @@
             color: #25d366 !important;
         }
     </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ElectronicsStore",
+      "@id": "https://mashily.github.io/mashily-store/#store",
+      "name": "متجر مشالى",
+      "alternateName": "Mashily Store",
+      "url": "https://mashily.github.io/mashily-store/",
+      "logo": "https://mashily.github.io/mashily-store/logo.png",
+      "image": "https://mashily.github.io/mashily-store/logo.png",
+      "description": "متجر مشالى لبيع الإلكترونيات واكسسوارات الكمبيوتر والموبايل، مع خدمة صيانة الأجهزة وفيديوهات تعليمية. الطلب عبر الموقع ويتم تأكيده على واتساب.",
+      "telephone": "+201551831308",
+      "priceRange": "ج.م",
+      "currenciesAccepted": "EGP",
+      "paymentAccepted": "تحويل بنكي، فودافون كاش، انستاباي",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "شها",
+        "addressLocality": "المنصورة",
+        "addressRegion": "الدقهلية",
+        "addressCountry": "EG"
+      },
+      "areaServed": { "@type": "City", "name": "المنصورة" },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "telephone": "+201551831308",
+        "availableLanguage": ["ar"]
+      }
+    }
+    </script>
 </head>
 <body>
     <div id="app-splash" class="app-splash" role="status" aria-live="polite">
@@ -155,7 +186,7 @@
     <section class="store-catalog" id="store-catalog" aria-labelledby="store-catalog-title">
         <div class="store-catalog-heading">
             <div class="offers-heading-title-group">
-                <h2 id="store-catalog-title">منتجات المتجر</h2>
+                <h1 id="store-catalog-title">منتجات المتجر</h1>
                 <div class="offers-deadline" data-offers-deadline hidden>
                     <div class="offers-countdown" data-offers-units role="timer" aria-label="الوقت المتبقي لنهاية التخفيضات">
                         <span class="offers-countdown-unit"><strong data-offers-unit="days">0</strong><small>يوم</small></span>
@@ -275,29 +306,25 @@
     <div id="store-toast" class="store-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <nav id="mobile-bottom-nav" class="mobile-bottom-nav" aria-label="تنقل المتجر">
-        <button class="mobile-nav-item" type="button" data-nav="home" onclick="navigateMobileSection('home')" aria-label="الرئيسية">
-            <i class="fas fa-house" aria-hidden="true"></i>
-            <span>الرئيسية</span>
+        <button class="mobile-nav-item" type="button" data-nav="offers" onclick="navigateMobileSection('offers')" aria-label="التخفيضات والعروض الخاصة" aria-controls="store-catalog">
+            <i class="fas fa-fire" aria-hidden="true"></i>
+            <span id="mobile-nav-offers-label">التخفيضات</span>
         </button>
-        <button class="mobile-nav-item" type="button" data-nav="categories" onclick="navigateMobileSection('categories')" aria-label="الأقسام">
-            <i class="fas fa-th-large" aria-hidden="true"></i>
-            <span>الأقسام</span>
-        </button>
-        <button id="mobile-store-admin-button" class="mobile-nav-store" type="button" onclick="triggerAdmin(event)" aria-label="زر المتجر والدخول للإدارة">
-            <span class="mobile-nav-store-ring"><img id="mobile-nav-store-logo" class="store-brand-logo" src="logo.png" alt="متجر مشالى"></span>
-            <span id="mobile-nav-store-label">المتجر</span>
-        </button>
-        <button class="mobile-nav-item" type="button" data-nav="cart" onclick="toggleCart(true); setMobileNavActive('cart')" aria-label="سلة المشتريات">
+        <button class="mobile-nav-item" type="button" data-nav="cart" onclick="toggleCartFromNav()" aria-label="سلة المشتريات" aria-controls="cart-sidebar" aria-expanded="false">
             <span class="mobile-nav-icon-wrap"><i class="fas fa-shopping-basket" aria-hidden="true"></i><span id="mobile-cart-badge" class="mobile-nav-badge" hidden>0</span></span>
-            <span>السلة</span>
+            <span id="mobile-nav-cart-label">السلة</span>
+        </button>
+        <button id="mobile-store-admin-button" class="mobile-nav-store" type="button" data-nav="home" onclick="navigateMobileHome(event)" aria-label="الرئيسية: عرض كل المنتجات">
+            <span class="mobile-nav-store-ring"><img id="mobile-nav-store-logo" class="store-brand-logo" src="logo.png" alt="متجر مشالى"></span>
+            <span id="mobile-nav-store-label">الرئيسية</span>
         </button>
         <button id="mobile-nav-maintenance" class="mobile-nav-item" type="button" data-nav="maintenance" onclick="openMaintenanceRequest(); setMobileNavActive('maintenance')" aria-label="طلب صيانة">
             <i class="fas fa-screwdriver-wrench" aria-hidden="true"></i>
             <span id="mobile-nav-maintenance-label">الصيانة</span>
         </button>
-        <button class="mobile-nav-item" type="button" data-nav="videos" onclick="navigateMobileSection('videos')" aria-label="الفيديوهات">
+        <button class="mobile-nav-item" type="button" data-nav="videos" onclick="navigateMobileSection('videos')" aria-label="الفيديوهات التعليمية">
             <i class="fas fa-play-circle" aria-hidden="true"></i>
-            <span>الفيديوهات</span>
+            <span id="mobile-nav-videos-label">الفيديوهات</span>
         </button>
     </nav>
 

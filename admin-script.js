@@ -105,8 +105,8 @@ function downloadProductsExcel() {
     // ورقة الأصناف، مع حفظ صور الاختصارات الثابتة بجانب بقية الأقسام.
     const categoryImages = JSON.parse(localStorage.getItem('storeCategoryImages')) || {};
     const categoriesData = [
-        {name: 'الكل', 'صورة الصنف': categoryImages.all || 'category-images/all.svg', icon: 'fas fa-layer-group'},
-        {name: 'offers', 'صورة الصنف': categoryImages.offers || 'category-images/offers.svg', icon: 'fas fa-fire'},
+        {name: 'الكل', 'صورة الصنف': categoryImages.all || 'images/default.svg', icon: 'fas fa-layer-group'},
+        {name: 'offers', 'صورة الصنف': categoryImages.offers || 'images/offers.svg', icon: 'fas fa-fire'},
         ...categories.filter(c => !getPinnedCategoryType(c.name)).map(c => ({
             name: c.name,
             'صورة الصنف': c.image || '',
@@ -268,7 +268,7 @@ function loadCategories() {
 
     container.innerHTML = categories.map((c, index) => `
         <div class="item-card">
-            <h4><img src="${c.image || 'category-images/default.svg'}" alt="" width="24" height="24" style="vertical-align:middle; object-fit:contain;" onerror="this.src='category-images/default.svg'"> <i class="${c.icon}"></i> ${c.name}</h4>
+            <h4><img src="${c.image || 'images/default.svg'}" alt="" width="24" height="24" style="vertical-align:middle; object-fit:contain;" onerror="this.src='images/default.svg'"> <i class="${c.icon}"></i> ${c.name}</h4>
             <p>${c.description || ''}</p>
             <div class="item-actions">
                 <button class="btn btn-info" onclick="editCategory(${index})">
@@ -414,8 +414,8 @@ function openCategoryModal(categoryIndex = null) {
         </div>
         <div class="form-group">
             <label>صورة الصنف:</label>
-            <input type="text" id="category-image" list="category-image-options" value="${category ? category.image || '' : ''}" placeholder="category-images/example.svg">
-            <small>اكتب مسار الصورة داخل مجلد category-images أو اختر صورة مقترحة.</small>
+            <input type="text" id="category-image" list="category-image-options" value="${category ? category.image || '' : ''}" placeholder="images/default.svg">
+            <small>اكتب مسار الصورة داخل مجلد images أو اختر صورة مقترحة.</small>
         </div>
         <div class="form-group">
             <label>الوصف:</label>

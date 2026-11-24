@@ -831,9 +831,11 @@ async function initializeStore() {
     storeRefreshPromise.then(updated => {
         if (updated) refreshStoreViewFromLocalData();
         if (!hasCachedProducts) hideAppSplash();
+        handleStoreDeepLink();
     }).catch(error => {
         console.error('تعذر تحديث بيانات المتجر.', error);
         if (!hasCachedProducts) hideAppSplash();
+        handleStoreDeepLink();
     });
 
     updateCartUI();
@@ -1157,7 +1159,7 @@ function createProductCard(p, index = 0, animateEntrance = false) {
             </button>
             ${!isOut && p.status ? `<div class="pro-badge ${p.status==='عرض خاص'?'offer':''}">${p.status}</div>` : ''}
             ${discountPercent > 0 ? `<div class="product-discount-badge">خصم ${discountPercent}%</div>` : ''}
-            <img src="${escapeAcademyHtml(getProductImageSource(p.image))}" alt="${escapeAcademyHtml(p.name)}" onerror="this.onerror=null;this.src='category-images/default.svg'">
+            <img src="${escapeAcademyHtml(getProductImageSource(p.image))}" alt="${escapeAcademyHtml(p.name)}" onerror="this.onerror=null;this.src='images/default.svg'">
             ${isOut ? '<div class="out-badge">غير متوفر حالياً ❌</div>' : ''}
             <div class="product-info-overlay">${p.desc || 'منتج أصلي من متجر مشالي'}</div>
         </div>
@@ -1815,8 +1817,8 @@ function renderCategories() {
 
     // تظل الأقسام الخاصة مثبتة بالأول، لكن مسارات صورها تأتي من ورقة Categories.
     const categories = [
-        {name: 'الكل', icon: 'fas fa-layer-group', image: categoryImageSettings.all || 'category-images/all.svg'},
-        {name: 'offers', label: 'تخفيضات 🔥', icon: 'fas fa-fire', image: categoryImageSettings.offers || 'category-images/offers.svg'},
+        {name: 'الكل', icon: 'fas fa-layer-group', image: categoryImageSettings.all || 'images/default.svg'},
+        {name: 'offers', label: 'تخفيضات 🔥', icon: 'fas fa-fire', image: categoryImageSettings.offers || 'images/offers.svg'},
         ...categoriesFromStorage.filter(c => !isPinnedStoreCategory(c.name))
     ];
     const activeOffersCount = getDiscountedProducts().length;
@@ -1836,7 +1838,7 @@ function renderCategories() {
                 aria-pressed="${currentCategory === cat.name}"
                 data-category="${escapeAcademyHtml(cat.name)}"
                 aria-label="${escapeAcademyHtml(label)}">
-            <img class="category-image" src="${escapeAcademyHtml(image)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='category-images/default.svg'">
+            <img class="category-image" src="${escapeAcademyHtml(image)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='images/default.svg'">
             <span class="cat-label">${escapeAcademyHtml(label)}</span>
             <span class="cat-count">${count.toLocaleString('ar-EG')}</span>
         </button>`;
@@ -1866,19 +1868,19 @@ function getCategoryImageSource(image, icon = '') {
     let path = String(image || '').trim().replace(/\\/g, '/').replace(/^(?:\.\/)+/, '');
     if (!path) {
         const iconName = String(icon).toLowerCase();
-        if (iconName.includes('desktop')) path = 'category-images/computer.svg';
-        else if (iconName.includes('mobile')) path = 'category-images/mobile.svg';
-        else if (iconName.includes('print')) path = 'category-images/printer.svg';
-        else if (iconName.includes('camera')) path = 'category-images/camera.svg';
-        else if (iconName.includes('paperclip')) path = 'category-images/stationery.svg';
-        else if (iconName.includes('battery')) path = 'category-images/accessories.svg';
-        else if (iconName.includes('plug')) path = 'category-images/electronics.svg';
-        else path = 'category-images/default.svg';
+        if (iconName.includes('desktop')) path = 'images/computer.svg';
+        else if (iconName.includes('mobile')) path = 'images/mobile.svg';
+        else if (iconName.includes('print')) path = 'images/printer.svg';
+        else if (iconName.includes('camera')) path = 'images/camera.svg';
+        else if (iconName.includes('paperclip')) path = 'images/stationery.svg';
+        else if (iconName.includes('battery')) path = 'images/accessories.svg';
+        else if (iconName.includes('plug')) path = 'images/electronics.svg';
+        else path = 'images/default.svg';
     }
     if (/^(?:[a-z]+:|\/)/i.test(path) || path.split('/').includes('..')) {
-        return 'category-images/default.svg';
+        return 'images/default.svg';
     }
-    if (!path.includes('/')) path = `category-images/${path}`;
+    if (!path.includes('/')) path = `images/${path}`;
     return path.split('/').map(encodeURIComponent).join('/');
 }
 
@@ -2244,6 +2246,7 @@ function showWishlist() {
     
     sidebar.classList.add('active');
     overlay.classList.add('active');
+    syncCartNavState();
 }
 
 function closeWishlist() {
@@ -2251,6 +2254,7 @@ function closeWishlist() {
     const overlay = document.getElementById('overlay');
     sidebar.classList.remove('active');
     overlay.classList.remove('active');
+    syncCartNavState();
 }
 
 function removeFromWishlist(productId) {
@@ -2422,7 +2426,30 @@ function toggleCart(s){
         c.classList.remove('active');
         o.classList.remove('active');
     }
+    syncCartNavState();
+}
 
+// مزامنة حالة زر السلة في الشريط السفلي مع فتح/غلق الدرج، وإخفاء الشريط أثناء فتح أي درج.
+function syncCartNavState() {
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const wishlistSidebar = document.getElementById('wishlist-sidebar');
+    const cartOpen = Boolean(cartSidebar && cartSidebar.classList.contains('active'));
+    const wishlistOpen = Boolean(wishlistSidebar && wishlistSidebar.classList.contains('active'));
+    const navButton = document.querySelector('.mobile-bottom-nav [data-nav="cart"]');
+    if (navButton) {
+        navButton.classList.toggle('active', cartOpen);
+        navButton.setAttribute('aria-expanded', String(cartOpen));
+        if (cartOpen) navButton.setAttribute('aria-current', 'true');
+        else navButton.removeAttribute('aria-current');
+    }
+    document.body.classList.toggle('nav-covered', cartOpen || wishlistOpen);
+}
+
+// زر السلة في الشريط السفلي: فتح/غلق بنظام التبديل (Toggle).
+function toggleCartFromNav() {
+    const cartSidebar = document.getElementById('cart-sidebar');
+    if (!cartSidebar) return;
+    toggleCart(!cartSidebar.classList.contains('active'));
 }
 
 function togglePayment(method, selectedButton) {
@@ -2745,21 +2772,75 @@ function setMobileNavActive(section) {
     });
 }
 
+function scrollToStoreCatalog() {
+    const catalog = document.getElementById('store-catalog');
+    if (!catalog) return;
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    window.requestAnimationFrame(() => catalog.scrollIntoView({behavior, block: 'start'}));
+}
+
+function resetStoreFilters() {
+    const needsReset = currentCategory !== 'الكل' || Boolean(currentProductSearch) || currentSort !== 'default';
+    currentProductSearch = '';
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) searchInput.value = '';
+    const clearButton = document.getElementById('search-clear-btn');
+    if (clearButton) clearButton.hidden = true;
+    const sortSelect = document.getElementById('product-sort');
+    if (sortSelect) sortSelect.value = 'default';
+    currentSort = 'default';
+    if (needsReset) filterByCategory('الكل');
+}
+
+// زر منتصف الشريط السفلي: الرئيسية + بوابة الدخول السري للإدارة (خمس ضغطات متتالية).
+function navigateMobileHome(event) {
+    if (event) event.preventDefault();
+    navigateMobileSection('home');
+    triggerAdmin(event);
+}
+
 function navigateMobileSection(section) {
     if (section === 'home') {
         setMobileNavActive('home');
-        window.scrollTo({top: 0, behavior: 'smooth'});
+        resetStoreFilters();
+        window.scrollTo({top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+        return;
+    }
+    if (section === 'offers') {
+        setMobileNavActive('offers');
+        filterByCategory('offers');
+        animateStoreCatalogHeading();
+        scrollToStoreCatalog();
         return;
     }
     if (section === 'categories') {
         setMobileNavActive('categories');
         const categoryBar = document.querySelector('.market-category-bar');
-        if (categoryBar) categoryBar.scrollIntoView({behavior: 'smooth', block: 'start'});
+        if (categoryBar) {
+            const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+            categoryBar.scrollIntoView({behavior, block: 'start'});
+        }
         return;
     }
     if (section === 'videos') {
         setMobileNavActive('videos');
         window.location.href = 'academy.html';
+    }
+}
+
+// روابط الوصول المباشر من الشريط السفلي في صفحة الأكاديمية (index.html#offers ...).
+function handleStoreDeepLink() {
+    if (!document.getElementById('products-grid')) return;
+    const hash = String(window.location.hash || '').toLowerCase();
+    if (hash === '#offers') {
+        navigateMobileSection('offers');
+    } else if (hash === '#cart' || hash === '#cart-sidebar') {
+        toggleCart(true);
+    } else if (hash === '#maintenance') {
+        openMaintenanceRequest();
+        setMobileNavActive('maintenance');
+    } else if (hash === '#categories' || hash === '#product-cats') {
+        navigateMobileSection('categories');
     }
 }
 
@@ -2774,22 +2855,23 @@ function applyMobileBottomNavigation(settings = {}) {
     if (!enabled) return;
 
     const labels = {
-        home: settings.bottom_nav_home_label || 'الرئيسية',
-        categories: settings.bottom_nav_categories_label || 'الأقسام',
-        store: settings.bottom_nav_store_label || 'المتجر',
+        offers: settings.bottom_nav_offers_label || 'التخفيضات',
         cart: settings.bottom_nav_cart_label || 'السلة',
+        home: settings.bottom_nav_home_label || settings.bottom_nav_store_label || 'الرئيسية',
         maintenance: settings.bottom_nav_maintenance_label || 'الصيانة',
         videos: settings.bottom_nav_videos_label || 'الفيديوهات'
     };
     const labelsBySelector = [
-        ['[data-nav="home"] span', labels.home],
-        ['[data-nav="categories"] span', labels.categories],
-        ['[data-nav="cart"] span:last-child', labels.cart],
+        ['#mobile-nav-offers-label', labels.offers],
+        ['#academy-mobile-offers-label', labels.offers],
+        ['#mobile-nav-cart-label', labels.cart],
+        ['#academy-mobile-cart-label', labels.cart],
+        ['#mobile-nav-store-label', labels.home],
+        ['#academy-mobile-store-label', labels.home],
         ['#mobile-nav-maintenance-label', labels.maintenance],
-        ['[data-nav="videos"] span', labels.videos],
-        ['#mobile-nav-store-label', labels.store],
-        ['#academy-mobile-store-label', labels.store],
-        ['#academy-mobile-maintenance-label', labels.maintenance]
+        ['#academy-mobile-maintenance-label', labels.maintenance],
+        ['#mobile-nav-videos-label', labels.videos],
+        ['#academy-mobile-videos-label', labels.videos]
     ];
     labelsBySelector.forEach(([selector, value]) => {
         document.querySelectorAll(selector).forEach(element => { element.textContent = value; });
@@ -3777,8 +3859,8 @@ function initAcademyPage() {
     const videoTracks = JSON.parse(localStorage.getItem('academyVideoTracks') || '[]');
 
     const tracks = videoTracks.length
-        ? [{name: 'الكل', description: 'كل الدروس والفيديوهات', image: 'category-images/all.svg', icon: 'fas fa-layer-group'}, ...videoTracks]
-        : [{name: 'الكل', description: 'كل الدروس والفيديوهات', image: 'category-images/all.svg', icon: 'fas fa-layer-group'},
+        ? [{name: 'الكل', description: 'كل الدروس والفيديوهات', image: 'images/default.svg', icon: 'fas fa-layer-group'}, ...videoTracks]
+        : [{name: 'الكل', description: 'كل الدروس والفيديوهات', image: 'images/default.svg', icon: 'fas fa-layer-group'},
             ...[...new Set(videos.map(video => String(video.track || video.category || '').trim()).filter(Boolean))]
                 .map(name => ({name, description: '', image: '', icon: 'fas fa-play-circle'}))];
     const allVideosFilter = document.querySelector('#academy-library-filter option[value="all"]');
@@ -4125,7 +4207,7 @@ function renderAcademyVideoTools(video) {
             const isOut = product.stock === 'out';
             const image = getProductImageSource(product.image);
             return `<article class="academy-linked-product">
-                <img src="${escapeAcademyHtml(image)}" alt="${escapeAcademyHtml(product.name)}" loading="lazy" onerror="this.onerror=null;this.src='category-images/default.svg'">
+                <img src="${escapeAcademyHtml(image)}" alt="${escapeAcademyHtml(product.name)}" loading="lazy" onerror="this.onerror=null;this.src='images/default.svg'">
                 <div class="academy-linked-product-info">
                     <strong>${escapeAcademyHtml(product.name)}</strong>
                     <span>${Number(product.price || 0).toLocaleString('ar-EG')} ج.م</span>

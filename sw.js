@@ -2,7 +2,7 @@
    sw.js - Service Worker لتطبيق متجر مشالى (PWA)
    يخزن الملفات الأساسية مؤقتاً ليعمل التطبيق أونلاين/أوفلاين
    ============================================================ */
-const CACHE_NAME = 'mashily-store-v43';
+const CACHE_NAME = 'mashily-store-v45';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -19,22 +19,21 @@ const CORE_ASSETS = [
   './logo.png',
   './logo-splash.png',
   './video.png',
-  './category-images/default.svg',
-  './category-images/all.svg',
-  './category-images/offers.svg',
-  './category-images/quran.svg',
-  './category-images/athletics.svg',
-  './category-images/programming.svg',
-  './category-images/marketing.svg',
-  './category-images/design.svg',
-  './category-images/electronics.svg',
-  './category-images/computer.svg',
-  './category-images/mobile.svg',
-  './category-images/stationery.svg',
-  './category-images/printer.svg',
-  './category-images/camera.svg',
-  './category-images/accessories.svg',
-  './category-images/other.svg',
+  './images/default.svg',
+  './images/offers.svg',
+  './images/quran.svg',
+  './images/ibtihalat.svg',
+  './images/programming.svg',
+  './images/marketing.svg',
+  './images/design.svg',
+  './images/electronics.svg',
+  './images/computer.svg',
+  './images/mobile.svg',
+  './images/stationery.svg',
+  './images/printer.svg',
+  './images/camera.svg',
+  './images/accessories.svg',
+  './images/other.svg',
   './academy-video-icon.svg',
   './signature.png'
 ];

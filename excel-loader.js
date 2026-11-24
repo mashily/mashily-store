@@ -217,8 +217,8 @@ async function fetchStoreFromExcel() {
         const allCategory = categoryEntries.find(category => isAllCategory(category.name));
         const offersCategory = categoryEntries.find(category => isOffersCategory(category.name));
         data.categoryImages = {
-            all: allCategory && allCategory.image || 'category-images/all.svg',
-            offers: offersCategory && offersCategory.image || 'category-images/offers.svg'
+            all: allCategory && allCategory.image || 'images/default.svg',
+            offers: offersCategory && offersCategory.image || 'images/offers.svg'
         };
         data.categories = categoryEntries.filter(category => !isAllCategory(category.name) && !isOffersCategory(category.name));
 
@@ -459,8 +459,8 @@ function buildStoreWorkbook() {
     const categoryNameKey = name => String(name || '').trim().toLowerCase();
     const isPinnedCategory = name => ['الكل', 'كل الأصناف', 'كل الأقسام', 'all', 'offers', 'التخفيضات', 'تخفيضات'].includes(categoryNameKey(name));
     const catRows = [
-        {'الاسم': 'الكل', 'صورة الصنف': categoryImages.all || 'category-images/all.svg', 'الأيقونة': 'fas fa-layer-group'},
-        {'الاسم': 'offers', 'صورة الصنف': categoryImages.offers || 'category-images/offers.svg', 'الأيقونة': 'fas fa-fire'},
+        {'الاسم': 'الكل', 'صورة الصنف': categoryImages.all || 'images/default.svg', 'الأيقونة': 'fas fa-layer-group'},
+        {'الاسم': 'offers', 'صورة الصنف': categoryImages.offers || 'images/offers.svg', 'الأيقونة': 'fas fa-fire'},
         ...categoryEntries.filter(category => !isPinnedCategory(category.name)).map(category => ({
             'الاسم': category.name,
             'صورة الصنف': category.image || '',
@@ -567,8 +567,8 @@ function buildStoreWorkbook() {
         { 'المفتاح': 'maintenance_areas', 'القيمة': settings.maintenance_areas || '', 'الوصف': 'مناطق الخدمة مفصولة بفاصلة أو | أو سطر جديد (اختياري)' },
         { 'المفتاح': 'bottom_nav_enabled', 'القيمة': settings.bottom_nav_enabled !== undefined ? settings.bottom_nav_enabled : 'نعم', 'الوصف': 'إظهار شريط التنقل السفلي على الهاتف؛ نعم أو لا' },
         { 'المفتاح': 'bottom_nav_home_label', 'القيمة': settings.bottom_nav_home_label || 'الرئيسية', 'الوصف': 'اسم زر الرئيسية في الشريط السفلي' },
-        { 'المفتاح': 'bottom_nav_categories_label', 'القيمة': settings.bottom_nav_categories_label || 'الأقسام', 'الوصف': 'اسم زر الأقسام في الشريط السفلي' },
-        { 'المفتاح': 'bottom_nav_store_label', 'القيمة': settings.bottom_nav_store_label || 'المتجر', 'الوصف': 'اسم زر شعار المتجر المركزي؛ اضغط عليه خمس مرات للدخول للإدارة' },
+        { 'المفتاح': 'bottom_nav_offers_label', 'القيمة': settings.bottom_nav_offers_label || 'التخفيضات', 'الوصف': 'اسم زر التخفيضات في الشريط السفلي' },
+        { 'المفتاح': 'bottom_nav_store_label', 'القيمة': settings.bottom_nav_store_label || 'الرئيسية', 'الوصف': 'اسم الزر المركزي (الشعار) في الشريط السفلي؛ الضغط عليه خمس مرات يفتح لوحة التحكم' },
         { 'المفتاح': 'bottom_nav_cart_label', 'القيمة': settings.bottom_nav_cart_label || 'السلة', 'الوصف': 'اسم زر السلة في الشريط السفلي' },
         { 'المفتاح': 'bottom_nav_maintenance_label', 'القيمة': settings.bottom_nav_maintenance_label || 'الصيانة', 'الوصف': 'اسم زر طلب الصيانة في الشريط السفلي' },
         { 'المفتاح': 'bottom_nav_videos_label', 'القيمة': settings.bottom_nav_videos_label || 'الفيديوهات', 'الوصف': 'اسم زر الفيديوهات في الشريط السفلي' },

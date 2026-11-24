@@ -83,7 +83,7 @@
     </nav>
 
     <section class="academy-library" id="academy-library" aria-labelledby="academy-library-title">
-        <h2 id="academy-library-title" class="visually-hidden">دروس الأكاديمية</h2>
+        <h1 id="academy-library-title" class="visually-hidden">دروس الأكاديمية</h1>
         <span id="academy-results-count" class="academy-results-count" role="status" aria-live="polite"></span>
         <main class="video-grid" id="academy-grid" aria-label="دروس الأكاديمية">
             <div class="loader" style="grid-column: 1/-1; margin: 50px auto;"></div>
@@ -162,24 +162,21 @@
     </footer>
 
     <nav id="academy-mobile-bottom-nav" class="mobile-bottom-nav" aria-label="تنقل المتجر">
-        <button class="mobile-nav-item" type="button" onclick="window.location.href='index.html'" aria-label="الرئيسية">
-            <i class="fas fa-house" aria-hidden="true"></i><span>الرئيسية</span>
+        <button class="mobile-nav-item" type="button" onclick="window.location.href='index.html#offers'" aria-label="التخفيضات والعروض الخاصة">
+            <i class="fas fa-fire" aria-hidden="true"></i><span id="academy-mobile-offers-label">التخفيضات</span>
         </button>
-        <button class="mobile-nav-item" type="button" onclick="window.location.href='index.html#product-cats'" aria-label="الأقسام">
-            <i class="fas fa-th-large" aria-hidden="true"></i><span>الأقسام</span>
+        <button class="mobile-nav-item" type="button" onclick="window.location.href='index.html#cart'" aria-label="سلة المشتريات">
+            <i class="fas fa-shopping-basket" aria-hidden="true"></i><span id="academy-mobile-cart-label">السلة</span>
         </button>
-        <button class="mobile-nav-store" type="button" onclick="triggerAdmin(event)" aria-label="زر المتجر والدخول للإدارة">
+        <button class="mobile-nav-store" type="button" onclick="window.location.href='index.html'" aria-label="الرئيسية: عرض كل المنتجات">
             <span class="mobile-nav-store-ring"><img id="academy-mobile-store-logo" class="store-brand-logo" src="logo.png" alt="متجر مشالى"></span>
-            <span id="academy-mobile-store-label">المتجر</span>
+            <span id="academy-mobile-store-label">الرئيسية</span>
         </button>
-        <button class="mobile-nav-item" type="button" onclick="window.location.href='index.html#cart-sidebar'" aria-label="سلة المشتريات">
-            <i class="fas fa-shopping-basket" aria-hidden="true"></i><span>السلة</span>
-        </button>
-        <button id="academy-mobile-nav-maintenance" class="mobile-nav-item" type="button" onclick="window.location.href='index.html'; setTimeout(() => openMaintenanceRequest(), 500)" aria-label="طلب صيانة">
+        <button id="academy-mobile-nav-maintenance" class="mobile-nav-item" type="button" onclick="window.location.href='index.html#maintenance'" aria-label="طلب صيانة">
             <i class="fas fa-screwdriver-wrench" aria-hidden="true"></i><span id="academy-mobile-maintenance-label">الصيانة</span>
         </button>
-        <button class="mobile-nav-item active" type="button" aria-current="page" aria-label="الفيديوهات">
-            <i class="fas fa-play-circle" aria-hidden="true"></i><span>الفيديوهات</span>
+        <button class="mobile-nav-item active" type="button" aria-current="page" aria-label="الفيديوهات التعليمية" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            <i class="fas fa-play-circle" aria-hidden="true"></i><span id="academy-mobile-videos-label">الفيديوهات</span>
         </button>
     </nav>
 

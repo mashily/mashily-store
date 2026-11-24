@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# صفحات الإدارة والأدوات الداخلية (غير مخصصة للفهرسة)
+Disallow: /admin.html
+Disallow: /admin-new.html
+Disallow: /login.html
+Disallow: /manager.html
+
+Sitemap: https://mashily.github.io/mashily-store/sitemap.xml
