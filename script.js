@@ -167,15 +167,62 @@ function validateCustomerContact(contact) {
 }
 
 function getWhatsAppNumber(value) {
-    return String(value || '')
+    const digits = String(value || '')
         .replace(/[٠-٩]/g, digit => String(digit.charCodeAt(0) - 0x0660))
         .replace(/[۰-۹]/g, digit => String(digit.charCodeAt(0) - 0x06F0))
         .replace(/\D/g, '');
+    // تحويل الرقم المحلي المصري (01xxxxxxxxx) إلى الصيغة الدولية (201xxxxxxxxx)
+    if (/^01\d{9}$/.test(digits)) return '2' + digits;
+    return digits;
 }
 
 function isStoreSettingEnabled(value, fallback = true) {
     if (value === undefined || value === null || String(value).trim() === '') return fallback;
     return !['لا', 'no', 'false', '0', 'off'].includes(String(value).trim().toLowerCase());
+}
+
+// قراءة إعدادات المتجر المحفوظة من ملف Excel (أو db.json كنسخة احتياطية)
+function getStoreSettings() {
+    try {
+        const stored = JSON.parse(localStorage.getItem('storeSettings') || '{}');
+        return stored && typeof stored === 'object' ? stored : {};
+    } catch (error) {
+        return {};
+    }
+}
+
+// قراءة إعداد نصي واحد مع قيمة احتياطية
+function getStoreSettingText(key, fallback = '') {
+    const value = getStoreSettings()[key];
+    const text = value === undefined || value === null ? '' : String(value).trim();
+    return text || fallback;
+}
+
+// رمز العملة الظاهر بجوار الأسعار (قابل للتعديل من ورقة Settings)
+function getCurrencyLabel() {
+    return getStoreSettingText('currency_label', 'ج.م') || 'ج.م';
+}
+
+// تعبئة قوالب الرسائل القادمة من الإكسل: {name} {phone} {items} {total} ...
+// السطر الذي يحتوي على رمز بلا قيمة يُحذف تلقائياً حتى لا تظهر أسطر فارغة في واتساب.
+function formatStoreTemplate(template, values = {}) {
+    const source = String(template || '').trim();
+    if (!source) return '';
+    const rendered = [];
+    source.split(/\r?\n/).forEach(line => {
+        let hasEmptyToken = false;
+        const replaced = line.replace(/\{([a-zA-Z_][a-zA-Z0-9_]*)\}/g, (match, key) => {
+            const value = values[key];
+            if (value === undefined || value === null || String(value).trim() === '') {
+                hasEmptyToken = true;
+                return '';
+            }
+            return String(value);
+        });
+        if (hasEmptyToken) return;
+        rendered.push(replaced.replace(/[ \t]+$/, ''));
+    });
+    return rendered.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }
 
 function openStoreForm(dialogId) {
@@ -189,10 +236,11 @@ function closeStoreForm(dialogId) {
 }
 
 function getSelectedPaymentLabel() {
-    if (selectedPaymentMethod === 'vodafone') return 'فودافون كاش';
-    if (selectedPaymentMethod === 'instapay') return 'InstaPay';
-    const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
-    return `تحويل بنكي${settings.bank_name ? ` - ${settings.bank_name}` : ''}`;
+    const settings = getStoreSettings();
+    if (selectedPaymentMethod === 'vodafone') return getStoreSettingText('payment_vodafone_label', 'فودافون كاش');
+    if (selectedPaymentMethod === 'instapay') return getStoreSettingText('payment_instapay_label', 'InstaPay');
+    const cashLabel = getStoreSettingText('payment_cash_label', 'تحويل بنكي');
+    return settings.bank_name ? `${cashLabel} - ${settings.bank_name}` : cashLabel;
 }
 
 function updateProductOrderSummary() {
@@ -206,13 +254,13 @@ function updateProductOrderSummary() {
         const name = document.createElement('span');
         name.textContent = `${item.name} × ${item.qty}`;
         const price = document.createElement('strong');
-        price.textContent = `${(Number(item.price) * Number(item.qty)).toLocaleString('ar-EG')} ج.م`;
+        price.textContent = `${(Number(item.price) * Number(item.qty)).toLocaleString('ar-EG')} ${getCurrencyLabel()}`;
         row.append(name, price);
         summary.appendChild(row);
     });
     const total = document.createElement('div');
     total.className = 'product-order-summary-total';
-    total.textContent = `الإجمالي: ${document.getElementById('total-price')?.innerText || '0'} ج.م`;
+    total.textContent = `الإجمالي: ${document.getElementById('total-price')?.innerText || '0'} ${getCurrencyLabel()}`;
     summary.appendChild(total);
     if (payment) payment.textContent = getSelectedPaymentLabel();
 }
@@ -286,18 +334,21 @@ function submitMaintenanceRequest(event) {
     const issue = String(form.elements.namedItem('issue').value || '').trim();
     const area = String(form.elements.namedItem('area').value || '').trim();
     saveCustomerContactData(contact);
-    const message = [
-        `طلب صيانة جديد — متجر ${settings.brand_name || 'مشالى'}`,
-        `الاسم: ${contact.name}`,
-        `رقم الهاتف: ${contact.phone}`,
-        `العنوان: ${contact.address}`,
-        area ? `المنطقة: ${area}` : '',
-        `نوع الجهاز: ${device}`,
-        model ? `الماركة والموديل: ${model}` : '',
-        service ? `الخدمة المطلوبة: ${service}` : '',
-        `وصف العطل: ${issue}`,
-        `رابط المتجر: ${getStoreUrl()}`
-    ].filter(Boolean).join('\n');
+    const maintenanceTemplate = String(settings.maintenance_whatsapp_template || '').trim()
+        || 'طلب صيانة جديد — متجر {brand}\nالاسم: {name}\nرقم الهاتف: {phone}\nالعنوان: {address}\nالمنطقة: {area}\nنوع الجهاز: {device}\nالماركة والموديل: {model}\nالخدمة المطلوبة: {service}\nوصف العطل: {issue}\nرابط المتجر: {url}';
+    const message = formatStoreTemplate(maintenanceTemplate, {
+        brand: String(settings.brand_name || 'مشالى').trim(),
+        name: contact.name,
+        phone: contact.phone,
+        address: contact.address,
+        area,
+        device,
+        model,
+        service,
+        issue,
+        url: getStoreUrl(),
+        store_url: getStoreUrl()
+    });
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
     closeStoreForm('maintenance-request-dialog');
 }
@@ -350,7 +401,13 @@ function renderStoreFooter(settings = {}, policies = []) {
         descriptionElement.hidden = !description;
     }
     if (copyrightElement) {
-        copyrightElement.textContent = `© ${new Date().getFullYear()} متجر ${brandName} — جميع الحقوق محفوظة`;
+        const copyrightTemplate = String(settings.footer_copyright_template || '').trim()
+            || '© {year} متجر {brand} — جميع الحقوق محفوظة';
+        copyrightElement.textContent = formatStoreTemplate(copyrightTemplate, {
+            year: new Date().getFullYear(),
+            brand: brandName,
+            store_name: `متجر ${brandName}`
+        }) || `© ${new Date().getFullYear()} متجر ${brandName} — جميع الحقوق محفوظة`;
     }
 
     const address = String(settings.footer_address || '').trim();
@@ -482,6 +539,149 @@ function getProductVideoSource(source) {
     }
 }
 
+// تطبيق النصوص الظاهرة في الواجهة من ورقة Settings (بدلاً من نصوص ثابتة في الكود)
+function applyStoreTextSettings(settings = {}) {
+    const setText = (id, value) => {
+        const text = String(value || '').trim();
+        if (!text) return;
+        document.querySelectorAll(`#${id}`).forEach(element => { element.textContent = text; });
+    };
+    const setPlaceholder = (id, value) => {
+        const text = String(value || '').trim();
+        if (!text) return;
+        document.querySelectorAll(`#${id}`).forEach(element => { element.setAttribute('placeholder', text); });
+    };
+    const pageIsAcademy = Boolean(document.getElementById('academy-grid'));
+    const splashFallback = pageIsAcademy ? 'جاري تحميل الأكاديمية...' : 'جاري تحميل المتجر...';
+    const splashText = pageIsAcademy ? settings.academy_splash_text : settings.store_splash_text;
+    setText('app-splash-text', String(splashText || '').trim() || splashFallback);
+    setPlaceholder('search-input', settings.search_placeholder);
+    setPlaceholder('academy-search', settings.academy_search_placeholder);
+    setText('mode-store-label', String(settings.mode_store_label || '').trim() || 'المتجر');
+    setText('mode-academy-label', String(settings.mode_academy_label || '').trim() || 'الفيديوهات التعليمية');
+    setText('offers-catalog-title', String(settings.offers_title || '').trim() || 'تخفيضات');
+    const expiredText = String(settings.offers_expired_text || '').trim() || 'انتهت التخفيضات';
+    document.querySelectorAll('[data-offers-expired]').forEach(element => { element.textContent = expiredText; });
+    setText('install-label', String(settings.install_button_label || '').trim() || 'تثبيت التطبيق');
+    setText('cart-title', String(settings.cart_title || '').trim() || '🛒 السلة');
+    setText('cart-payment-prompt', String(settings.cart_payment_prompt || '').trim() || 'طريقة الدفع المفضلة');
+    setText('payment-cash-label', String(settings.payment_cash_label || '').trim() || 'تحويل بنكي');
+    setText('payment-vodafone-label', String(settings.payment_vodafone_label || '').trim() || 'فودافون كاش');
+    setText('payment-instapay-label', String(settings.payment_instapay_label || '').trim() || 'InstaPay');
+    setText('cart-checkout-label', String(settings.cart_checkout_label || '').trim() || 'تأكيد الطلب');
+    setText('cart-clear-label', String(settings.cart_clear_label || '').trim() || 'إفراغ السلة');
+    setText('cart-coupon-label', String(settings.cart_coupon_label || '').trim() || 'كوبون:');
+    const couponInput = document.getElementById('coupon-input');
+    const couponPlaceholder = String(settings.cart_coupon_placeholder || '').trim();
+    if (couponInput && couponPlaceholder) couponInput.setAttribute('placeholder', couponPlaceholder);
+    const couponButton = document.getElementById('cart-coupon-apply');
+    const couponButtonLabel = String(settings.cart_coupon_apply_label || '').trim();
+    if (couponButton && couponButtonLabel) couponButton.textContent = couponButtonLabel;
+    setText('product-checkout-title', String(settings.checkout_title || '').trim() || 'تأكيد طلب المنتجات');
+    setText('checkout-submit-label', String(settings.checkout_submit_label || '').trim() || 'متابعة إلى واتساب');
+    setText('maintenance-submit-label', String(settings.maintenance_submit_label || '').trim() || 'إرسال طلب الصيانة عبر واتساب');
+    setText('maintenance-request-title', String(settings.maintenance_form_title || '').trim() || 'طلب صيانة');
+    const cartNote = document.getElementById('cart-note');
+    if (cartNote) {
+        const note = String(settings.cart_note || '').trim();
+        cartNote.textContent = note;
+        cartNote.hidden = !note;
+    }
+}
+
+// تطبيق نصوص مقدمة المتجر (نصوص الترحيب) وألوانها وأحجامها من ورقة Settings
+function applyStoreHeroSettings(settings = {}) {
+    const hero = document.getElementById('store-hero');
+    if (!hero) return;
+    const enabled = isStoreSettingEnabled(settings.store_hero_enabled, true);
+    const brandName = String(settings.brand_name || 'مشالى').trim();
+    const texts = {
+        'store-hero-kicker': String(settings.store_hero_kicker || settings.site_tagline || '').trim(),
+        'store-hero-title': String(settings.store_hero_title || '').trim(),
+        'store-hero-highlight': String(settings.store_hero_highlight || '').trim(),
+        'store-hero-description': String(settings.store_hero_description || '').trim()
+    };
+    const hasContent = Object.values(texts).some(Boolean);
+    hero.hidden = !enabled || !hasContent;
+    if (hero.hidden) return;
+
+    Object.entries(texts).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.textContent = value;
+        element.hidden = !value;
+    });
+
+    const applyColor = (id, value) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        const color = String(value || '').trim();
+        element.style.color = /^#[0-9a-f]{6}$/i.test(color) ? color : '';
+    };
+    applyColor('store-hero-kicker', settings.store_hero_kicker_color);
+    applyColor('store-hero-title', settings.store_hero_title_color);
+    applyColor('store-hero-highlight', settings.store_hero_highlight_color);
+    applyColor('store-hero-description', settings.store_hero_description_color);
+
+    const size = (value, min, max, fallback) => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) && parsed > 0 ? Math.min(max, Math.max(min, parsed)) : fallback;
+    };
+    hero.style.setProperty('--store-hero-kicker-size', `${size(settings.store_hero_kicker_size, 10, 28, 14)}px`);
+    hero.style.setProperty('--store-hero-title-size', `${size(settings.store_hero_title_size, 12, 64, 45)}px`);
+    hero.style.setProperty('--store-hero-description-size', `${size(settings.store_hero_description_size, 10, 26, 16)}px`);
+}
+
+// تحديث بيانات JSON-LD من نفس إعدادات الإكسل حتى تتوافق معها محركات البحث
+function applyStructuredData(settings = {}) {
+    const script = document.getElementById('store-jsonld');
+    if (!script) return;
+    const rawUrl = String(settings.website || getStoreUrl() || '').trim();
+    const storeUrl = rawUrl ? (rawUrl.endsWith('/') ? rawUrl : `${rawUrl}/`) : DEFAULT_STORE_URL;
+    const brandName = String(settings.brand_name || 'مشالى').trim();
+    const logoPath = String(settings.brand_logo_image || 'logo.png').trim();
+    const logoUrl = /^https?:/i.test(logoPath) ? logoPath : `${storeUrl}${logoPath.replace(/^\.?\//, '')}`;
+    const phoneDigits = getWhatsAppNumber(settings.footer_phone || settings.whatsapp || settings.vodafone);
+    const paymentLabels = [
+        String(settings.payment_cash_label || '').trim() || 'تحويل بنكي',
+        String(settings.payment_vodafone_label || '').trim() || 'فودافون كاش',
+        String(settings.payment_instapay_label || '').trim() || 'InstaPay'
+    ];
+    const city = String(settings.store_city || '').trim();
+    const data = {
+        '@context': 'https://schema.org',
+        '@type': 'ElectronicsStore',
+        '@id': `${storeUrl}#store`,
+        name: brandName,
+        alternateName: String(settings.site_name || '').trim() || brandName,
+        url: storeUrl,
+        logo: logoUrl,
+        image: logoUrl,
+        description: String(settings.site_description || '').trim() || `متجر ${brandName} للإلكترونيات والفيديوهات التعليمية`,
+        priceRange: getCurrencyLabel(),
+        currenciesAccepted: String(settings.currency_code || 'EGP').trim() || 'EGP',
+        paymentAccepted: paymentLabels.join('، '),
+        address: {
+            '@type': 'PostalAddress',
+            streetAddress: String(settings.footer_address || '').trim(),
+            addressLocality: city,
+            addressRegion: String(settings.store_region || '').trim(),
+            addressCountry: String(settings.store_country || 'EG').trim() || 'EG'
+        }
+    };
+    if (phoneDigits.length >= 7 && phoneDigits.length <= 15) {
+        data.telephone = `+${phoneDigits}`;
+        data.contactPoint = {
+            '@type': 'ContactPoint',
+            contactType: 'customer service',
+            telephone: `+${phoneDigits}`,
+            availableLanguage: ['ar']
+        };
+    }
+    if (city) data.areaServed = { '@type': 'City', name: city };
+    script.textContent = JSON.stringify(data, null, 2);
+}
+
 function applySiteBranding(settings) {
     const brandName = settings.brand_name || 'مشالى';
     const siteName = settings.site_name || `متجر ${brandName} | الإلكترونيات`;
@@ -495,16 +695,24 @@ function applySiteBranding(settings) {
     const textValues = {
         'site-brand-name': brandName,
         'store-academy-name': academyName,
-        'academy-header-name': academyName,
         'academy-store-name': `متجر ${brandName}`,
         'academy-page-name': academyName,
         'academy-page-description': academyDescription,
-        'academy-footer-text': `© ${new Date().getFullYear()} ${academyName} - جميع الحقوق محفوظة`
+        'academy-footer-text': formatStoreTemplate(
+            String(settings.academy_footer_template || '').trim() || '© {year} {academy_name} - جميع الحقوق محفوظة',
+            { year: new Date().getFullYear(), academy_name: academyName, brand: brandName }
+        )
     };
     Object.entries(textValues).forEach(([id, value]) => {
         const element = document.getElementById(id);
         if (element && value) element.textContent = value;
     });
+    const taglineElement = document.getElementById('site-tagline');
+    if (taglineElement) {
+        const tagline = String(settings.site_tagline || '').trim();
+        taglineElement.textContent = tagline;
+        taglineElement.hidden = !tagline;
+    }
     const academyHeaderLink = document.getElementById('academy-header-link');
     if (academyHeaderLink) academyHeaderLink.setAttribute('aria-label', academyName);
 
@@ -580,6 +788,17 @@ function applySiteBranding(settings) {
     document.querySelectorAll('meta[name="theme-color"]').forEach(meta => meta.setAttribute('content', themeColor));
     const splash = document.getElementById('app-splash');
     if (splash) splash.style.setProperty('--app-splash-color', themeColor);
+    const website = String(settings.website || '').trim();
+    if (website) {
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) canonical.href = pageIsAcademy ? `${website.replace(/\/$/, '')}/academy.html` : website;
+        document.querySelectorAll('meta[property="og:url"]').forEach(meta => {
+            meta.setAttribute('content', pageIsAcademy ? `${website.replace(/\/$/, '')}/academy.html` : website);
+        });
+    }
+    applyStoreTextSettings(settings);
+    applyStoreHeroSettings(settings);
+    applyStructuredData(settings);
     applyMobileBottomNavigation(settings);
     initializeOneSignalPush(settings);
 }
@@ -613,12 +832,17 @@ function refreshStoreData() {
             const response = await fetch('db.json?v=' + new Date().getTime());
             if (!response.ok) return false;
             const data = await response.json();
-            if(data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
-            if(data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
-            if(data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
-            if(data.ticker) localStorage.setItem('tickerText', data.ticker);
-            if(data.proof) localStorage.setItem('proofText', data.proof);
-            if(data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
+            if (typeof applyStoreData === 'function') {
+                // db.json مطابق لملف Excel ويحمل نفس البنية، لذا يُطبّق بالكامل
+                applyStoreData(data);
+            } else {
+                if(data.products) localStorage.setItem('storeProducts', JSON.stringify(data.products));
+                if(data.categories) localStorage.setItem('storeCategories', JSON.stringify(data.categories));
+                if(data.videos) localStorage.setItem('academyVideos', JSON.stringify(data.videos));
+                if(data.ticker) localStorage.setItem('tickerText', data.ticker);
+                if(data.proof) localStorage.setItem('proofText', data.proof);
+                if(data.coupons) localStorage.setItem('storeCoupons', JSON.stringify(data.coupons));
+            }
             await loadDriveImageIndex();
             return true;
         } catch (error) {
@@ -653,8 +877,13 @@ function applyPaymentSettings(settings) {
         const waFloat = document.getElementById('wa-float-btn');
         if(waFloat) {
             const storeUrl = getStoreUrl();
-            const greet = `أريد تصفح المتجر: ${storeUrl}`;
-            waFloat.href = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(greet)}`;
+            const brandName = String(settings.brand_name || 'مشالى').trim();
+            const floatTemplate = String(settings.whatsapp_float_message || '').trim() || 'أريد تصفح المتجر: {store_url}';
+            const greet = formatStoreTemplate(floatTemplate, { store_url: storeUrl, url: storeUrl, brand: brandName })
+                || `أريد تصفح المتجر: ${storeUrl}`;
+            waFloat.href = `https://wa.me/${getWhatsAppNumber(settings.whatsapp)}?text=${encodeURIComponent(greet)}`;
+            waFloat.setAttribute('aria-label', String(settings.whatsapp_float_label || '').trim() || 'تواصل معنا على واتساب');
+            waFloat.title = String(settings.whatsapp_float_label || '').trim() || 'تواصل معنا على واتساب';
         }
     }
 }
@@ -1146,6 +1375,7 @@ function createProductCard(p, index = 0, animateEntrance = false) {
     const oldPrice = p.originalPrice || p.oldPrice;
     const discountPercent = oldPrice ? Math.round(((oldPrice - p.price) / oldPrice) * 100) : 0;
     const hasDiscount = Number(oldPrice) > Number(p.price);
+    const currencyLabel = getCurrencyLabel();
     
     return `
     <div class="product-card ${isOut ? 'product-unavailable' : ''} ${animateEntrance ? 'store-entrance' : ''}" data-product-id="${escapeAcademyHtml(p.id)}" ${animateEntrance ? `style="--entrance-index:${Math.min(index, 11)}"` : ''} onclick="if(!event.target.closest('button,a,input,select,textarea')) openProductDetails(${p.id})" onmouseleave="hideAllInfos()">
@@ -1167,8 +1397,8 @@ function createProductCard(p, index = 0, animateEntrance = false) {
             ${renderProductRating(p)}
             <h4><button class="product-title-btn" type="button" onclick="openProductDetails(${p.id})">${p.name}</button></h4>
             <div class="price-tag">
-                <span class="sale-price">${p.price} <small>ج.م</small></span>
-                ${hasDiscount ? `<span class="old-price"><span>السعر قبل الخصم</span><s>${oldPrice} ج.م</s></span>` : ''}
+                <span class="sale-price">${p.price} <small>${currencyLabel}</small></span>
+                ${hasDiscount ? `<span class="old-price"><span>السعر قبل الخصم</span><s>${oldPrice} ${currencyLabel}</s></span>` : ''}
             </div>
             ${hasTimer ? renderProductCountdown(p) : ''}
         </div>
@@ -1241,9 +1471,10 @@ function openProductDetails(id) {
     document.getElementById('modal-desc').innerText = product.description;
     
     // السعر
+    const currencyLabel = getCurrencyLabel();
     const priceHTML = `
-        ${oldPrice ? `<s style="color:#999; font-size:1.1rem; margin-left:10px;">${oldPrice} ج.م</s> ` : ''}
-        <span style="font-size:1.5rem; color:var(--primary);">${product.price} ج.م</span>
+        ${oldPrice ? `<s style="color:#999; font-size:1.1rem; margin-left:10px;">${oldPrice} ${currencyLabel}</s> ` : ''}
+        <span style="font-size:1.5rem; color:var(--primary);">${product.price} ${currencyLabel}</span>
     `;
     document.getElementById('modal-price-area').innerHTML = priceHTML;
 
@@ -2234,7 +2465,7 @@ function showWishlist() {
                 <img src="${item.image}" alt="${item.name}" style="width:60px; height:60px; object-fit:contain; border-radius:6px; background:white; padding:5px;">
                 <div style="flex:1;">
                     <h5 style="margin:0 0 3px 0; font-size:0.85rem; color:var(--text);">${item.name}</h5>
-                    <div style="color:var(--primary); font-weight:bold; font-size:0.9rem; margin-bottom:5px;">${item.price} ج.م</div>
+                    <div style="color:var(--primary); font-weight:bold; font-size:0.9rem; margin-bottom:5px;">${item.price} ${getCurrencyLabel()}</div>
                     <div style="display:flex; gap:5px;">
                         <button onclick="addToCart(${item.id}); showWishlist();" style="background:var(--primary); color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer; flex:1;">إضافة للسلة</button>
                         <button onclick="removeFromWishlist(${item.id}); showWishlist();" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer;">حذف</button>
@@ -2352,12 +2583,12 @@ function updateCartUI() {
     const totalArea = document.getElementById('cart-total-area');
     if(totalArea) {
         totalArea.innerHTML = `
-            ${discountAmount > 0 ? `<div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#777; margin-bottom:5px;"><span>المجموع الفرعي:</span><span>${total} ج.م</span></div>` : ''}
-            ${discountAmount > 0 ? `<div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#27ae60; margin-bottom:5px;"><span>خصم (${appliedCoupon.code}):</span><span>-${Math.floor(discountAmount)} ج.م</span></div>` : ''}
+            ${discountAmount > 0 ? `<div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#777; margin-bottom:5px;"><span>المجموع الفرعي:</span><span>${total} ${getCurrencyLabel()}</span></div>` : ''}
+            ${discountAmount > 0 ? `<div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#27ae60; margin-bottom:5px;"><span>خصم (${appliedCoupon.code}):</span><span>-${Math.floor(discountAmount)} ${getCurrencyLabel()}</span></div>` : ''}
             <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; border-top:${discountAmount > 0 ? '1px solid #ddd; padding-top:5px' : 'none'}">
                 <span style="color:#555; font-size:0.9rem;">الإجمالي:</span>
                 <div style="color:var(--primary); font-size:1.3rem; font-weight:900;">
-                    <span id="total-price">${Math.floor(finalTotal)}</span> <small style="font-size:0.8rem; color:#777;">ج.م</small>
+                    <span id="total-price">${Math.floor(finalTotal)}</span> <small style="font-size:0.8rem; color:#777;">${getCurrencyLabel()}</small>
                 </div>
             </div>
         `;
@@ -2366,6 +2597,9 @@ function updateCartUI() {
     const container = document.getElementById('cart-items');
     if(!container) return;
 
+    const emptyCartText = getStoreSettingText('cart_empty_text', 'السلة فارغة');
+    const removeItemLabel = getStoreSettingText('cart_remove_label', 'حذف');
+    const currency = getCurrencyLabel();
     container.innerHTML = cart.map((item, idx) => `
         <div style="display:flex; gap:10px; background:var(--bg); padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border);">
             <!-- الصورة -->
@@ -2375,7 +2609,7 @@ function updateCartUI() {
             <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between;">
                 <div>
                     <b style="font-size:0.85rem; color:var(--text); display:block; line-height:1.2; margin-bottom:2px;">${item.name}</b>
-                    <small style="color:var(--primary); font-weight:bold; font-size:0.9rem;">${item.price} ج.م</small>
+                    <small style="color:var(--primary); font-weight:bold; font-size:0.9rem;">${item.price} ${currency}</small>
                 </div>
                 
                 <!-- الكمية والأزرار -->
@@ -2383,14 +2617,14 @@ function updateCartUI() {
                     <button onclick="changeQty(${idx},-1); return false;" style="width:24px; height:24px; background:var(--primary); color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;">−</button>
                     <span style="min-width:20px; text-align:center; font-weight:bold; color:var(--text);">${item.qty}</span>
                     <button onclick="changeQty(${idx},1); return false;" style="width:24px; height:24px; background:var(--primary); color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;">+</button>
-                    <button onclick="removeFromCart(${idx}); return false;" style="margin-right:auto; background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold;">حذف</button>
+                    <button onclick="removeFromCart(${idx}); return false;" style="margin-right:auto; background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold;">${removeItemLabel}</button>
                 </div>
             </div>
         </div>
     `).join('') || `
         <div style="text-align:center; padding:40px 20px; color:var(--text-light);">
             <i class="fas fa-shopping-basket fa-3x" style="margin-bottom:10px; opacity:0.5;"></i>
-            <p style="margin:10px 0 0 0; font-size:0.9rem;">السلة فارغة</p>
+            <p style="margin:10px 0 0 0; font-size:0.9rem;">${emptyCartText}</p>
         </div>
     `;
 }
@@ -2403,7 +2637,7 @@ function removeFromCart(i){
 }
 function clearCart() {
     if(cart.length === 0) return;
-    if(confirm('هل أنت متأكد من حذف جميع المنتجات من السلة؟')) {
+    if(confirm(getStoreSettingText('cart_clear_confirm', 'هل أنت متأكد من حذف جميع المنتجات من السلة؟'))) {
         cart = [];
         appliedCoupon = null; // إلغاء الكوبون عند تفريغ السلة
         document.getElementById('coupon-msg').innerText = '';
@@ -2510,14 +2744,14 @@ function applyCoupon() {
         if (coupon.minSpend && subTotal < coupon.minSpend) {
             appliedCoupon = null;
             msg.style.color = '#e74c3c';
-            msg.innerText = `❌ يجب أن تكون قيمة السلة ${coupon.minSpend} ج.م على الأقل.`;
+            msg.innerText = `❌ يجب أن تكون قيمة السلة ${coupon.minSpend} ${getCurrencyLabel()} على الأقل.`;
             updateCartUI();
             return;
         }
 
         appliedCoupon = coupon;
         msg.style.color = '#27ae60';
-        msg.innerText = `✅ تم تطبيق خصم ${coupon.value}${coupon.type === 'percent' ? '%' : 'ج.م'}`;
+        msg.innerText = `✅ تم تطبيق خصم ${coupon.value}${coupon.type === 'percent' ? '%' : getCurrencyLabel()}`;
     } else {
         appliedCoupon = null;
         msg.style.color = '#e74c3c';
@@ -2560,20 +2794,21 @@ function submitProductOrder(event) {
     if (selectedPaymentMethod === 'cash' && settings.bank_account) {
         paymentText += ` - رقم الحساب: ${settings.bank_account}`;
     }
-    const message = [
-        `طلب جديد من متجر ${settings.brand_name || 'مشالى'}`,
-        `الاسم: ${contact.name}`,
-        `رقم الهاتف: ${contact.phone}`,
-        `العنوان: ${contact.address}`,
-        '',
-        'المنتجات:',
-        details,
-        appliedCoupon ? `كوبون الخصم: ${appliedCoupon.code}` : '',
-        `الإجمالي النهائي: ${document.getElementById('total-price')?.innerText || '0'} ج.م`,
-        `طريقة الدفع: ${paymentText}`,
-        '',
-        `رابط المتجر: ${getStoreUrl()}`
-    ].filter(Boolean).join('\n');
+    const orderTemplate = String(settings.order_whatsapp_template || '').trim()
+        || 'طلب جديد من متجر {brand}\nالاسم: {name}\nرقم الهاتف: {phone}\nالعنوان: {address}\n\nالمنتجات:\n{items}\nكوبون الخصم: {coupon}\nالإجمالي النهائي: {total} {currency}\nطريقة الدفع: {payment}\n\nرابط المتجر: {url}';
+    const message = formatStoreTemplate(orderTemplate, {
+        brand: String(settings.brand_name || 'مشالى').trim(),
+        name: contact.name,
+        phone: contact.phone,
+        address: contact.address,
+        items: details,
+        coupon: appliedCoupon ? appliedCoupon.code : '',
+        total: document.getElementById('total-price')?.innerText || '0',
+        currency: getCurrencyLabel(),
+        payment: paymentText,
+        url: getStoreUrl(),
+        store_url: getStoreUrl()
+    });
 
     const history = JSON.parse(localStorage.getItem('orderHistory') || '[]');
     history.unshift({
@@ -2732,12 +2967,13 @@ function shareProduct(id, event) {
     const specs = Array.isArray(product.specs)
         ? product.specs.filter(Boolean).join('، ')
         : String(product.specs || '').trim();
+    const currencyLabel = getCurrencyLabel();
     const message = [
         `مرحباً، أود الاستفسار عن هذا المنتج من متجر ${storeName}:`,
         '',
         `اسم الصنف: ${product.name}`,
-        `السعر: ${price.toLocaleString('ar-EG')} ج.م`,
-        oldPrice > price ? `السعر قبل الخصم: ${oldPrice.toLocaleString('ar-EG')} ج.م` : '',
+        `السعر: ${price.toLocaleString('ar-EG')} ${currencyLabel}`,
+        oldPrice > price ? `السعر قبل الخصم: ${oldPrice.toLocaleString('ar-EG')} ${currencyLabel}` : '',
         description ? `التفاصيل: ${description}` : '',
         specs ? `المواصفات: ${specs}` : '',
         `التوفر: ${getProductAvailabilityText(product.stock)}`,
@@ -4210,7 +4446,7 @@ function renderAcademyVideoTools(video) {
                 <img src="${escapeAcademyHtml(image)}" alt="${escapeAcademyHtml(product.name)}" loading="lazy" onerror="this.onerror=null;this.src='images/default.svg'">
                 <div class="academy-linked-product-info">
                     <strong>${escapeAcademyHtml(product.name)}</strong>
-                    <span>${Number(product.price || 0).toLocaleString('ar-EG')} ج.م</span>
+                    <span>${Number(product.price || 0).toLocaleString('ar-EG')} ${getCurrencyLabel()}</span>
                 </div>
                 <button type="button" ${isOut ? 'disabled' : ''} onclick="addToCart(${Number.isFinite(Number(product.id)) ? Number(product.id) : JSON.stringify(String(product.id))}, 1, event, false)" aria-label="إضافة ${escapeAcademyHtml(product.name)} إلى السلة">
                     <i class="fas fa-cart-plus" aria-hidden="true"></i>${isOut ? 'غير متوفر' : 'أضف للسلة'}

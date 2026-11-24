@@ -341,19 +341,19 @@ async function fetchStoreFromExcel() {
         // أوراق منفصلة للأخبار والإشعارات، مع دعم الورقة القديمة المختلطة.
         const notifRows = sheetToObjects(wb.Sheets['Notifications']);
         const hasTickerSheet = Boolean(wb.Sheets['Ticker']);
-        if (hasTickerSheet) data.ticker = '';
         const tickerMessages = getTickerMessages(
             hasTickerSheet ? sheetToObjects(wb.Sheets['Ticker']) : notifRows,
             !hasTickerSheet
         );
+        // إذا كانت ورقة Ticker فارغة (أو بدون رسائل مفعلة) يُستخدم مفتاح ticker من ورقة Settings كنسخة احتياطية
         data.tickerMessages = tickerMessages.length
             ? tickerMessages
-            : (!hasTickerSheet && data.ticker ? [{ text: data.ticker, duration: 5, speed: 20 }] : []);
+            : (data.ticker ? [{ text: data.ticker, duration: 5, speed: 20 }] : []);
         const proofMessages = getProofMessages(notifRows, !hasTickerSheet);
         data.proofMessages = proofMessages.length
             ? proofMessages
-            : (!hasTickerSheet && data.proof
-                ? data.proof.split(',').map(text => ({ text: text.trim(), duration: 5, interval: 16 })).filter(item => item.text)
+            : (data.proof
+                ? String(data.proof).split(',').map(text => ({ text: text.trim(), duration: 5, interval: 16 })).filter(item => item.text)
                 : []);
 
         const popupRows = wb.Sheets['Popups'] ? sheetToObjects(wb.Sheets['Popups']) : [];
@@ -575,6 +575,46 @@ function buildStoreWorkbook() {
         { 'المفتاح': 'bottom_nav_active_color', 'القيمة': settings.bottom_nav_active_color || '', 'الوصف': 'لون زر التنقل النشط بصيغة HEX؛ اتركه فارغاً لاستخدام لون الثيم' },
         { 'المفتاح': 'onesignal_enabled', 'القيمة': settings.onesignal_enabled || 'لا', 'الوصف': 'تفعيل إشعارات OneSignal في الويب؛ نعم أو لا' },
         { 'المفتاح': 'onesignal_app_id', 'القيمة': settings.onesignal_app_id || '', 'الوصف': 'App ID الخاص بتطبيق OneSignal (يُعطى من لوحة OneSignal ولا يعد سرًا)' },
+        { 'المفتاح': 'site_tagline', 'القيمة': settings.site_tagline || 'الإلكترونيات والفيديوهات التعليمية', 'الوصف': 'العبارة أسفل شعار المتجر وتُستخدم كعبارة ترحيب احتياطية' },
+        { 'المفتاح': 'currency_label', 'القيمة': settings.currency_label || 'ج.م', 'الوصف': 'رمز العملة الظاهر بجوار كل سعر' },
+        { 'المفتاح': 'currency_code', 'القيمة': settings.currency_code || 'EGP', 'الوصف': 'كود العملة في بيانات السيو (مثال: EGP)' },
+        { 'المفتاح': 'store_city', 'القيمة': settings.store_city || '', 'الوصف': 'المدينة (تظهر في بيانات السيو لمحركات البحث)' },
+        { 'المفتاح': 'store_region', 'القيمة': settings.store_region || '', 'الوصف': 'المحافظة (تظهر في بيانات السيو لمحركات البحث)' },
+        { 'المفتاح': 'store_country', 'القيمة': settings.store_country || 'EG', 'الوصف': 'كود الدولة في بيانات السيو (مثال: EG)' },
+        { 'المفتاح': 'store_hero_enabled', 'القيمة': settings.store_hero_enabled !== undefined ? settings.store_hero_enabled : 'نعم', 'الوصف': 'إظهار مقدمة المتجر أعلى الصفحة؛ نعم أو لا' },
+        { 'المفتاح': 'store_splash_text', 'القيمة': settings.store_splash_text || 'جاري تحميل المتجر...', 'الوصف': 'نص شاشة التحميل في صفحة المتجر' },
+        { 'المفتاح': 'academy_splash_text', 'القيمة': settings.academy_splash_text || 'جاري تحميل الأكاديمية...', 'الوصف': 'نص شاشة التحميل في صفحة الأكاديمية' },
+        { 'المفتاح': 'search_placeholder', 'القيمة': settings.search_placeholder || 'ابحث باسم المنتج أو القسم أو المواصفات', 'الوصف': 'النص التوضيحي داخل مربع البحث في المتجر' },
+        { 'المفتاح': 'academy_search_placeholder', 'القيمة': settings.academy_search_placeholder || 'ابحث باسم الدرس أو القسم...', 'الوصف': 'النص التوضيحي داخل مربع البحث في الأكاديمية' },
+        { 'المفتاح': 'mode_store_label', 'القيمة': settings.mode_store_label || 'المتجر', 'الوصف': 'اسم زر المتجر في مفتاح التبديل أعلى الصفحة' },
+        { 'المفتاح': 'mode_academy_label', 'القيمة': settings.mode_academy_label || 'الفيديوهات التعليمية', 'الوصف': 'اسم زر الأكاديمية في مفتاح التبديل أعلى الصفحة' },
+        { 'المفتاح': 'offers_title', 'القيمة': settings.offers_title || 'تخفيضات', 'الوصف': 'عنوان قسم التخفيضات في الصفحة الرئيسية' },
+        { 'المفتاح': 'offers_expired_text', 'القيمة': settings.offers_expired_text || 'انتهت التخفيضات', 'الوصف': 'نص يظهر عند انتهاء مدة التخفيضات' },
+        { 'المفتاح': 'cart_title', 'القيمة': settings.cart_title || '🛒 السلة', 'الوصف': 'عنوان درج سلة المشتريات' },
+        { 'المفتاح': 'cart_empty_text', 'القيمة': settings.cart_empty_text || 'السلة فارغة', 'الوصف': 'النص الذي يظهر عندما تكون السلة فارغة' },
+        { 'المفتاح': 'cart_remove_label', 'القيمة': settings.cart_remove_label || 'حذف', 'الوصف': 'نص زر حذف صنف من السلة' },
+        { 'المفتاح': 'cart_clear_confirm', 'القيمة': settings.cart_clear_confirm || 'هل أنت متأكد من حذف جميع المنتجات من السلة؟', 'الوصف': 'رسالة تأكيد إفراغ السلة' },
+        { 'المفتاح': 'cart_checkout_label', 'القيمة': settings.cart_checkout_label || 'تأكيد الطلب', 'الوصف': 'نص زر تأكيد الطلب داخل السلة' },
+        { 'المفتاح': 'cart_clear_label', 'القيمة': settings.cart_clear_label || 'إفراغ السلة', 'الوصف': 'نص زر تفريغ السلة' },
+        { 'المفتاح': 'cart_note', 'القيمة': settings.cart_note || '', 'الوصف': 'ملاحظة اختيارية تظهر أسفل السلة (مثال: سياسة الشحن أو التوصيل)' },
+        { 'المفتاح': 'cart_payment_prompt', 'القيمة': settings.cart_payment_prompt || 'طريقة الدفع المفضلة', 'الوصف': 'النص فوق أزرار طرق الدفع في السلة' },
+        { 'المفتاح': 'cart_coupon_label', 'القيمة': settings.cart_coupon_label || 'كوبون:', 'الوصف': 'نص عنوان خانة الكوبون في السلة' },
+        { 'المفتاح': 'cart_coupon_placeholder', 'القيمة': settings.cart_coupon_placeholder || 'الكود', 'الوصف': 'النص التوضيحي داخل خانة الكوبون' },
+        { 'المفتاح': 'cart_coupon_apply_label', 'القيمة': settings.cart_coupon_apply_label || 'تطبيق', 'الوصف': 'نص زر تطبيق الكوبون' },
+        { 'المفتاح': 'payment_cash_label', 'القيمة': settings.payment_cash_label || 'تحويل بنكي', 'الوصف': 'اسم طريقة الدفع بالتحويل البنكي' },
+        { 'المفتاح': 'payment_vodafone_label', 'القيمة': settings.payment_vodafone_label || 'فودافون كاش', 'الوصف': 'اسم طريقة الدفع فودافون كاش' },
+        { 'المفتاح': 'payment_instapay_label', 'القيمة': settings.payment_instapay_label || 'InstaPay', 'الوصف': 'اسم طريقة الدفع انستاباي' },
+        { 'المفتاح': 'checkout_title', 'القيمة': settings.checkout_title || 'تأكيد طلب المنتجات', 'الوصف': 'عنوان نافذة تأكيد الطلب' },
+        { 'المفتاح': 'checkout_submit_label', 'القيمة': settings.checkout_submit_label || 'متابعة إلى واتساب', 'الوصف': 'نص زر إرسال الطلب إلى واتساب' },
+        { 'المفتاح': 'maintenance_form_title', 'القيمة': settings.maintenance_form_title || 'طلب صيانة', 'الوصف': 'عنوان نافذة طلب الصيانة' },
+        { 'المفتاح': 'maintenance_submit_label', 'القيمة': settings.maintenance_submit_label || 'إرسال طلب الصيانة عبر واتساب', 'الوصف': 'نص زر إرسال طلب الصيانة' },
+        { 'المفتاح': 'install_button_label', 'القيمة': settings.install_button_label || 'تثبيت التطبيق', 'الوصف': 'نص زر تثبيت التطبيق على الهاتف' },
+        { 'المفتاح': 'whatsapp_float_label', 'القيمة': settings.whatsapp_float_label || 'تواصل معنا على واتساب', 'الوصف': 'الوصف الظاهر عند مرور المؤشر على زر واتساب العائم' },
+        { 'المفتاح': 'whatsapp_float_message', 'القيمة': settings.whatsapp_float_message || 'أريد تصفح المتجر: {store_url}', 'الوصف': 'نص رسالة زر واتساب العائم؛ استخدم {store_url} لإدراج رابط المتجر' },
+        { 'المفتاح': 'order_whatsapp_template', 'القيمة': settings.order_whatsapp_template || 'طلب جديد من متجر {brand}\nالاسم: {name}\nرقم الهاتف: {phone}\nالعنوان: {address}\n\nالمنتجات:\n{items}\nكوبون الخصم: {coupon}\nالإجمالي النهائي: {total} {currency}\nطريقة الدفع: {payment}\n\nرابط المتجر: {url}', 'الوصف': 'قالب رسالة الطلب: {brand} {name} {phone} {address} {items} {coupon} {total} {currency} {payment} {url}' },
+        { 'المفتاح': 'maintenance_whatsapp_template', 'القيمة': settings.maintenance_whatsapp_template || 'طلب صيانة جديد — متجر {brand}\nالاسم: {name}\nرقم الهاتف: {phone}\nالعنوان: {address}\nالمنطقة: {area}\nنوع الجهاز: {device}\nالماركة والموديل: {model}\nالخدمة المطلوبة: {service}\nوصف العطل: {issue}\nرابط المتجر: {url}', 'الوصف': 'قالب رسالة الصيانة: {brand} {name} {phone} {address} {area} {device} {model} {service} {issue} {url}' },
+        { 'المفتاح': 'footer_copyright_template', 'القيمة': settings.footer_copyright_template || '© {year} متجر {brand} — جميع الحقوق محفوظة', 'الوصف': 'نص حقوق النشر في تذييل المتجر؛ {year} و {brand}' },
+        { 'المفتاح': 'academy_footer_template', 'القيمة': settings.academy_footer_template || '© {year} {academy_name} - جميع الحقوق محفوظة', 'الوصف': 'نص حقوق النشر في تذييل الأكاديمية؛ {year} و {academy_name}' },
         { 'المفتاح': 'website', 'القيمة': settings.website || 'https://mashily.github.io/mashily-store/', 'الوصف': 'رابط المتجر على الإنترنت (لمعاينة واتساب والمشاركة)' },
         { 'المفتاح': 'drive_folder_id', 'القيمة': settings.drive_folder_id || '1ONsyQHZaoPNvzCXWxLjIaXs6yfMwiVRD', 'الوصف': 'معرّف مجلد صور Google Drive؛ اجعل الوصول للصور Anyone with the link / Viewer' },
         { 'المفتاح': 'drive_api_key', 'القيمة': settings.drive_api_key || '', 'الوصف': 'مفتاح Google Drive API مقيّد بالموقع وبـ Drive API فقط؛ المفتاح ظاهر للزوار لذا يجب تقييده' },

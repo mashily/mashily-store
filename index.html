@@ -58,7 +58,7 @@
             color: #25d366 !important;
         }
     </style>
-    <script type="application/ld+json">
+    <script type="application/ld+json" id="store-jsonld">
     {
       "@context": "https://schema.org",
       "@type": "ElectronicsStore",
@@ -93,7 +93,7 @@
 <body>
     <div id="app-splash" class="app-splash" role="status" aria-live="polite">
         <img id="app-splash-image" src="logo-splash.png" alt="شعار متجر مشالى" width="512" height="224" fetchpriority="high" decoding="async">
-        <span>جاري تحميل المتجر...</span>
+        <span id="app-splash-text">جاري تحميل المتجر...</span>
     </div>
     <div class="site-electric-background" aria-hidden="true">
         <span class="site-electric-glow site-electric-glow-one"></span>
@@ -109,11 +109,11 @@
             <div class="store-mode-switch" aria-label="اختيار قسم المتجر أو الفيديوهات">
                 <a class="store-mode-button active" href="index.html" aria-current="page" onclick="animateStoreModeSwitch(event, this)">
                     <i class="fas fa-store" aria-hidden="true"></i>
-                    <span>المتجر</span>
+                    <span id="mode-store-label">المتجر</span>
                 </a>
                 <a class="store-mode-button" href="academy.html" onclick="animateStoreModeSwitch(event, this)">
                     <i class="fab fa-youtube" aria-hidden="true"></i>
-                    <span>الفيديوهات التعليمية</span>
+                    <span id="mode-academy-label">الفيديوهات التعليمية</span>
                 </a>
             </div>
             <div class="market-search">
@@ -142,6 +142,9 @@
                         <button onclick="setTheme('mint', event)" title="نعناعي"><i class="fas fa-leaf"></i></button>
                     </div>
                 </div>
+                <button class="market-icon-button market-badge-button" type="button" onclick="showWishlist()" aria-label="المفضلة" title="المفضلة" id="wishlist-open-btn">
+                    <i class="fas fa-heart" aria-hidden="true"></i><span id="wishlist-badge" class="market-badge" style="display: none;">0</span>
+                </button>
                 <button class="market-icon-button market-badge-button market-cart-button" type="button" onclick="toggleCart(true)" aria-label="سلة المشتريات">
                     <i class="fas fa-shopping-basket"></i><span class="market-cart-label">السلة</span><span id="cart-badge" class="market-badge">0</span>
                 </button>
@@ -161,6 +164,19 @@
             <i class="fas fa-chevron-left" aria-hidden="true"></i>
         </button>
     </nav>
+
+    <!-- مقدمة المتجر: تُقرأ نصوصها وألوانها وأحجامها من ورقة Settings -->
+    <section id="store-hero" class="store-hero" aria-labelledby="store-hero-title" hidden>
+        <span class="store-hero-brand">
+            <img id="store-hero-logo" class="store-brand-logo" src="logo.png" alt="شعار المتجر" width="132" height="54" decoding="async">
+            <span id="site-brand-name" class="store-hero-brand-name"></span>
+            <span id="site-tagline" class="store-hero-brand-tagline" hidden></span>
+        </span>
+        <span id="store-hero-kicker" class="store-hero-kicker" hidden></span>
+        <h2 id="store-hero-title" class="store-hero-title"></h2>
+        <p id="store-hero-highlight" class="store-hero-highlight" hidden></p>
+        <p id="store-hero-description" class="store-hero-description" hidden></p>
+    </section>
 
     <section id="offers-catalog" class="offers-catalog" aria-labelledby="offers-catalog-title" hidden>
         <div class="store-catalog-heading">
@@ -267,7 +283,7 @@
             </div>
             <div class="store-form-payment-summary"><strong>طريقة الدفع:</strong> <span id="product-order-payment"></span></div>
             <div class="store-form-actions">
-                <button class="store-form-submit" type="submit"><i class="fab fa-whatsapp" aria-hidden="true"></i> متابعة إلى واتساب</button>
+                <button class="store-form-submit" type="submit"><i class="fab fa-whatsapp" aria-hidden="true"></i> <span id="checkout-submit-label">متابعة إلى واتساب</span></button>
                 <button class="store-form-cancel" type="button" onclick="closeStoreForm('product-checkout-dialog')">رجوع للسلة</button>
             </div>
         </form>
@@ -294,7 +310,7 @@
                 <datalist id="maintenance-area-options"></datalist>
             </div>
             <div class="store-form-actions">
-                <button class="store-form-submit" type="submit"><i class="fab fa-whatsapp" aria-hidden="true"></i> إرسال طلب الصيانة عبر واتساب</button>
+                <button class="store-form-submit" type="submit"><i class="fab fa-whatsapp" aria-hidden="true"></i> <span id="maintenance-submit-label">إرسال طلب الصيانة عبر واتساب</span></button>
                 <button class="store-form-cancel" type="button" onclick="closeStoreForm('maintenance-request-dialog')">إلغاء</button>
             </div>
         </form>
@@ -331,7 +347,7 @@
     <div id="cart-sidebar" class="cart-sidebar" style="width: 350px; background: var(--card); display:flex; flex-direction:column;">
         <!-- رأس السلة -->
         <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background: var(--primary); color:white; border-radius: 8px 8px 0 0;">
-            <h4 style="margin:0; font-size:1.2rem;">🛒 السلة</h4>
+            <h4 id="cart-title" style="margin:0; font-size:1.2rem;">🛒 السلة</h4>
             <button onclick="toggleCart(false)" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; padding:0; width:30px; height:30px; display:flex; align-items:center; justify-content:center;">✕</button>
         </div>
 
@@ -343,16 +359,16 @@
             
             <!-- طريقة الدفع -->
             <div style="margin-bottom:10px;">
-                <p style="margin:0 0 7px; font-size:.8rem; color:var(--text-light);">طريقة الدفع المفضلة</p>
+                <p id="cart-payment-prompt" style="margin:0 0 7px; font-size:.8rem; color:var(--text-light);">طريقة الدفع المفضلة</p>
                 <div class="cart-payment-options">
                     <button class="cart-payment-option active" type="button" aria-pressed="true" aria-expanded="false" onclick="togglePayment('cash', this)">
-                        <i class="fas fa-university" style="font-size:0.8rem;"></i> تحويل بنكي
+                        <i class="fas fa-university" style="font-size:0.8rem;"></i> <span id="payment-cash-label">تحويل بنكي</span>
                     </button>
                     <button class="cart-payment-option" type="button" aria-pressed="false" aria-expanded="false" onclick="togglePayment('vodafone', this)">
-                        <i class="fas fa-mobile-alt" style="font-size:0.8rem;"></i> فودافون
+                        <i class="fas fa-mobile-alt" style="font-size:0.8rem;"></i> <span id="payment-vodafone-label">فودافون كاش</span>
                     </button>
                     <button class="cart-payment-option" type="button" aria-pressed="false" aria-expanded="false" onclick="togglePayment('instapay', this)">
-                        <i class="fas fa-university" style="font-size:0.8rem;"></i> Instapay
+                        <i class="fas fa-university" style="font-size:0.8rem;"></i> <span id="payment-instapay-label">InstaPay</span>
                     </button>
                 </div>
             </div>
@@ -365,11 +381,11 @@
             </div>
             <div id="vodafone-info" style="display:none; background:#fff5f5; border:1px solid var(--primary); color:#c0392b; padding:8px; border-radius:6px; font-size:0.8rem; text-align:center; margin-bottom:10px;">
                 <p style="margin:0 0 3px 0; font-weight:bold; font-size:0.75rem;">رقم فودافون:</p>
-                <b id="vf-number-display" style="font-size:0.9rem; display:block; letter-spacing:1px;">01551831308</b>
+                <b id="vf-number-display" style="font-size:0.9rem; display:block; letter-spacing:1px;"></b>
             </div>
             <div id="instapay-info" style="display:none; background:#f3e5f5; border:1px solid var(--primary); color:#6a1b9a; padding:8px; border-radius:6px; font-size:0.8rem; text-align:center; margin-bottom:10px;">
                 <p style="margin:0 0 3px 0; font-weight:bold; font-size:0.75rem;">حساب انستاباي:</p>
-                <b id="ip-username-display" style="font-size:0.9rem; display:block; letter-spacing:1px;">Mashily@instapay</b>
+                <b id="ip-username-display" style="font-size:0.9rem; display:block; letter-spacing:1px;"></b>
                 <div id="ip-qr-container" style="display:none; margin: 8px auto; width: fit-content;">
                     <img id="ip-qr-image" src="" alt="InstaPay QR" style="max-width: 80px; border-radius: 6px;">
                 </div>
@@ -377,10 +393,10 @@
 
             <!-- كوبون -->
             <div style="margin-bottom:12px;">
-                <label style="display:block; font-size:0.85rem; margin-bottom:4px; color:var(--text);">كوبون:</label>
+                <label id="cart-coupon-label" style="display:block; font-size:0.85rem; margin-bottom:4px; color:var(--text);">كوبون:</label>
                 <div style="display:flex; gap:4px;">
                     <input type="text" id="coupon-input" placeholder="الكود" style="flex:1; padding:6px; border:1px solid var(--border); border-radius:4px; background:var(--bg); color:var(--text); font-size:0.8rem;">
-                    <button onclick="applyCoupon()" style="background:var(--primary); color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.75rem;">تطبيق</button>
+                    <button id="cart-coupon-apply" onclick="applyCoupon()" style="background:var(--primary); color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.75rem;">تطبيق</button>
                 </div>
                 <div id="coupon-msg" style="font-size:0.7rem; margin-top:3px; text-align:center; font-weight:bold; color:var(--primary);"></div>
             </div>
@@ -400,12 +416,14 @@
             </div>
 
             <button class="cart-checkout-btn" type="button" onclick="sendToWhatsApp()">
-                <i class="fas fa-clipboard-check"></i> تأكيد الطلب
+                <i class="fas fa-clipboard-check"></i> <span id="cart-checkout-label">تأكيد الطلب</span>
             </button>
+
+            <div id="cart-note" class="cart-note" hidden></div>
 
             <!-- زر تفريغ السلة -->
             <button class="cart-clear-btn" type="button" onclick="clearCart()">
-                <i class="fas fa-trash-alt"></i> إفراغ السلة
+                <i class="fas fa-trash-alt"></i> <span id="cart-clear-label">إفراغ السلة</span>
             </button>
 
 </div>
@@ -526,7 +544,7 @@
         });
     </script>
     <button id="install-btn" style="display:none; position:fixed; bottom:20px; left:20px; background:#2e8b57; color:white; border:none; padding:12px 18px; border-radius:50px; cursor:pointer; font-weight:bold; font-size:0.9rem; box-shadow:0 4px 15px rgba(0,0,0,0.25); z-index:3000; align-items:center; gap:8px;">
-        <i class="fas fa-download"></i> تثبيت التطبيق
+        <i class="fas fa-download"></i> <span id="install-label">تثبيت التطبيق</span>
     </button>
     <a id="wa-float-btn" href="https://wa.me/201551831308?text=%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%AA%D8%B5%D9%81%D8%AD%20%D8%A7%D9%84%D9%85%D8%AA%D8%AC%D8%B1%3A%20https%3A%2F%2Fmashily.github.io%2Fmashily-store%2F" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>

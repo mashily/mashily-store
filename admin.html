@@ -3056,12 +3056,24 @@
             showAlert('تم تصدير المنتجات إلى Excel بنجاح', 'success');
         }
 
+        // رابط المتجر الرسمي يُقرأ من إعدادات الإكسل (Settings > website) مع قيمة احتياطية
+        function getAdminStoreUrl() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+                const url = String(settings.website || '').trim();
+                if (url) return url;
+            } catch (error) { /* تجاهل */ }
+            return 'https://mashily.github.io/mashily-store/';
+        }
+
         function renderAdminInstallQr() {
             const container = document.getElementById('admin-install-qr');
             if (!container || typeof QRCode === 'undefined') return;
+            const storeUrl = getAdminStoreUrl();
+            document.querySelectorAll('.admin-install-url').forEach(node => { node.textContent = storeUrl; });
             container.innerHTML = '';
             new QRCode(container, {
-                text: 'https://mashily.github.io/mashily-store/',
+                text: storeUrl,
                 width: 280,
                 height: 280,
                 colorDark: '#142019',
@@ -3111,7 +3123,7 @@
                         <h1>تطبيق متجر مشالى</h1>
                         <p>امسح رمز QR بكاميرا هاتفك لفتح المتجر، ثم أضِفه إلى الشاشة الرئيسية كتطبيق.</p>
                         <img class="qr" src="${qrImage}" alt="رمز QR لفتح متجر مشالى">
-                        <p class="url">https://mashily.github.io/mashily-store/</p>
+                        <p class="url">${getAdminStoreUrl()}</p>
                         <p>Android: افتح الرابط في Chrome أو Edge واختر تثبيت التطبيق.<br>iPhone: افتح الرابط في Safari، ثم مشاركة ← إضافة إلى الشاشة الرئيسية.</p>
                     </main>
                     <datalist id="category-image-options">
@@ -3284,7 +3296,8 @@
                     // إشعار واتساب
                     if(document.getElementById('notify-whatsapp').checked) {
                         const msg = `⚠️ تنبيه أمني: تم تغيير كلمة المرور للمستخدم (${currentUser.username}) في لوحة تحكم متجر مشالي.`;
-                        window.open(`https://wa.me/201551831308?text=${encodeURIComponent(msg)}`, '_blank');
+                        const notifyNumber = String((settings && settings.whatsapp) || '201551831308').replace(/\D/g, '');
+                        window.open(`https://wa.me/${notifyNumber}?text=${encodeURIComponent(msg)}`, '_blank');
                     }
                     document.getElementById('current-pass-change').value = '';
                     alert('تم تغيير كلمة المرور بنجاح. يرجى تسجيل الدخول مجدداً.');

@@ -1,5 +1,116 @@
 {
   "generatedFrom": "store-data.xlsx",
+  "generatedAt": "2026-11-24",
+  "settings": {
+    "whatsapp": "201551831308",
+    "vodafone": "01551831308",
+    "instapay": "Mashily@instapay",
+    "qr": "",
+    "ticker": "اللهم صل وسلم وبارك على سيدنا محمد وعلى اله وصحبه وسلم      اهلا بكم مع مشالي للالكترونيات",
+    "proof": "نحن متخصصون في بيع الإلكترونيات والتكنولوجيا منذ 2020,اهلا بكم في مشالي للالكترونيات ,welcome to mashily electronic ",
+    "brand_name": "مشالى لتجارة للالكترونيات",
+    "site_name": "متجر مشالى | لتجارة الإلكترونيات",
+    "app_name": "متجر مشالى | لتجارة الإلكترونيات",
+    "short_name": "مشالى لتجارة للالكترونيات",
+    "site_tagline": "الإلكترونيات والفيديوهات التعليمية",
+    "site_description": "متجر مشالى لبيع للإلكترونيات والفيديوهات التعليمية",
+    "academy_name": "التعليمية",
+    "academy_description": "منصتك الأولى لتعلم صيانة الإلكترونيات والبرمجة وأحدث التقنيات.",
+    "theme_color": "#f7f9f8",
+    "academy_description_color": "",
+    "academy_description_size": "16",
+    "store_hero_kicker": "أهلاً بك في متجر مشالى",
+    "store_hero_title": "اختياراتك التقنية",
+    "store_hero_highlight": "بخطوات أسهل",
+    "store_hero_description": "تصفّح المنتجات والأقسام، قارن التفاصيل والأسعار، ثم أرسل طلبك مباشرة عبر واتساب.",
+    "store_hero_kicker_color": "",
+    "store_hero_title_color": "",
+    "store_hero_highlight_color": "",
+    "store_hero_description_color": "",
+    "store_hero_kicker_size": "14",
+    "store_hero_title_size": "45",
+    "store_hero_description_size": "16",
+    "academy_logo_image": "video.png",
+    "brand_logo_image": "logo.png",
+    "app_icon_192": "icon-192.png",
+    "app_icon_512": "icon-512.png",
+    "app_splash_image": "logo.png",
+    "cart_auto_close_seconds": 2,
+    "bank_name": "البنك الاهلي المصري (محمد فتحي)",
+    "bank_account": "4525001106440001018",
+    "offers_end_date": "2026-12-31 23:59",
+    "drive_folder_id": "1ONsyQHZaoPNvzCXWxLjIaXs6yfMwiVRD",
+    "drive_api_key": "",
+    "footer_address": "المنصورة - شها ",
+    "footer_maps_url": "",
+    "footer_working_hours": "",
+    "footer_closed_days": "",
+    "footer_phone": "",
+    "footer_description": "بيع وصيانة الالكترونيات ",
+    "footer_facebook_url": "",
+    "footer_youtube_url": "",
+    "footer_instagram_url": "",
+    "footer_tiktok_url": "",
+    "footer_whatsapp": "",
+    "footer_contact_heading": "العنوان ومواعيد العمل",
+    "footer_social_heading": "تابعنا وتواصل معنا",
+    "footer_policy_label": "سياسة الاستبدال والاسترجاع",
+    "maintenance_enabled": "نعم",
+    "maintenance_button_label": "طلب صيانة",
+    "maintenance_whatsapp": "",
+    "maintenance_intro": "أرسل تفاصيل الجهاز والعطل، وسيتواصل معك فريق الصيانة لتأكيد الخطوات والتكلفة.",
+    "maintenance_areas": "",
+    "bottom_nav_enabled": "نعم",
+    "bottom_nav_home_label": "الرئيسية",
+    "bottom_nav_offers_label": "التخفيضات",
+    "bottom_nav_store_label": "المتجر",
+    "bottom_nav_cart_label": "السلة",
+    "bottom_nav_maintenance_label": "الصيانة",
+    "bottom_nav_videos_label": "الفيديوهات",
+    "bottom_nav_active_color": "",
+    "onesignal_enabled": "لا",
+    "onesignal_app_id": "",
+    "website": "https://mashily.github.io/mashily-store/",
+    "currency_label": "ج.م",
+    "currency_code": "EGP",
+    "store_city": "المنصورة",
+    "store_region": "الدقهلية",
+    "store_country": "EG",
+    "store_hero_enabled": "نعم",
+    "store_splash_text": "جاري تحميل المتجر...",
+    "academy_splash_text": "جاري تحميل الأكاديمية...",
+    "search_placeholder": "ابحث باسم المنتج أو القسم أو المواصفات",
+    "academy_search_placeholder": "ابحث باسم الدرس أو القسم...",
+    "mode_store_label": "المتجر",
+    "mode_academy_label": "الفيديوهات التعليمية",
+    "offers_title": "تخفيضات",
+    "offers_expired_text": "انتهت التخفيضات",
+    "cart_title": "🛒 السلة",
+    "cart_empty_text": "السلة فارغة",
+    "cart_remove_label": "حذف",
+    "cart_clear_confirm": "هل أنت متأكد من حذف جميع المنتجات من السلة؟",
+    "cart_checkout_label": "تأكيد الطلب",
+    "cart_clear_label": "إفراغ السلة",
+    "cart_note": "",
+    "cart_payment_prompt": "طريقة الدفع المفضلة",
+    "cart_coupon_label": "كوبون:",
+    "cart_coupon_placeholder": "الكود",
+    "cart_coupon_apply_label": "تطبيق",
+    "payment_cash_label": "تحويل بنكي",
+    "payment_vodafone_label": "فودافون كاش",
+    "payment_instapay_label": "InstaPay",
+    "checkout_title": "تأكيد طلب المنتجات",
+    "checkout_submit_label": "متابعة إلى واتساب",
+    "maintenance_form_title": "طلب صيانة",
+    "maintenance_submit_label": "إرسال طلب الصيانة عبر واتساب",
+    "install_button_label": "تثبيت التطبيق",
+    "whatsapp_float_label": "تواصل معنا على واتساب",
+    "whatsapp_float_message": "أريد تصفح المتجر: {store_url}",
+    "order_whatsapp_template": "طلب جديد من متجر {brand}\nالاسم: {name}\nرقم الهاتف: {phone}\nالعنوان: {address}\n\nالمنتجات:\n{items}\nكوبون الخصم: {coupon}\nالإجمالي النهائي: {total} {currency}\nطريقة الدفع: {payment}\n\nرابط المتجر: {url}",
+    "maintenance_whatsapp_template": "طلب صيانة جديد — متجر {brand}\nالاسم: {name}\nرقم الهاتف: {phone}\nالعنوان: {address}\nالمنطقة: {area}\nنوع الجهاز: {device}\nالماركة والموديل: {model}\nالخدمة المطلوبة: {service}\nوصف العطل: {issue}\nرابط المتجر: {url}",
+    "footer_copyright_template": "© {year} متجر {brand} — جميع الحقوق محفوظة",
+    "academy_footer_template": "© {year} {academy_name} - جميع الحقوق محفوظة"
+  },
   "products": [
     {
       "id": 1,
@@ -645,6 +756,29 @@
       "videos": [],
       "rating": 5,
       "reviewCount": 25
+    },
+    {
+      "id": 9999,
+      "name": "تجربة",
+      "price": 15,
+      "originalPrice": null,
+      "description": "اختبار عرض صورة محلية من مجلد الصور",
+      "image": "images/mobile.svg",
+      "imageName": "",
+      "images": [
+        "images/mobile.svg"
+      ],
+      "category": "الكترونيات",
+      "stock": "متوفر",
+      "status": "جديد",
+      "tags": [],
+      "specs": [],
+      "offerStarts": "",
+      "offerEnds": "",
+      "showInOffers": false,
+      "videos": [],
+      "rating": 0,
+      "reviewCount": 0
     }
   ],
   "categories": [
@@ -693,16 +827,6 @@
     "all": "images/default.svg",
     "offers": "images/offers.svg"
   },
-  "academyCats": [
-    "قرآن ",
-    "أبتهالات"
-  ],
-  "statuses": [
-    "عرض خاص",
-    "جديد",
-    "حصري",
-    "خضوامات "
-  ],
   "videos": [
     {
       "id": 1770051311267,
@@ -729,6 +853,54 @@
       "type": "locked",
       "duration": "1:12:41",
       "image": "https://img.youm7.com/xlarge/202503220235503550.jpg",
+      "tools": [],
+      "linkedProducts": [],
+      "attachments": [],
+      "likes": 0,
+      "dislikes": 0,
+      "comments": []
+    },
+    {
+      "id": 1770051311269,
+      "title": "مقدمة البرمجة بلغة بايثون",
+      "url": "https://youtu.be/example1",
+      "category": "برمجة",
+      "track": "برمجة",
+      "type": "free",
+      "duration": "0:30:00",
+      "image": "",
+      "tools": [],
+      "linkedProducts": [],
+      "attachments": [],
+      "likes": 0,
+      "dislikes": 0,
+      "comments": []
+    },
+    {
+      "id": 1770051311270,
+      "title": "شرح أساسيات التسويق الإلكتروني",
+      "url": "https://youtu.be/example2",
+      "category": "تسويق",
+      "track": "تسويق",
+      "type": "free",
+      "duration": "0:45:00",
+      "image": "",
+      "tools": [],
+      "linkedProducts": [],
+      "attachments": [],
+      "likes": 0,
+      "dislikes": 0,
+      "comments": []
+    },
+    {
+      "id": 1770051311271,
+      "title": "دورة تصميم الجرافيك للمبتدئين",
+      "url": "https://youtu.be/example3",
+      "category": "تصميم",
+      "track": "تصميم",
+      "type": "locked",
+      "duration": "1:00:00",
+      "image": "",
       "tools": [],
       "linkedProducts": [],
       "attachments": [],
@@ -779,8 +951,13 @@
       "active": true
     }
   ],
-  "ticker": "",
-  "proof": "نحن متخصصون في بيع الإلكترونيات والتكنولوجيا منذ 2020,اهلا بكم في مشالي للالكترونيات ,welcome to mashily electronic ",
+  "accessCodes": [
+    {
+      "code": "3212",
+      "durationDays": 1000,
+      "active": true
+    }
+  ],
   "coupons": [
     {
       "code": "01551831308",
@@ -802,6 +979,133 @@
       "type": "percent",
       "expiry": "2026-12-31",
       "minSpend": 1
+    }
+  ],
+  "statuses": [
+    "عرض خاص",
+    "جديد",
+    "حصري",
+    "خضوامات "
+  ],
+  "popups": [
+    {
+      "active": true,
+      "location": "الكل",
+      "type": "اهلا بكــــــــــــم",
+      "title": "أهلاً بك في متجر مشالي",
+      "message": "تصفح أحدث المنتجات وتابع العروض المؤقتة قبل انتهائها.",
+      "image": "",
+      "buttonText": "تصفح المتجر",
+      "buttonUrl": "index.html",
+      "starts": "",
+      "ends": "2026-12-07 23:59",
+      "duration": 6,
+      "celebration": true,
+      "celebrationDuration": 3,
+      "decorations": [
+        "🎈",
+        "❤️",
+        "🎉",
+        "✨",
+        "💛🎈",
+        "❤️",
+        "🎉",
+        "✨",
+        "💛🎈",
+        "❤️",
+        "🎉",
+        "✨",
+        "💛🎈",
+        "❤️",
+        "🎉",
+        "✨",
+        "💛🎈",
+        "❤️",
+        "🎉",
+        "✨",
+        "💛🎈",
+        "❤️",
+        "🎉",
+        "✨",
+        "💛"
+      ]
+    }
+  ],
+  "ticker": "اللهم صل وسلم وبارك على سيدنا محمد وعلى اله وصحبه وسلم      اهلا بكم مع مشالي للالكترونيات",
+  "proof": "نحن متخصصون في بيع الإلكترونيات والتكنولوجيا منذ 2020,اهلا بكم في مشالي للالكترونيات ,welcome to mashily electronic ",
+  "tickerMessages": [
+    {
+      "text": "عرض خاص هذا الأسبوع - خصم 20% على جميع الالكترونيات !",
+      "duration": 5,
+      "speed": 20
+    },
+    {
+      "text": "اللهم صل وسلم وبارك على سيدنا محمد عدد كمال الله وكما يليق بكماله",
+      "duration": 50,
+      "speed": 30
+    }
+  ],
+  "proofMessages": [
+    {
+      "text": "🔥محمد من المنصورة اشترى سماعه + بور 🔥",
+      "duration": 4,
+      "interval": 10
+    },
+    {
+      "text": "⚡محمد من المنصورة طلب قطعة واي فاي ⚡",
+      "duration": 4,
+      "interval": 10
+    },
+    {
+      "text": "✅خالد من طنطا انضم للأكاديمية الآن ✅",
+      "duration": 4,
+      "interval": 10
+    },
+    {
+      "text": "♥عميل جديد طلب وصلة HDMI أصلية 🔌",
+      "duration": 4,
+      "interval": 10
+    },
+    {
+      "text": "♥تم شحن طلب جديد إلى الإسكندرية بنجاح 🚚",
+      "duration": 4,
+      "interval": 10
+    },
+    {
+      "text": "⌚سارة من الجيزة اشترت ساعة ذكية Ultra ⌚",
+      "duration": 4,
+      "interval": 10
+    },
+    {
+      "text": "⌚مصطفى من المنصورة طلب باور بانك 🔋",
+      "duration": 4,
+      "interval": 10
+    },
+    {
+      "text": "✅تم توصيل طلب إلى المنصورة بنجاح ✅",
+      "duration": 4,
+      "interval": 10
+    },
+    {
+      "text": "تم توصيل طلبات الي العميل أ جملة الجمالية",
+      "duration": 10,
+      "interval": 10
+    }
+  ],
+  "footerPolicies": [
+    {
+      "title": "سياسة الاستبدال والاسترجاع",
+      "content": "سياسة الاستبدال والاسترجاع",
+      "order": 1,
+      "active": true
+    }
+  ],
+  "maintenanceServices": [
+    {
+      "title": "صيانة عامة",
+      "description": "تحديد نوع الجهاز والعطل للتواصل الأولي",
+      "order": 1,
+      "active": true
     }
   ]
 }

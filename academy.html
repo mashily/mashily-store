@@ -26,7 +26,7 @@
 <body>
     <div id="app-splash" class="app-splash" role="status" aria-live="polite">
         <img id="app-splash-image" src="logo.png" alt="شعار متجر مشالى">
-        <span>جاري تحميل الأكاديمية...</span>
+        <span id="app-splash-text">جاري تحميل الأكاديمية...</span>
     </div>
     <!-- الهيدر -->
     <header class="market-header">
@@ -34,16 +34,16 @@
             <div class="academy-mode-switch" aria-label="اختيار القسم الرئيسي">
                 <a class="academy-mode-button" href="index.html" onclick="animateStoreModeSwitch(event, this)">
                     <i class="fas fa-store" aria-hidden="true"></i>
-                    <span>المتجر</span>
+                    <span id="mode-store-label">المتجر</span>
                 </a>
                 <a class="academy-mode-button active" href="academy.html" aria-current="page" onclick="animateStoreModeSwitch(event, this)">
                     <i class="fab fa-youtube" aria-hidden="true"></i>
-                    <span>الفيديوهات التعليمية</span>
+                    <span id="mode-academy-label">الفيديوهات التعليمية</span>
                 </a>
             </div>
             <label class="market-search" for="academy-search">
                 <i class="fas fa-search" aria-hidden="true"></i>
-                <input type="search" id="academy-search" placeholder="ابحث باسم الدرس أو القسم..." oninput="searchAcademy()" aria-label="البحث في الدروس">
+                <input type="search" id="academy-search" placeholder="ابحث باسم الدرس أو القسم..." oninput="searchAcademy()" aria-label="البحث في الدروس" autocomplete="off">
             </label>
             <div class="market-actions">
                 <div class="market-theme-wrap">
@@ -82,8 +82,22 @@
         <div id="academy-cats" class="cat-nav-scroll"></div>
     </nav>
 
+    <!-- مقدمة الأكاديمية: الاسم والوصف والشعار تُقرأ من ورقة Settings -->
+    <section id="academy-hero" class="academy-hero" aria-labelledby="academy-page-name">
+        <div class="academy-brand-mark">
+            <img id="academy-page-icon" class="academy-video-icon" src="video.png" alt="شعار الأكاديمية" width="56" height="56" decoding="async">
+            <span id="academy-header-name"></span>
+        </div>
+        <h1 id="academy-page-name">الفيديوهات التعليمية</h1>
+        <p id="academy-page-description">منصتك الأولى لتعلم صيانة الإلكترونيات والبرمجة وأحدث التقنيات.</p>
+        <a class="academy-hero-action" href="index.html">
+            <i class="fas fa-store" aria-hidden="true"></i>
+            <span id="academy-store-name">متجر مشالى</span>
+        </a>
+    </section>
+
     <section class="academy-library" id="academy-library" aria-labelledby="academy-library-title">
-        <h1 id="academy-library-title" class="visually-hidden">دروس الأكاديمية</h1>
+        <h2 id="academy-library-title" class="visually-hidden">دروس الأكاديمية</h2>
         <span id="academy-results-count" class="academy-results-count" role="status" aria-live="polite"></span>
         <main class="video-grid" id="academy-grid" aria-label="دروس الأكاديمية">
             <div class="loader" style="grid-column: 1/-1; margin: 50px auto;"></div>

@@ -3961,3 +3961,124 @@ button, a { touch-action: manipulation; }
         .academy-linked-product { grid-template-columns: 52px minmax(0, 1fr) 94px; }
         .academy-linked-product img { width: 52px; height: 52px; }
     }
+
+/* ===== مقدمة المتجر (Store Hero) — النصوص والألوان والأحجام تُقرأ من ورقة Settings ===== */
+.store-hero {
+    max-width: 1180px;
+    margin: 14px auto 2px;
+    padding: 22px 20px 20px;
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+.store-hero[hidden] { display: none; }
+.store-hero-kicker {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--primary);
+    font-size: var(--store-hero-kicker-size, 14px);
+    font-weight: 700;
+    line-height: 1.6;
+}
+.store-hero-title {
+    margin: 0;
+    color: var(--text);
+    font-size: var(--store-hero-title-size, 45px);
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+}
+.store-hero-highlight {
+    margin: 0;
+    color: var(--primary);
+    font-size: clamp(15px, 0.7vw + 12px, 20px);
+    font-weight: 800;
+    line-height: 1.5;
+}
+.store-hero-description {
+    margin: 0;
+    max-width: 660px;
+    color: var(--text-light);
+    font-size: var(--store-hero-description-size, 16px);
+    line-height: 1.75;
+}
+
+/* ملاحظة أسفل السلة (سياسة الشحن/التوصيل) — تظهر فقط عند كتابة cart_note في الإكسل */
+.cart-note {
+    margin: 0 0 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px dashed var(--border);
+    background: var(--bg);
+    color: var(--text-light);
+    font-size: 0.75rem;
+    line-height: 1.6;
+    text-align: center;
+}
+.cart-note[hidden] { display: none; }
+
+@media (max-width: 900px) {
+    .store-hero {
+        margin: 10px 12px 0;
+        padding: 18px 14px 16px;
+        border-radius: 18px;
+    }
+    .store-hero-title { font-size: calc(var(--store-hero-title-size, 45px) * 0.62); }
+    .store-hero-description { font-size: calc(var(--store-hero-description-size, 16px) * 0.92); }
+}
+@media (max-width: 420px) {
+    .store-hero-title { font-size: calc(var(--store-hero-title-size, 45px) * 0.52); }
+}
+
+/* شعار واسم المتجر داخل مقدمة المتجر (يُقرأ من Settings: brand_logo_image / brand_name / site_tagline) */
+.store-hero-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+.store-hero-brand img {
+    display: block;
+    width: auto;
+    max-width: min(190px, 46vw);
+    height: auto;
+    max-height: 62px;
+    object-fit: contain;
+}
+.store-hero-brand-name {
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: -.2px;
+}
+.store-hero-brand-tagline {
+    color: var(--text-light);
+    font-size: .82rem;
+    font-weight: 700;
+}
+.store-hero-brand-name:empty,
+.store-hero-brand-tagline:empty { display: none; }
+
+/* شعار الأكاديمية داخل مقدمتها (يُقرأ من Settings: academy_logo_image) */
+.academy-hero .academy-video-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto;
+}
+.academy-hero .academy-brand-mark { margin-bottom: 10px; }
+.academy-hero #academy-header-name:empty { display: none; }
+.academy-hero h1 { margin-bottom: 10px; }
+@media (max-width: 600px) {
+    .academy-hero { padding: 22px 16px; margin: 14px 12px 12px; border-radius: 18px; }
+    .academy-hero .academy-video-icon { width: 46px; height: 46px; }
+}
