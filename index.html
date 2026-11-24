@@ -72,7 +72,7 @@
       "telephone": "+201551831308",
       "priceRange": "ج.م",
       "currenciesAccepted": "EGP",
-      "paymentAccepted": "تحويل بنكي، فودافون كاش، انستاباي",
+      "paymentAccepted": "الدفع عند الاستلام (كاش)، فودافون كاش، انستاباي",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "شها",
@@ -277,8 +277,10 @@
             <div id="product-order-summary" class="product-order-summary"></div>
             <div class="store-customer-fields">
                 <label>الاسم الكامل<input type="text" name="name" data-customer-field="name" autocomplete="name" required maxlength="100"></label>
-                <label>رقم الهاتف<input type="tel" name="phone" data-customer-field="phone" autocomplete="tel" inputmode="tel" required maxlength="25"></label>
-                <label class="store-field-wide">العنوان بالتفصيل<textarea name="address" data-customer-field="address" autocomplete="street-address" rows="3" required maxlength="500"></textarea></label>
+                <label>رقم الهاتف الأساسي<input type="tel" name="phone" data-customer-field="phone" autocomplete="tel" inputmode="tel" required maxlength="25"></label>
+                <label class="store-field-wide" data-cash-field hidden>المحافظة / المدينة<input type="text" name="city" data-customer-field="city" autocomplete="address-level2" maxlength="80" placeholder="مثال: الدقهلية - المنصورة"></label>
+                <label class="store-field-wide">العنوان بالتفصيل<textarea name="address" data-customer-field="address" autocomplete="street-address" rows="3" required maxlength="500" placeholder="الشارع، رقم العقار، الدور، علامة مميزة"></textarea></label>
+                <label class="store-field-wide" data-cash-field hidden>ملاحظات التوصيل (اختياري)<textarea name="notes" data-customer-field="notes" rows="2" maxlength="300" placeholder="أي تفاصيل تساعد المندوب (الوقت المناسب، الدور، …)"></textarea></label>
                 <label class="store-remember-customer"><input type="checkbox" data-remember-customer> تذكر بياناتي على هذا الجهاز</label>
             </div>
             <div class="store-form-payment-summary"><strong>طريقة الدفع:</strong> <span id="product-order-payment"></span></div>
@@ -362,7 +364,7 @@
                 <p id="cart-payment-prompt" style="margin:0 0 7px; font-size:.8rem; color:var(--text-light);">طريقة الدفع المفضلة</p>
                 <div class="cart-payment-options">
                     <button class="cart-payment-option active" type="button" aria-pressed="true" aria-expanded="false" onclick="togglePayment('cash', this)">
-                        <i class="fas fa-university" style="font-size:0.8rem;"></i> <span id="payment-cash-label">تحويل بنكي</span>
+                        <i class="fas fa-money-bill-wave" style="font-size:0.8rem;"></i> <span id="payment-cash-label">الدفع عند الاستلام</span>
                     </button>
                     <button class="cart-payment-option" type="button" aria-pressed="false" aria-expanded="false" onclick="togglePayment('vodafone', this)">
                         <i class="fas fa-mobile-alt" style="font-size:0.8rem;"></i> <span id="payment-vodafone-label">فودافون كاش</span>
@@ -373,11 +375,11 @@
                 </div>
             </div>
 
-            <!-- معلومات الدفع -->
-            <div id="bank-info" class="cart-payment-details" hidden>
-                <p>التحويل البنكي:</p>
-                <b>اسم البنك: <span id="bank-name-display">—</span></b>
-                <b>رقم الحساب: <span id="bank-account-display">—</span></b>
+            <!-- ملاحظة الدفع عند الاستلام: لا تُعرض أي بيانات بنكية مع هذه الطريقة -->
+            <div id="cash-info" class="cart-payment-details" hidden>
+                <p>الدفع عند الاستلام:</p>
+                <b>تدفع نقداً للمندوب عند استلام الطلب.</b>
+                <span id="payment-cash-note" class="cart-payment-note"></span>
             </div>
             <div id="vodafone-info" style="display:none; background:#fff5f5; border:1px solid var(--primary); color:#c0392b; padding:8px; border-radius:6px; font-size:0.8rem; text-align:center; margin-bottom:10px;">
                 <p style="margin:0 0 3px 0; font-weight:bold; font-size:0.75rem;">رقم فودافون:</p>

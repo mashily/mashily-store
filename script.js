@@ -76,7 +76,9 @@ function saveCustomerContactData(data) {
     const contact = {
         name: String(data.name || '').trim(),
         phone: String(data.phone || '').trim(),
-        address: String(data.address || '').trim()
+        city: String(data.city || '').trim(),
+        address: String(data.address || '').trim(),
+        notes: String(data.notes || '').trim()
     };
     try {
         sessionStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify(contact));
@@ -101,7 +103,7 @@ function syncCustomerContactField(field, value) {
 
 function initializeCustomerContactForms() {
     const customer = getCustomerContactData();
-    ['name', 'phone', 'address'].forEach(field => syncCustomerContactField(field, String(customer[field] || '')));
+    ['name', 'phone', 'city', 'address', 'notes'].forEach(field => syncCustomerContactField(field, String(customer[field] || '')));
 
     document.querySelectorAll('[data-customer-field]').forEach(input => {
         input.addEventListener('input', () => {
@@ -143,10 +145,17 @@ function initializeCustomerContactForms() {
 }
 
 function getCustomerFormData(form) {
+    // بعض الحقول (المدينة / ملاحظات التوصيل) تظهر فقط مع الدفع عند الاستلام
+    const readField = name => {
+        const field = form.elements.namedItem(name);
+        return field ? String(field.value || '').trim() : '';
+    };
     return {
-        name: String(form.elements.namedItem('name').value || '').trim(),
-        phone: String(form.elements.namedItem('phone').value || '').trim(),
-        address: String(form.elements.namedItem('address').value || '').trim()
+        name: readField('name'),
+        phone: readField('phone'),
+        city: readField('city'),
+        address: readField('address'),
+        notes: readField('notes')
     };
 }
 
@@ -156,7 +165,11 @@ function validateCustomerContact(contact) {
         .replace(/[۰-۹]/g, digit => String(digit.charCodeAt(0) - 0x06F0))
         .replace(/\D/g, '');
     if (!contact.name || !contact.phone || !contact.address) {
-        alert('من فضلك اكتب الاسم ورقم الهاتف والعنوان بالكامل.');
+        alert(getStoreSettingText('checkout_required_alert', 'من فضلك اكتب الاسم ورقم الهاتف والعنوان بالكامل.'));
+        return false;
+    }
+    if (selectedPaymentMethod === 'cash' && !contact.city) {
+        alert(getStoreSettingText('checkout_city_required_alert', 'من فضلك اكتب المحافظة / المدينة لتوصيل الطلب عند الاستلام.'));
         return false;
     }
     if (phoneDigits.length < 7 || phoneDigits.length > 15) {
@@ -236,11 +249,10 @@ function closeStoreForm(dialogId) {
 }
 
 function getSelectedPaymentLabel() {
-    const settings = getStoreSettings();
     if (selectedPaymentMethod === 'vodafone') return getStoreSettingText('payment_vodafone_label', 'فودافون كاش');
     if (selectedPaymentMethod === 'instapay') return getStoreSettingText('payment_instapay_label', 'InstaPay');
-    const cashLabel = getStoreSettingText('payment_cash_label', 'تحويل بنكي');
-    return settings.bank_name ? `${cashLabel} - ${settings.bank_name}` : cashLabel;
+    // الدفع عند الاستلام لا يحمل أي بيانات بنكية
+    return getStoreSettingText('payment_cash_label', 'الدفع عند الاستلام');
 }
 
 function updateProductOrderSummary() {
@@ -565,7 +577,7 @@ function applyStoreTextSettings(settings = {}) {
     setText('install-label', String(settings.install_button_label || '').trim() || 'تثبيت التطبيق');
     setText('cart-title', String(settings.cart_title || '').trim() || '🛒 السلة');
     setText('cart-payment-prompt', String(settings.cart_payment_prompt || '').trim() || 'طريقة الدفع المفضلة');
-    setText('payment-cash-label', String(settings.payment_cash_label || '').trim() || 'تحويل بنكي');
+    setText('payment-cash-label', String(settings.payment_cash_label || '').trim() || 'الدفع عند الاستلام');
     setText('payment-vodafone-label', String(settings.payment_vodafone_label || '').trim() || 'فودافون كاش');
     setText('payment-instapay-label', String(settings.payment_instapay_label || '').trim() || 'InstaPay');
     setText('cart-checkout-label', String(settings.cart_checkout_label || '').trim() || 'تأكيد الطلب');
@@ -643,7 +655,7 @@ function applyStructuredData(settings = {}) {
     const logoUrl = /^https?:/i.test(logoPath) ? logoPath : `${storeUrl}${logoPath.replace(/^\.?\//, '')}`;
     const phoneDigits = getWhatsAppNumber(settings.footer_phone || settings.whatsapp || settings.vodafone);
     const paymentLabels = [
-        String(settings.payment_cash_label || '').trim() || 'تحويل بنكي',
+        String(settings.payment_cash_label || '').trim() || 'الدفع عند الاستلام',
         String(settings.payment_vodafone_label || '').trim() || 'فودافون كاش',
         String(settings.payment_instapay_label || '').trim() || 'InstaPay'
     ];
@@ -853,10 +865,9 @@ function refreshStoreData() {
 }
 
 function applyPaymentSettings(settings) {
-    const bankNameEl = document.getElementById('bank-name-display');
-    const bankAccountEl = document.getElementById('bank-account-display');
-    if(bankNameEl) bankNameEl.innerText = settings.bank_name || '—';
-    if(bankAccountEl) bankAccountEl.innerText = settings.bank_account || '—';
+    // الدفع عند الاستلام: لا يتم عرض أي بيانات بنكية، فقط ملاحظة تعريفية
+    const cashNoteEl = document.getElementById('payment-cash-note');
+    if(cashNoteEl) cashNoteEl.innerText = String(settings.payment_cash_note || '').trim();
     if(settings.vodafone) {
         const vfEl = document.getElementById('vf-number-display');
         if(vfEl) vfEl.innerText = settings.vodafone;
@@ -1000,6 +1011,7 @@ async function initializeStore() {
     // تحميل إعدادات الدفع المخصصة
     const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
     applyPaymentSettings(settings);
+    syncCheckoutPaymentFields();
 
     // استبدال الافتراضي الداكن السابق بالفاتح مرة واحدة مع حفظ اختيار الزائر الصريح.
     let savedTheme = localStorage.getItem('theme');
@@ -2688,7 +2700,7 @@ function toggleCartFromNav() {
 
 function togglePayment(method, selectedButton) {
     const details = {
-        cash: document.getElementById('bank-info'),
+        cash: document.getElementById('cash-info'),
         vodafone: document.getElementById('vodafone-info'),
         instapay: document.getElementById('instapay-info')
     };
@@ -2707,6 +2719,19 @@ function togglePayment(method, selectedButton) {
         button.classList.toggle('active', isSelected);
         button.setAttribute('aria-pressed', String(isSelected));
         button.setAttribute('aria-expanded', String(isSelected && shouldExpand));
+    });
+    syncCheckoutPaymentFields();
+}
+
+// إظهار حقول التوصيل (المحافظة + ملاحظات التوصيل) فقط عند اختيار الدفع عند الاستلام
+function syncCheckoutPaymentFields() {
+    const dialog = document.getElementById('product-checkout-dialog');
+    if (!dialog) return;
+    const isCash = selectedPaymentMethod === 'cash';
+    dialog.querySelectorAll('[data-cash-field]').forEach(field => {
+        field.hidden = !isCash;
+        const cityInput = field.querySelector('input[name="city"]');
+        if (cityInput) cityInput.required = isCash;
     });
 }
 
@@ -2766,6 +2791,7 @@ function sendToWhatsApp() {
         return;
     }
     updateProductOrderSummary();
+    syncCheckoutPaymentFields();
     toggleCart(false);
     openStoreForm('product-checkout-dialog');
 }
@@ -2790,22 +2816,25 @@ function submitProductOrder(event) {
 
     saveCustomerContactData(contact);
     const details = cart.map(item => `${item.name} (${item.qty})`).join('\n');
-    let paymentText = getSelectedPaymentLabel();
-    if (selectedPaymentMethod === 'cash' && settings.bank_account) {
-        paymentText += ` - رقم الحساب: ${settings.bank_account}`;
-    }
+    const paymentText = getSelectedPaymentLabel();
+    const paymentNote = selectedPaymentMethod === 'cash'
+        ? getStoreSettingText('payment_cash_note', 'الدفع نقداً للمندوب عند استلام الطلب، مع مراجعة المنتجات قبل السداد.')
+        : '';
     const orderTemplate = String(settings.order_whatsapp_template || '').trim()
-        || 'طلب جديد من متجر {brand}\nالاسم: {name}\nرقم الهاتف: {phone}\nالعنوان: {address}\n\nالمنتجات:\n{items}\nكوبون الخصم: {coupon}\nالإجمالي النهائي: {total} {currency}\nطريقة الدفع: {payment}\n\nرابط المتجر: {url}';
+        || 'طلب جديد من متجر {brand}\nالاسم: {name}\nرقم الهاتف: {phone}\nالمحافظة / المدينة: {city}\nالعنوان: {address}\nملاحظات التوصيل: {notes}\n\nالمنتجات:\n{items}\nكوبون الخصم: {coupon}\nالإجمالي النهائي: {total} {currency}\nطريقة الدفع: {payment}\n{payment_note}\n\nرابط المتجر: {url}';
     const message = formatStoreTemplate(orderTemplate, {
         brand: String(settings.brand_name || 'مشالى').trim(),
         name: contact.name,
         phone: contact.phone,
+        city: contact.city,
         address: contact.address,
+        notes: contact.notes,
         items: details,
         coupon: appliedCoupon ? appliedCoupon.code : '',
         total: document.getElementById('total-price')?.innerText || '0',
         currency: getCurrencyLabel(),
         payment: paymentText,
+        payment_note: paymentNote,
         url: getStoreUrl(),
         store_url: getStoreUrl()
     });

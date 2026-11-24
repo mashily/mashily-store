@@ -2036,6 +2036,9 @@ body {
 .cart-payment-details[hidden] { display: none; }
 .cart-payment-details p { margin: 0 0 5px; font-weight: 800; }
 .cart-payment-details b { display: block; margin-top: 3px; overflow-wrap: anywhere; }
+.cart-payment-note { display: block; margin-top: 5px; color: var(--text-light); font-size: .72rem; font-weight: 700; }
+.cart-payment-note:empty { display: none; }
+.store-customer-fields [data-cash-field][hidden] { display: none; }
 .cart-checkout-btn { display: flex; width: 100%; min-height: 50px; align-items: center; justify-content: center; gap: 9px; margin: 0 0 7px; border: 0; border-radius: 11px; background: #218c55; color: #fff; font: inherit; font-size: .97rem; font-weight: 800; cursor: pointer; transition: background-color .2s ease; }
 .cart-checkout-btn:hover { background: #197747; }
 .cart-checkout-btn i { font-size: 1.2rem; }

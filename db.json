@@ -1,6 +1,6 @@
 {
   "generatedFrom": "store-data.xlsx",
-  "generatedAt": "2026-11-24",
+  "generatedAt": "2026-11-24T15:47:50.666Z",
   "settings": {
     "whatsapp": "201551831308",
     "vodafone": "01551831308",
@@ -96,7 +96,7 @@
     "cart_coupon_label": "كوبون:",
     "cart_coupon_placeholder": "الكود",
     "cart_coupon_apply_label": "تطبيق",
-    "payment_cash_label": "تحويل بنكي",
+    "payment_cash_label": "الدفع عند الاستلام",
     "payment_vodafone_label": "فودافون كاش",
     "payment_instapay_label": "InstaPay",
     "checkout_title": "تأكيد طلب المنتجات",
@@ -106,10 +106,13 @@
     "install_button_label": "تثبيت التطبيق",
     "whatsapp_float_label": "تواصل معنا على واتساب",
     "whatsapp_float_message": "أريد تصفح المتجر: {store_url}",
-    "order_whatsapp_template": "طلب جديد من متجر {brand}\nالاسم: {name}\nرقم الهاتف: {phone}\nالعنوان: {address}\n\nالمنتجات:\n{items}\nكوبون الخصم: {coupon}\nالإجمالي النهائي: {total} {currency}\nطريقة الدفع: {payment}\n\nرابط المتجر: {url}",
+    "order_whatsapp_template": "طلب جديد من متجر {brand}\nالاسم: {name}\nرقم الهاتف: {phone}\nالمحافظة / المدينة: {city}\nالعنوان: {address}\nملاحظات التوصيل: {notes}\n\nالمنتجات:\n{items}\nكوبون الخصم: {coupon}\nالإجمالي النهائي: {total} {currency}\nطريقة الدفع: {payment}\n{payment_note}\n\nرابط المتجر: {url}",
     "maintenance_whatsapp_template": "طلب صيانة جديد — متجر {brand}\nالاسم: {name}\nرقم الهاتف: {phone}\nالعنوان: {address}\nالمنطقة: {area}\nنوع الجهاز: {device}\nالماركة والموديل: {model}\nالخدمة المطلوبة: {service}\nوصف العطل: {issue}\nرابط المتجر: {url}",
     "footer_copyright_template": "© {year} متجر {brand} — جميع الحقوق محفوظة",
-    "academy_footer_template": "© {year} {academy_name} - جميع الحقوق محفوظة"
+    "academy_footer_template": "© {year} {academy_name} - جميع الحقوق محفوظة",
+    "payment_cash_note": "لا يوجد دفع إلكتروني مطلوب — يمكنك فحص المنتجات قبل السداد.",
+    "checkout_required_alert": "من فضلك اكتب الاسم ورقم الهاتف والعنوان بالكامل.",
+    "checkout_city_required_alert": "من فضلك اكتب المحافظة / المدينة لتوصيل الطلب عند الاستلام."
   },
   "products": [
     {
