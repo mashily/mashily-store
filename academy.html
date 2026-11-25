@@ -49,15 +49,16 @@
                 <div class="market-theme-wrap">
                     <button class="market-icon-button" type="button" onclick="toggleThemeMenu(event)" aria-label="تغيير المظهر"><i id="theme-icon" class="fas fa-moon"></i></button>
                     <div id="theme-menu" class="market-theme-menu">
-                        <button onclick="setTheme('dark', event)" title="داكن هادئ"><i class="fas fa-moon"></i></button>
-                        <button onclick="setTheme('light', event)" title="فاتح"><i class="fas fa-sun"></i></button>
-                        <button onclick="setTheme('neon', event)" title="نيون"><i class="fas fa-bolt"></i></button>
-                        <button onclick="setTheme('gold', event)" title="ذهبي"><i class="fas fa-crown"></i></button>
+                        <button data-theme-choice="dark" onclick="setTheme('dark', event)" title="داكن هادئ"><i class="fas fa-moon"></i></button>
+                        <button data-theme-choice="light" onclick="setTheme('light', event)" title="فاتح"><i class="fas fa-sun"></i></button>
+                        <button data-theme-choice="white" onclick="setTheme('white', event)" title="أبيض"><i class="fas fa-circle"></i></button>
+                        <button data-theme-choice="neon" onclick="setTheme('neon', event)" title="نيون"><i class="fas fa-bolt"></i></button>
+                        <button data-theme-choice="gold" onclick="setTheme('gold', event)" title="ذهبي"><i class="fas fa-crown"></i></button>
+                        <button data-theme-choice="ocean" onclick="setTheme('ocean', event)" title="أزرق"><i class="fas fa-water"></i></button>
+                        <button data-theme-choice="rose" onclick="setTheme('rose', event)" title="وردي"><i class="fas fa-heart"></i></button>
+                        <button data-theme-choice="mint" onclick="setTheme('mint', event)" title="نعناعي"><i class="fas fa-leaf"></i></button>
                     </div>
                 </div>
-                <button class="market-icon-button" type="button" onclick="document.getElementById('academy-library-filter').value='favorites'; applyAcademyFilters();" aria-label="دروس المفضلة">
-                    <i class="fas fa-heart"></i>
-                </button>
                 <a class="market-icon-button" href="index.html" aria-label="العودة إلى المتجر"><i class="fas fa-shopping-basket"></i></a>
             </div>
         </div>
@@ -179,7 +180,7 @@
         <button class="mobile-nav-item" type="button" onclick="window.location.href='index.html#offers'" aria-label="التخفيضات والعروض الخاصة">
             <i class="fas fa-fire" aria-hidden="true"></i><span id="academy-mobile-offers-label">التخفيضات</span>
         </button>
-        <button class="mobile-nav-item" type="button" onclick="window.location.href='index.html#cart'" aria-label="سلة المشتريات">
+        <button class="mobile-nav-item" type="button" onclick="window.location.href='cart.html'" aria-label="سلة المشتريات">
             <i class="fas fa-shopping-basket" aria-hidden="true"></i><span id="academy-mobile-cart-label">السلة</span>
         </button>
         <button class="mobile-nav-store" type="button" onclick="window.location.href='index.html'" aria-label="الرئيسية: عرض كل المنتجات">

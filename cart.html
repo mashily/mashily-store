@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>السلة | متجر مشالى</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f7f9f8">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="standalone-cart-page">
+    <div id="app-splash" class="app-splash" role="status" aria-live="polite">
+        <img id="app-splash-image" src="logo-splash.png" alt="شعار متجر مشالى">
+        <span>جاري تحميل السلة...</span>
+    </div>
+
+    <header class="market-header standalone-cart-header">
+        <div class="standalone-cart-topbar">
+            <a href="index.html" class="standalone-cart-back" aria-label="العودة إلى المتجر">
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </a>
+            <h1><i class="fas fa-shopping-basket" aria-hidden="true"></i> سلة المشتريات</h1>
+            <span id="standalone-cart-count" class="standalone-cart-count">0</span>
+        </div>
+    </header>
+
+    <main class="standalone-cart-main">
+        <section class="standalone-cart-items-panel" aria-labelledby="standalone-cart-items-title">
+            <div class="standalone-cart-panel-heading">
+                <h2 id="standalone-cart-items-title">المنتجات المختارة</h2>
+                <button type="button" class="standalone-cart-clear" onclick="clearStandaloneCart()">إفراغ السلة</button>
+            </div>
+            <div id="standalone-cart-items" class="standalone-cart-items"></div>
+        </section>
+
+        <section class="standalone-recommendations" aria-labelledby="standalone-recommendations-title">
+            <div class="standalone-cart-panel-heading">
+                <h2 id="standalone-recommendations-title">قد يعجبك أيضًا</h2>
+            </div>
+            <div id="standalone-recommendations-grid" class="standalone-recommendations-grid"></div>
+        </section>
+
+        <aside class="standalone-cart-summary" aria-labelledby="standalone-cart-summary-title">
+            <h2 id="standalone-cart-summary-title">ملخص الطلب</h2>
+
+            <div class="standalone-payment-options">
+                <button class="standalone-payment-option active" type="button" data-payment="cash" onclick="toggleStandalonePayment('cash', this)">
+                    <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
+                    <span>الدفع عند الاستلام</span>
+                </button>
+                <button class="standalone-payment-option" type="button" data-payment="vodafone" onclick="toggleStandalonePayment('vodafone', this)">
+                    <i class="fas fa-mobile-alt" aria-hidden="true"></i>
+                    <span>فودافون كاش</span>
+                </button>
+                <button class="standalone-payment-option" type="button" data-payment="instapay" onclick="toggleStandalonePayment('instapay', this)">
+                    <i class="fas fa-university" aria-hidden="true"></i>
+                    <span>InstaPay</span>
+                </button>
+            </div>
+            <div id="standalone-payment-detail" class="standalone-payment-detail"></div>
+
+            <div class="standalone-coupon">
+                <label for="standalone-coupon-input">كوبون الخصم</label>
+                <div>
+                    <input id="standalone-coupon-input" type="text" autocomplete="off" placeholder="الكود">
+                    <button type="button" onclick="applyStandaloneCoupon()">تطبيق</button>
+                </div>
+                <p id="standalone-coupon-message"></p>
+            </div>
+
+            <div id="standalone-cart-totals" class="standalone-cart-totals"></div>
+
+            <form id="standalone-checkout-form" class="standalone-checkout-form" onsubmit="submitStandaloneOrder(event)">
+                <label>الاسم الكامل
+                    <input type="text" name="name" data-customer-field="name" autocomplete="name" required maxlength="100">
+                </label>
+                <label>رقم الهاتف
+                    <input type="tel" name="phone" data-customer-field="phone" autocomplete="tel" inputmode="tel" required maxlength="25">
+                </label>
+                <label data-cash-field>المحافظة / المدينة
+                    <input type="text" name="city" data-customer-field="city" autocomplete="address-level2" maxlength="80" placeholder="مثال: الدقهلية - المنصورة">
+                </label>
+                <label class="standalone-field-wide">العنوان بالتفصيل
+                    <textarea name="address" data-customer-field="address" autocomplete="street-address" rows="3" required maxlength="500" placeholder="الشارع، رقم العقار، الدور، علامة مميزة"></textarea>
+                </label>
+                <label class="standalone-field-wide" data-cash-field>ملاحظات التوصيل (اختياري)
+                    <textarea name="notes" data-customer-field="notes" rows="2" maxlength="300"></textarea>
+                </label>
+                <label class="standalone-remember-customer">
+                    <input type="checkbox" data-remember-customer> تذكر بياناتي على هذا الجهاز
+                </label>
+                <button class="standalone-checkout-submit" type="submit">
+                    <i class="fab fa-whatsapp" aria-hidden="true"></i>
+                    تأكيد الطلب عبر واتساب
+                </button>
+            </form>
+        </aside>
+
+    </main>
+
+    <nav class="mobile-bottom-nav standalone-cart-nav" aria-label="تنقل المتجر">
+        <button class="mobile-nav-item" type="button" onclick="window.location.href='index.html#offers'">
+            <i class="fas fa-fire" aria-hidden="true"></i><span>التخفيضات</span>
+        </button>
+        <button class="mobile-nav-item active" type="button" aria-current="page" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+            <i class="fas fa-shopping-basket" aria-hidden="true"></i><span>السلة</span>
+        </button>
+        <button class="mobile-nav-store" type="button" onclick="window.location.href='index.html'">
+            <span class="mobile-nav-store-ring"><img class="store-brand-logo" src="logo.png" alt="متجر مشالى"></span>
+            <span>الرئيسية</span>
+        </button>
+        <button class="mobile-nav-item" type="button" onclick="window.location.href='index.html#maintenance'">
+            <i class="fas fa-screwdriver-wrench" aria-hidden="true"></i><span>الصيانة</span>
+        </button>
+        <button class="mobile-nav-item" type="button" onclick="window.location.href='academy.html'">
+            <i class="fas fa-play-circle" aria-hidden="true"></i><span>الفيديوهات</span>
+        </button>
+    </nav>
+
+    <script src="xlsx.full.min.js"></script>
+    <script src="excel-loader.js"></script>
+    <script src="script.js"></script>
+    <script>
+        window.addEventListener('load', async function() {
+            await init();
+            initializeStandaloneCart();
+            hideAppSplash();
+        });
+    </script>
+</body>
+</html>

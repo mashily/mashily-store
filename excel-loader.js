@@ -273,9 +273,10 @@ async function fetchStoreFromExcel() {
             return {
                 code: String(getFirstValue(row, ['الكود', 'code']) || '').trim(),
                 durationDays: Math.floor(parseNum(getFirstValue(row, ['مدة الصلاحية (يوم)', 'المدة بالأيام', 'duration_days']))),
+                expiryDate: String(getFirstValue(row, ['تاريخ الانتهاء', 'expiry_date', 'expires_at']) || '').trim(),
                 active: !['لا', 'no', 'false', '0', 'غير فعال', 'معطل'].includes(activeValue)
             };
-        }).filter(item => item.code && item.durationDays > 0);
+        }).filter(item => item.code && (item.durationDays > 0 || item.expiryDate));
 
         // ---- الكوبونات ----
         const coupRows = sheetToObjects(wb.Sheets['Coupons']);
@@ -499,9 +500,10 @@ function buildStoreWorkbook() {
     const codeRows = accessCodes.map(item => ({
         'الكود': item.code,
         'مدة الصلاحية (يوم)': item.durationDays,
+        'تاريخ الانتهاء': item.expiryDate || '',
         'فعال': item.active === false ? 'لا' : 'نعم'
     }));
-    const codeHeaders = ['الكود', 'مدة الصلاحية (يوم)', 'فعال'];
+    const codeHeaders = ['الكود', 'مدة الصلاحية (يوم)', 'تاريخ الانتهاء', 'فعال'];
     const codesSheet = codeRows.length
         ? XLSX.utils.json_to_sheet(codeRows, {header: codeHeaders})
         : XLSX.utils.aoa_to_sheet([codeHeaders]);
@@ -584,6 +586,9 @@ function buildStoreWorkbook() {
         { 'المفتاح': 'store_hero_enabled', 'القيمة': settings.store_hero_enabled !== undefined ? settings.store_hero_enabled : 'نعم', 'الوصف': 'إظهار مقدمة المتجر أعلى الصفحة؛ نعم أو لا' },
         { 'المفتاح': 'store_splash_text', 'القيمة': settings.store_splash_text || 'جاري تحميل المتجر...', 'الوصف': 'نص شاشة التحميل في صفحة المتجر' },
         { 'المفتاح': 'academy_splash_text', 'القيمة': settings.academy_splash_text || 'جاري تحميل الأكاديمية...', 'الوصف': 'نص شاشة التحميل في صفحة الأكاديمية' },
+        { 'المفتاح': 'campaign_popup_enabled', 'القيمة': settings.campaign_popup_enabled !== undefined ? settings.campaign_popup_enabled : 'نعم', 'الوصف': 'تشغيل شاشة الترحيب والحملات من ورقة Popups؛ نعم أو لا' },
+        { 'المفتاح': 'campaign_popup_delay_seconds', 'القيمة': settings.campaign_popup_delay_seconds !== undefined ? settings.campaign_popup_delay_seconds : '0.5', 'الوصف': 'التأخير قبل ظهور شاشة الترحيب بالثواني؛ استخدم 0 للظهور فوراً' },
+        { 'المفتاح': 'campaign_popup_duration_seconds', 'القيمة': settings.campaign_popup_duration_seconds !== undefined ? settings.campaign_popup_duration_seconds : '2', 'الوصف': 'مدة ظهور الشاشة الافتراضية بالثواني إذا تركت مدة الصف فارغة' },
         { 'المفتاح': 'search_placeholder', 'القيمة': settings.search_placeholder || 'ابحث باسم المنتج أو القسم أو المواصفات', 'الوصف': 'النص التوضيحي داخل مربع البحث في المتجر' },
         { 'المفتاح': 'academy_search_placeholder', 'القيمة': settings.academy_search_placeholder || 'ابحث باسم الدرس أو القسم...', 'الوصف': 'النص التوضيحي داخل مربع البحث في الأكاديمية' },
         { 'المفتاح': 'mode_store_label', 'القيمة': settings.mode_store_label || 'المتجر', 'الوصف': 'اسم زر المتجر في مفتاح التبديل أعلى الصفحة' },

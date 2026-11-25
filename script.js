@@ -816,6 +816,25 @@ function applySiteBranding(settings) {
 }
 
 function init() {
+    if (document.getElementById('standalone-cart-items')) {
+        if (!storeInitializationPromise) {
+            products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+            const settings = JSON.parse(localStorage.getItem('storeSettings')) || {};
+            applySiteBranding(settings);
+            applyPaymentSettings(settings);
+            applyStoreTextSettings(settings);
+            initializeCustomerContactForms();
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            syncThemeMenuSelection(savedTheme);
+            storeInitializationPromise = Promise.resolve(true);
+            refreshStoreData().then(() => {
+                products = JSON.parse(localStorage.getItem('storeProducts')) || [];
+                if (typeof renderStandaloneCart === 'function') renderStandaloneCart();
+            }).catch(error => console.warn('تعذر تحديث بيانات السلة من الإكسيل.', error));
+        }
+        return storeInitializationPromise;
+    }
     if (!storeInitializationPromise) storeInitializationPromise = initializeStore();
     return storeInitializationPromise;
 }
@@ -1053,6 +1072,7 @@ async function initializeStore() {
         themeIcon.className = themeIcons[savedTheme] || 'fas fa-sun';
         themeIcon.style.color = themeColors[savedTheme] || '#5a8f7b';
     }
+    syncThemeMenuSelection(savedTheme);
 
     // 2. تحديث شريط الأخبار من البيانات المحلية.
     renderStoreTicker();
@@ -1102,7 +1122,11 @@ async function initializeStore() {
     const ovGuard = document.getElementById('overlay');
     if (ovGuard) ovGuard.classList.remove('active');
 
-    setTimeout(showStoreCampaignPopup, 1800);
+    const popupDelaySetting = JSON.parse(localStorage.getItem('storeSettings') || '{}').campaign_popup_delay_seconds;
+    const popupDelay = Number(popupDelaySetting);
+    setTimeout(showStoreCampaignPopup, Number.isFinite(popupDelay) && popupDelay >= 0
+        ? popupDelay * 1000
+        : 500);
 }
 
 function getCampaignPage() {
@@ -1132,6 +1156,8 @@ function getCampaignUrl(value) {
 function getActiveCampaignPopup() {
     const page = getCampaignPage();
     if (!page) return null;
+    const settings = JSON.parse(localStorage.getItem('storeSettings') || '{}');
+    if (!isStoreSettingEnabled(settings.campaign_popup_enabled, true)) return null;
     const popups = JSON.parse(localStorage.getItem('storePopups') || '[]');
     const now = Date.now();
 
@@ -1265,7 +1291,11 @@ function showStoreCampaignPopup() {
             if (event.target === overlay) close();
         });
         document.addEventListener('keydown', onKeyDown);
-        const duration = Math.max(1, Math.min(120, Number(campaign.duration) || 8));
+        const durationSetting = JSON.parse(localStorage.getItem('storeSettings') || '{}').campaign_popup_duration_seconds;
+        const durationFallback = Number.isFinite(Number(durationSetting))
+            ? Number(durationSetting)
+            : 2;
+        const duration = Math.max(1, Math.min(120, Number(campaign.duration) > 0 ? Number(campaign.duration) : durationFallback));
         closeTimer = setTimeout(close, duration * 1000);
         closeButton.focus();
     };
@@ -1287,7 +1317,8 @@ function launchCampaignCelebration(durationSeconds, decorations = ['🎈', '❤�
     const selectedDecorations = Array.isArray(decorations) && decorations.length
         ? decorations
         : ['🎈', '❤️', '🎉', '✨', '💛'];
-    for (let index = 0; index < 28; index++) {
+    const particleCount = window.matchMedia('(max-width: 600px)').matches ? 44 : 56;
+    for (let index = 0; index < particleCount; index++) {
         const particle = document.createElement('span');
         particle.className = 'campaign-particle';
         particle.textContent = selectedDecorations[Math.floor(Math.random() * selectedDecorations.length)];
@@ -1307,6 +1338,22 @@ function toggleThemeMenu(event) {
     event.stopPropagation();
     const menu = document.getElementById('theme-menu');
     menu.style.display = menu.style.display === 'none' ? 'grid' : 'none';
+}
+
+function syncThemeMenuSelection(themeName) {
+    const colors = {
+        dark: '#9bb8a7', light: '#5a8f7b', white: '#2e8b57',
+        ocean: '#2f6f8f', rose: '#c97b84', mint: '#5b9a7e',
+        neon: '#00D4FF', gold: '#FFD700'
+    };
+    document.querySelectorAll('[data-theme-choice]').forEach(button => {
+        const active = button.dataset.themeChoice === themeName;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        if (active) button.style.setProperty('--theme-choice-color', colors[themeName] || '#5a8f7b');
+    });
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) themeIcon.style.color = colors[themeName] || '#5a8f7b';
 }
 
 function setTheme(themeName, event) {
@@ -1345,7 +1392,20 @@ function setTheme(themeName, event) {
     if(themeIcon) {
         themeIcon.className = icons[themeName] || 'fas fa-moon';
         themeIcon.style.color = colors[themeName] || '#9bb8a7';
+        const iconButton = themeIcon.closest('.market-icon-button');
+        if (iconButton) {
+            iconButton.style.setProperty('--theme-active-color', colors[themeName] || '#9bb8a7');
+            iconButton.classList.remove('theme-icon-pulse');
+            void iconButton.offsetWidth;
+            iconButton.classList.add('theme-icon-pulse');
+            window.setTimeout(() => iconButton.classList.remove('theme-icon-pulse'), 520);
+        }
     }
+    document.querySelectorAll('[data-theme-choice]').forEach(button => {
+        const active = button.dataset.themeChoice === themeName;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
     
     // إغلاق القائمة
     const menu = document.getElementById('theme-menu');
@@ -2641,21 +2701,195 @@ function updateCartUI() {
     `;
 }
 
-function changeQty(i,v){ cart[i].qty+=v; if(cart[i].qty<1) removeFromCart(i); updateCartUI(); }
+function changeQty(i,v){
+    if (!cart[i]) return;
+    cart[i].qty += v;
+    if (cart[i].qty < 1) return removeFromCart(i);
+    updateCartUI();
+    if (document.getElementById('standalone-cart-items')) renderStandaloneCart();
+}
 function removeFromCart(i){ 
     cart.splice(i,1); 
     localStorage.setItem('MASHILY_CART', JSON.stringify(cart));
-    updateCartUI(); 
+    updateCartUI();
+    if (document.getElementById('standalone-cart-items')) renderStandaloneCart();
 }
 function clearCart() {
     if(cart.length === 0) return;
     if(confirm(getStoreSettingText('cart_clear_confirm', 'هل أنت متأكد من حذف جميع المنتجات من السلة؟'))) {
         cart = [];
         appliedCoupon = null; // إلغاء الكوبون عند تفريغ السلة
-        document.getElementById('coupon-msg').innerText = '';
-        document.getElementById('coupon-input').value = '';
+        const couponMessage = document.getElementById('coupon-msg');
+        const couponInput = document.getElementById('coupon-input');
+        if (couponMessage) couponMessage.innerText = '';
+        if (couponInput) couponInput.value = '';
         updateCartUI();
+        if (document.getElementById('standalone-cart-items')) renderStandaloneCart();
     }
+}
+
+function clearStandaloneCart() {
+    if (!cart.length) return;
+    if (!confirm(getStoreSettingText('cart_clear_confirm', 'هل أنت متأكد من حذف جميع المنتجات من السلة؟'))) return;
+    cart = [];
+    appliedCoupon = null;
+    localStorage.setItem('MASHILY_CART', JSON.stringify(cart));
+    renderStandaloneCart();
+}
+
+function toggleStandalonePayment(method, button) {
+    selectedPaymentMethod = method;
+    document.querySelectorAll('.standalone-payment-option').forEach(option => {
+        option.classList.toggle('active', option === button);
+    });
+    const detail = document.getElementById('standalone-payment-detail');
+    const settings = JSON.parse(localStorage.getItem('storeSettings') || '{}');
+    const cashFields = document.querySelectorAll('[data-cash-field]');
+    cashFields.forEach(field => field.hidden = method !== 'cash');
+    if (detail) {
+        if (method === 'cash') {
+            detail.innerHTML = '<i class="fas fa-truck" aria-hidden="true"></i><div><strong>الدفع عند الاستلام</strong><span>تدفع للمندوب بعد مراجعة الطلب.</span></div>';
+        } else if (method === 'vodafone') {
+            detail.innerHTML = `<i class="fas fa-mobile-alt" aria-hidden="true"></i><div><strong>فودافون كاش</strong><span>${settings.vodafone || 'رقم التحويل غير مضبوط حالياً'}</span></div>`;
+        } else {
+            detail.innerHTML = `<i class="fas fa-university" aria-hidden="true"></i><div><strong>InstaPay</strong><span>${settings.instapay || 'الحساب غير مضبوط حالياً'}</span></div>`;
+        }
+    }
+}
+
+function applyStandaloneCoupon() {
+    const input = document.getElementById('standalone-coupon-input');
+    const message = document.getElementById('standalone-coupon-message');
+    const code = String(input?.value || '').trim();
+    if (!code) {
+        if (message) message.textContent = 'اكتب كود الكوبون أولاً.';
+        return;
+    }
+    const coupons = JSON.parse(localStorage.getItem('storeCoupons') || '[]');
+    const coupon = coupons.find(item => String(item.code || '').trim().toLowerCase() === code.toLowerCase());
+    if (!coupon) {
+        appliedCoupon = null;
+        if (message) message.textContent = 'الكوبون غير صحيح.';
+        renderStandaloneCart();
+        return;
+    }
+    const today = new Date();
+    const expiry = coupon.expiry ? new Date(`${coupon.expiry}T23:59:59`) : null;
+    if (expiry && today > expiry) {
+        appliedCoupon = null;
+        if (message) message.textContent = 'انتهت صلاحية الكوبون.';
+        renderStandaloneCart();
+        return;
+    }
+    const subtotal = cart.reduce((sum, item) => sum + Number(item.price) * Number(item.qty), 0);
+    if (subtotal < Number(coupon.minSpend || 0)) {
+        appliedCoupon = null;
+        if (message) message.textContent = `الحد الأدنى للكوبون ${Number(coupon.minSpend)} ج.م`;
+        renderStandaloneCart();
+        return;
+    }
+    appliedCoupon = {code: coupon.code, type: coupon.type, value: Number(coupon.value)};
+    if (message) message.textContent = 'تم تطبيق الكوبون بنجاح.';
+    renderStandaloneCart();
+}
+
+function getStandaloneRecommendations() {
+    const cartCategories = new Set(cart.map(item => normalizeStoreCategory(item.category)).filter(Boolean));
+    const cartIds = new Set(cart.map(item => String(item.id)));
+    return products
+        .filter(product => !cartIds.has(String(product.id)) && product.stock !== 'out')
+        .sort((left, right) => {
+            const leftMatch = cartCategories.has(normalizeStoreCategory(left.category));
+            const rightMatch = cartCategories.has(normalizeStoreCategory(right.category));
+            return Number(rightMatch) - Number(leftMatch);
+        })
+        .slice(0, 8);
+}
+
+function renderStandaloneCart() {
+    const container = document.getElementById('standalone-cart-items');
+    if (!container) return;
+    const count = cart.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+    const countElement = document.getElementById('standalone-cart-count');
+    if (countElement) countElement.textContent = String(count);
+
+    container.innerHTML = cart.length ? cart.map((item, index) => `
+        <article class="standalone-cart-item">
+            <img src="${escapeAcademyHtml(getProductImageSource(item.image))}" alt="${escapeAcademyHtml(item.name)}" onerror="this.onerror=null;this.src='category-images/default.svg'">
+            <div class="standalone-cart-item-info">
+                <strong>${escapeAcademyHtml(item.name)}</strong>
+                <span>${escapeAcademyHtml(item.category || 'منتج')}</span>
+                <b>${Number(item.price || 0).toLocaleString('ar-EG')} ${getCurrencyLabel()}</b>
+            </div>
+            <div class="standalone-cart-item-actions">
+                <button type="button" onclick="changeQty(${index},-1)" aria-label="تقليل الكمية"><i class="fas fa-minus"></i></button>
+                <strong>${item.qty}</strong>
+                <button type="button" onclick="changeQty(${index},1)" aria-label="زيادة الكمية"><i class="fas fa-plus"></i></button>
+                <button type="button" class="standalone-cart-remove" onclick="removeFromCart(${index})" aria-label="حذف الصنف"><i class="fas fa-trash"></i></button>
+            </div>
+        </article>
+    `).join('') : `
+        <div class="standalone-cart-empty">
+            <i class="fas fa-shopping-basket" aria-hidden="true"></i>
+            <h3>السلة فارغة</h3>
+            <p>ابدأ بإضافة أصنافك المفضلة من المتجر.</p>
+            <a href="index.html">تصفح المنتجات</a>
+        </div>
+    `;
+
+    const subtotal = cart.reduce((sum, item) => sum + Number(item.price) * Number(item.qty), 0);
+    let discount = 0;
+    if (appliedCoupon) {
+        discount = appliedCoupon.type === 'percent'
+            ? subtotal * Number(appliedCoupon.value) / 100
+            : Number(appliedCoupon.value);
+    }
+    const total = Math.max(0, subtotal - discount);
+    const totals = document.getElementById('standalone-cart-totals');
+    if (totals) {
+        totals.innerHTML = `
+            <div><span>المجموع الفرعي</span><strong>${Math.floor(subtotal).toLocaleString('ar-EG')} ${getCurrencyLabel()}</strong></div>
+            ${discount ? `<div class="standalone-discount"><span>الخصم${appliedCoupon ? ` (${escapeAcademyHtml(appliedCoupon.code)})` : ''}</span><strong>-${Math.floor(discount).toLocaleString('ar-EG')} ${getCurrencyLabel()}</strong></div>` : ''}
+            <div class="standalone-grand-total"><span>الإجمالي</span><strong id="total-price">${Math.floor(total).toLocaleString('ar-EG')} <small>${getCurrencyLabel()}</small></strong></div>
+        `;
+    }
+
+    const recommendations = document.getElementById('standalone-recommendations-grid');
+    if (recommendations) {
+        recommendations.innerHTML = getStandaloneRecommendations().map(product => `
+            <article class="standalone-recommendation-card">
+                <img src="${escapeAcademyHtml(getProductImageSource(product.image))}" alt="${escapeAcademyHtml(product.name)}" loading="lazy" onerror="this.onerror=null;this.src='category-images/default.svg'">
+                <strong>${escapeAcademyHtml(product.name)}</strong>
+                <span>${Number(product.price || 0).toLocaleString('ar-EG')} ${getCurrencyLabel()}</span>
+                <button type="button" onclick="addStandaloneProduct(${JSON.stringify(String(product.id))})">
+                    <i class="fas fa-cart-plus" aria-hidden="true"></i> إضافة للسلة
+                </button>
+            </article>
+        `).join('') || '<p class="standalone-recommendations-empty">لا توجد منتجات إضافية حالياً.</p>';
+    }
+}
+
+function addStandaloneProduct(id) {
+    addToCart(id);
+    renderStandaloneCart();
+}
+
+function openStandaloneProduct(id) {
+    window.location.href = `index.html#product-${encodeURIComponent(id)}`;
+}
+
+function submitStandaloneOrder(event) {
+    event.preventDefault();
+    submitProductOrder(event);
+}
+
+function initializeStandaloneCart() {
+    initializeCustomerContactForms();
+    toggleStandalonePayment(selectedPaymentMethod === 'vodafone' ? 'vodafone'
+        : selectedPaymentMethod === 'instapay' ? 'instapay' : 'cash',
+    document.querySelector(`.standalone-payment-option[data-payment="${selectedPaymentMethod === 'vodafone' ? 'vodafone'
+        : selectedPaymentMethod === 'instapay' ? 'instapay' : 'cash'}"]`));
+    renderStandaloneCart();
 }
 
 function toggleCart(s){ 
@@ -4045,6 +4279,44 @@ function normalizeAcademyAccessCode(code) {
     return String(code || '').trim().toUpperCase();
 }
 
+function parseAcademyCodeExpiry(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return null;
+    const isoMatch = raw.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+    if (isoMatch) {
+        const date = new Date(
+            Number(isoMatch[1]),
+            Number(isoMatch[2]) - 1,
+            Number(isoMatch[3]),
+            Number(isoMatch[4] || 23),
+            Number(isoMatch[5] || 59),
+            Number(isoMatch[6] || 59),
+            999
+        );
+        return Number.isFinite(date.getTime()) ? date.getTime() : null;
+    }
+    const dayMonthYear = raw.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})(?:[ T](\d{1,2}):(\d{1,2}))?/);
+    if (dayMonthYear) {
+        const date = new Date(
+            Number(dayMonthYear[3]),
+            Number(dayMonthYear[2]) - 1,
+            Number(dayMonthYear[1]),
+            Number(dayMonthYear[4] || 23),
+            Number(dayMonthYear[5] || 59),
+            59,
+            999
+        );
+        return Number.isFinite(date.getTime()) ? date.getTime() : null;
+    }
+    const date = new Date(raw);
+    return Number.isFinite(date.getTime()) ? date.getTime() : null;
+}
+
+function getAcademyCodeExpiry(item) {
+    const fixedExpiry = parseAcademyCodeExpiry(item.expiryDate);
+    return fixedExpiry;
+}
+
 function getAcademyPaidAccessHistory() {
     return JSON.parse(localStorage.getItem(ACADEMY_PAID_ACCESS_KEY) || '{}');
 }
@@ -4054,9 +4326,10 @@ function hasActiveAcademyPaidAccess() {
     const codes = JSON.parse(localStorage.getItem('academyAccessCodes') || '[]');
     return codes.some(item => {
         const access = accessHistory[normalizeAcademyAccessCode(item.code)];
-        return item.active !== false && access
-            && Number.isFinite(Number(access.expiresAt))
-            && Date.now() < Number(access.expiresAt);
+        if (item.active === false || !access || !Number.isFinite(Number(access.expiresAt))) return false;
+        const fixedExpiry = getAcademyCodeExpiry(item);
+        if (fixedExpiry && Date.now() >= fixedExpiry) return false;
+        return Date.now() < Number(access.expiresAt);
     });
 }
 
@@ -4065,7 +4338,8 @@ function activateAcademyPaidAccess() {
 
     const accessCodes = JSON.parse(localStorage.getItem('academyAccessCodes') || '[]');
     const activeCodes = accessCodes.filter(item => item.active !== false
-        && item.code && Number(item.durationDays) > 0);
+        && item.code
+        && (Number(item.durationDays) > 0 || getAcademyCodeExpiry(item)));
     if (!activeCodes.length) {
         alert('الفيديوهات المدفوعة غير مفعّلة حالياً. أضف كوداً فعالاً في ورقة Codes بملف Excel.');
         return false;
@@ -4077,6 +4351,11 @@ function activateAcademyPaidAccess() {
     const matchingCode = activeCodes.find(item => normalizeAcademyAccessCode(item.code) === enteredCode);
     if (!matchingCode) {
         alert('الكود غير صحيح أو غير فعال.');
+        return false;
+    }
+    const fixedExpiry = getAcademyCodeExpiry(matchingCode);
+    if (fixedExpiry && Date.now() >= fixedExpiry) {
+        alert('انتهت صلاحية هذا الكود في تاريخ الإكسيل المحدد.');
         return false;
     }
 
@@ -4091,7 +4370,12 @@ function activateAcademyPaidAccess() {
     }
 
     const activatedAt = Date.now();
-    const expiresAt = activatedAt + Math.floor(Number(matchingCode.durationDays)) * 24 * 60 * 60 * 1000;
+    const durationExpiry = Number(matchingCode.durationDays) > 0
+        ? activatedAt + Math.floor(Number(matchingCode.durationDays)) * 24 * 60 * 60 * 1000
+        : null;
+    const expiresAt = fixedExpiry && durationExpiry
+        ? Math.min(fixedExpiry, durationExpiry)
+        : fixedExpiry || durationExpiry;
     accessHistory[enteredCode] = {
         activatedAt,
         expiresAt
